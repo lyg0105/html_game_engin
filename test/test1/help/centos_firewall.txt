@@ -1,0 +1,5 @@
+#방화벽 구동 확인
+systemctl status firewalld
+
+#방화벽 구동 중지
+systemctl stop firewalld

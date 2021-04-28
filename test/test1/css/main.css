@@ -1,0 +1,26 @@
+*{
+    margin:0px;
+    padding:0px;
+}
+#canvas_wrap{
+    position: relative;
+    width:1000px;
+    height:600px;
+    margin:0 auto;
+}
+#game_controll{
+    width:1000px;
+    margin: 0 auto;
+    background:green;
+}
+#login_div{
+    position:absolute;
+    top:150px;
+    left:400px;
+    width:200px;
+    height:200px;
+    background:rgb(200, 226, 167);
+    text-align: center;
+    z-index: 99;
+    padding-top:50px;
+}

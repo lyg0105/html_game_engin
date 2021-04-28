@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/jscolor/jscolor.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="./js/main.js"></script>
+    <title>Test1</title>
+</head>
+<body>
+    <div id="canvas_wrap">
+        <canvas id="game_canvas" ></canvas>
+        <div id="login_div">
+            이름: <input type="text" id="login_name_input" value="" style="width: 60px;" autocomplete="off" />
+            <br /><br />
+            <button id="login_btn" >로그인</button>
+        </div>
+    </div>
+    <div id="game_controll" >
+        <p>
+            이름:<input type="text" id="name_input" value="5" style="width: 50px;" readonly="readonly" />
+            Speed:<input type="number" id="speed_input" value="5" style="width: 50px;" />
+            Color:<input type="text" id="color_input" value="#fff" data-jscolor="{}" style="width: 60px;" />
+            <button id="login_out_btn" style="color: red;">로그아웃</button>
+        </p>
+    </div>
+</body>
+</html>

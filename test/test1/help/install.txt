@@ -1,0 +1,32 @@
+npm install socket.io
+npm install express
+
+
+#pm2 설치
+npm install -g pm2@latest
+
+사용법
+
+#확인
+pm2 list 
+
+#시작
+pm2 start app.js
+
+#종료
+pm2 stop 0
+
+#프로세스끝
+pm2 delete 0
+
+#모니터링
+pm2 monit
+
+#로그확인
+pm2 logs
+
+#파일변경 확인후 자동 재시작
+pm2 start app.js --watch
+
+#실행하면서 로그 확인도 같이 실행
+sudo pm2 start app.js --watch && sudo pm2 logs
