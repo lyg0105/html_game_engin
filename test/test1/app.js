@@ -1,4 +1,6 @@
 const express = require('express');
+const Unit = require('./server/value/unit');
+
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -32,6 +34,7 @@ function updateData(rowData){
         }
     }
     if(pre_idx==-1){
+        rowData=new Unit.Unit(rowData).getData();
         unit_arr.push(rowData);
     }else{
         for(var key in rowData){
@@ -73,27 +76,58 @@ function moveUnits(){
         var min_y=unit.height/2+20;
         var max_x=game_opt.map_width-(unit.width/2);
         var max_y=game_opt.map_height-(unit.height/2);
-        if(unit.x<min_x){
-            unit.x=min_x;
-        }else if(unit.x>max_x){
-            unit.x=max_x;
-        }
-        if(unit.y<min_y){
-            unit.y=min_y;
-        }else if(unit.y>max_y){
-            unit.y=max_y;
+
+        //이동속도
+        if(unit.is_move){
+            unit.speed+=unit.speed_power;
+            if(unit.speed>unit.speed_max){
+                unit.speed=unit.speed_max;
+            }
+        }else{
+            unit.speed=0;
         }
 
-        if(unit.direct_left_right=="left"){
-            unit.x-=unit.speed;
-        }else if(unit.direct_left_right=="right"){
-            unit.x+=unit.speed;
+        //방향
+        if(unit.down_key_json["up"]&&unit.down_key_json["right"]){
+            unit.angle=315;
+        }else if(unit.down_key_json["down"]&&unit.down_key_json["right"]){
+            unit.angle=45;
+        }else if(unit.down_key_json["down"]&&unit.down_key_json["left"]){
+            unit.angle=135;
+        }else if(unit.down_key_json["up"]&&unit.down_key_json["left"]){
+            unit.angle=225;
+        }else if(unit.down_key_json["up"]){
+            unit.angle=270;
+        }else if(unit.down_key_json["right"]){
+            unit.angle=0;
+        }else if(unit.down_key_json["down"]){
+            unit.angle=90;
+        }else if(unit.down_key_json["left"]){
+            unit.angle=180;
         }
-        if(unit.direct_up_down=="up"){
-            unit.y-=unit.speed;
-        }else if(unit.direct_up_down=="down"){
-            unit.y+=unit.speed;
+
+        if(unit.speed>0){
+            var m_deg=unit.angle;
+            var mx=Math.cos(m_deg*(Math.PI/180))*unit.speed;
+		    var my=Math.sin(m_deg*(Math.PI/180))*unit.speed;
+            console.log(unit.angle,mx,my);
+            
+            unit.x+=parseInt(mx);
+            unit.y+=parseInt(my);
         }
+
+        if(unit.x<0){
+            unit.x=0;
+        }else if(unit.x>game_opt.map_width){
+            unit.x=game_opt.map_width;
+        }
+
+        if(unit.y<0){
+            unit.y=0;
+        }else if(unit.y>game_opt.map_height){
+            unit.y=game_opt.map_height;
+        }
+
         unit_arr[i]=unit;
     }
 }
@@ -102,3 +136,30 @@ io.on('connection', onConnection);
 
 http.listen(port, () => console.log('listening on port ' + port));
 gameLoop();
+
+
+function getD(x1,y1,x2, y2) {
+	//목표 x2,y2 주체x1,y1으로부터의 각도
+	var dgr = Math.atan((-(y2 - y1)) / (x2 - x1)) * (180 / Math.PI);
+
+	dgr = parseInt(dgr);
+
+	if (x1 < x2 && y1 > y2) {
+		dgr = 360 - dgr;
+	} else if (x1 < x2 && y1 < y2) {
+		dgr = (-dgr);
+	} else if (x1 > x2 && y1 < y2) {
+		dgr = 180 - dgr;
+	} else if (x1 > x2 && y1 > y2) {
+		dgr = 180 + (-dgr);
+	}
+	dgr = parseInt(dgr);
+
+	return dgr;
+}
+function getDistance(x1,y1,x2, y2){
+	//목표x2,y2와 주체x1,y1과의 거리구하기
+	var distance=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+	distance=parseInt(distance);
+	return distance;
+}

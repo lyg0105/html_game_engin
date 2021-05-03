@@ -1,13 +1,22 @@
-var Unit=function(init_data){
+exports.Unit=function(init_data){
     this.data={
-        x:10,
-        y:50,
-        speed:5,
-        direct_left_right:"",
-        direct_up_down:"",
+        name:"",
+        x:50,
+        y:100,
+        shape:"circle",//rect
+        is_move:false,
+        speed:0,
+        speed_power:1,
+        speed_max:5,
+        angle:0,
+        down_key_json:{
+            "up":false,
+            "down":false,
+            "left":false,
+            "right":false
+        },
         width:50,
         height:50,
-        name:"",
         color:"#fff",
     };
     this.getData=function(){
@@ -24,4 +33,3 @@ var Unit=function(init_data){
     }
     this.init();
 };
-export default Unit;

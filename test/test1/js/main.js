@@ -1,4 +1,3 @@
-import Unit from './value/unit.js';
 /*
 시작
 컨트롤명령
@@ -67,8 +66,12 @@ function loginAction(){
     }
 
     if(iamData==null){
-        var iamUnit=new Unit({"name":user_name});
-        iamData=iamUnit.getData();
+        iamData={
+            "name":user_name,
+            "speed":5,
+            "color":"#fff",
+            "down_key_json":{}
+        };
     }
 
     document.getElementById("speed_input").value=iamData.speed;
@@ -90,7 +93,7 @@ function updateIamDataByInput(){
     iamData.color=document.getElementById("color_input").value;
     iamData.speed=document.getElementById("speed_input").value;
     iamData.speed=parseInt(iamData.speed);
-
+    
     socket.emit("updateData",iamData);
 }
 
@@ -122,6 +125,7 @@ function drawUnits(){
     for(var i=0;i<unit_len;i++){
         var unit=unit_arr[i];
         ctx.save();
+        //그리기
         ctx.fillStyle = unit.color;
         ctx.fillRect(unit.x-(unit.width/2),unit.y-(unit.height/2),unit.width,unit.height);
         //이름
@@ -134,21 +138,35 @@ function drawUnits(){
 }
 function onKeyDown(e){
     if(e.keyCode==38){
-        iamData.direct_up_down="up";
+        iamData.is_move=true;
+        iamData.down_key_json["up"]=true;
     }else if(e.keyCode==40){
-        iamData.direct_up_down="down";
+        iamData.is_move=true;
+        iamData.down_key_json["down"]=true;
     }
     if(e.keyCode==37){
-        iamData.direct_left_right="left";
+        iamData.is_move=true;
+        iamData.down_key_json["left"]=true;
     }else if(e.keyCode==39){
-        iamData.direct_left_right="right";
+        iamData.is_move=true;
+        iamData.down_key_json["right"]=true;
+    }
+
+    if(e.keyCode==13){
+        if(document.getElementById("login_div").style.display!="none"){
+            loginAction();
+        }
     }
 }
 function onKeyUp(e){
     if(e.keyCode==38||e.keyCode==40){
-        iamData.direct_up_down="";
+        iamData.is_move=false;
+        iamData.down_key_json["up"]=false;
+        iamData.down_key_json["down"]=false;
     }
     if(e.keyCode==37||e.keyCode==39){
-        iamData.direct_left_right="";
+        iamData.is_move=false;
+        iamData.down_key_json["left"]=false;
+        iamData.down_key_json["right"]=false;
     }
 }
