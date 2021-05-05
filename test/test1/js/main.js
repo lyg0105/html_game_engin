@@ -61,6 +61,7 @@ function loginAction(){
     }
     if(pre_iamData!=null){
         if(confirm("이미 있는 아이디가 있습니다. 이걸로 로그인 하시겠습니까?")){
+            console.log(pre_iamData);
             iamData=pre_iamData;
         }
     }

@@ -38,7 +38,7 @@ function updateData(rowData){
         unit_arr.push(rowData);
     }else{
         for(var key in rowData){
-            if(key!="x"&&key!="y"){
+            if(key!="x"&&key!="y"&&key!="speed"){
                 unit_arr[pre_idx][key]=rowData[key];
             }
         }
@@ -72,10 +72,10 @@ function moveUnits(){
         unit.speed=parseInt(unit.speed);
         unit.x=parseInt(unit.x);
         unit.y=parseInt(unit.y);
-        var min_x=unit.width/2;
-        var min_y=unit.height/2+20;
-        var max_x=game_opt.map_width-(unit.width/2);
-        var max_y=game_opt.map_height-(unit.height/2);
+        unit.speed_max=parseInt(unit.speed_max);
+        unit.speed_power=parseInt(unit.speed_power);
+        unit.width=parseInt(unit.width);
+        unit.height=parseInt(unit.height);
 
         //이동속도
         if(unit.is_move){
@@ -124,6 +124,12 @@ function moveUnits(){
             unit.x+=parseInt(mx);
             unit.y+=parseInt(my);
         }
+
+
+        var min_x=unit.width/2;
+        var min_y=unit.height/2+20;
+        var max_x=game_opt.map_width-(unit.width/2);
+        var max_y=game_opt.map_height-(unit.height/2);
 
         if(unit.x<0){
             unit.x=0;
