@@ -127,28 +127,35 @@ function drawUnits(){
         ctx.save();
         //그리기
         ctx.fillStyle = unit.color;
-        ctx.fillRect(unit.x-(unit.width/2),unit.y-(unit.height/2),unit.width,unit.height);
+        if(unit.shape=="circle"){
+            ctx.beginPath();
+            ctx.arc(unit.x,unit.y,unit.height/2, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.fill();
+        }else{
+            ctx.fillRect(unit.x-(unit.width/2),unit.y-(unit.height/2),unit.width,unit.height);
+        }
         //이름
         ctx.font="11px";
         ctx.fillStyle = "#fff";
-        ctx.fillText(unit.name,unit.x-(unit.width/2),unit.y-(unit.height/2)-8);
+        ctx.textAlign = "center";
+        ctx.fillText(unit.name,unit.x,unit.y-(unit.height/2)-6);
 
         ctx.restore();
     }
 }
 function onKeyDown(e){
-    if(e.keyCode==38){
+    if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
         iamData.is_move=true;
+    }
+    if(e.keyCode==38){
         iamData.down_key_json["up"]=true;
     }else if(e.keyCode==40){
-        iamData.is_move=true;
         iamData.down_key_json["down"]=true;
     }
     if(e.keyCode==37){
-        iamData.is_move=true;
         iamData.down_key_json["left"]=true;
     }else if(e.keyCode==39){
-        iamData.is_move=true;
         iamData.down_key_json["right"]=true;
     }
 
@@ -160,13 +167,17 @@ function onKeyDown(e){
 }
 function onKeyUp(e){
     if(e.keyCode==38||e.keyCode==40){
-        iamData.is_move=false;
         iamData.down_key_json["up"]=false;
         iamData.down_key_json["down"]=false;
     }
     if(e.keyCode==37||e.keyCode==39){
-        iamData.is_move=false;
         iamData.down_key_json["left"]=false;
         iamData.down_key_json["right"]=false;
+    }
+    if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
+        if(iamData.down_key_json["up"]==false&&iamData.down_key_json["down"]==false
+            &&iamData.down_key_json["left"]==false&&iamData.down_key_json["right"]==false){
+                iamData.is_move=false;
+        }
     }
 }

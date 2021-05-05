@@ -1,5 +1,5 @@
 const express = require('express');
-const Unit = require('./server/value/unit');
+const Unit = require('./value/unit');
 
 const app = express();
 const http = require('http').Server(app);
@@ -11,7 +11,7 @@ var game_opt={
     map_width:1000,
     map_height:600
 };
-app.use(express.static(__dirname + '/'));
+app.use(express.static(__dirname + '/../'));
 
 function onConnection(socket){
     //socket_arr.push(socket);
@@ -110,7 +110,16 @@ function moveUnits(){
             var m_deg=unit.angle;
             var mx=Math.cos(m_deg*(Math.PI/180))*unit.speed;
 		    var my=Math.sin(m_deg*(Math.PI/180))*unit.speed;
-            console.log(unit.angle,mx,my);
+            if(m_deg==90){
+                mx=0;
+                my=unit.speed;
+            }else if(m_deg==180){
+                mx=-unit.speed;
+                my=0;
+            }else if(m_deg==270){
+                mx=0;
+                my=-unit.speed;
+            }
             
             unit.x+=parseInt(mx);
             unit.y+=parseInt(my);

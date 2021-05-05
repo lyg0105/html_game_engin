@@ -1,0 +1,11 @@
+var angle=89;
+var speed=10;
+var rad_one=(Math.PI/180);
+var rad=angle*rad_one;
+var cos=Math.cos(rad);
+var sin=Math.sin(rad);
+var x=cos*speed;
+var y=sin*speed;
+console.log("RAD",rad_one+"X"+angle+"="+rad);
+console.log(cos,sin);
+console.log(x,y);
