@@ -151,13 +151,17 @@ function onKeyDown(e){
     }
     if(e.keyCode==38){
         iamData.down_key_json["up"]=true;
+        iamData.down_key_json["down"]=false;
     }else if(e.keyCode==40){
         iamData.down_key_json["down"]=true;
+        iamData.down_key_json["up"]=false;
     }
     if(e.keyCode==37){
         iamData.down_key_json["left"]=true;
+        iamData.down_key_json["right"]=false;
     }else if(e.keyCode==39){
         iamData.down_key_json["right"]=true;
+        iamData.down_key_json["left"]=false;
     }
 
     if(e.keyCode==13){
@@ -167,12 +171,14 @@ function onKeyDown(e){
     }
 }
 function onKeyUp(e){
-    if(e.keyCode==38||e.keyCode==40){
+    if(e.keyCode==38){
         iamData.down_key_json["up"]=false;
+    }else if(e.keyCode==40){
         iamData.down_key_json["down"]=false;
     }
-    if(e.keyCode==37||e.keyCode==39){
+    if(e.keyCode==37){
         iamData.down_key_json["left"]=false;
+    }else if(e.keyCode==39){
         iamData.down_key_json["right"]=false;
     }
     if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){

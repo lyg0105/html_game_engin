@@ -1,4 +1,4 @@
-cd server
+cd test/test1/server
 npm install socket.io
 npm install express
 
