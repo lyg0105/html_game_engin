@@ -36,6 +36,8 @@ window.onload=function(){
 
     document.getElementById("login_btn").addEventListener("click",loginAction);
     document.getElementById("login_out_btn").addEventListener("click",logOutAction);
+
+    document.getElementById("game_canvas").addEventListener("click",onClickCanvas);
 };
 function openLoginPage(){
     document.getElementById("login_name_input").value='';
@@ -61,7 +63,6 @@ function loginAction(){
     }
     if(pre_iamData!=null){
         if(confirm("이미 있는 아이디가 있습니다. 이걸로 로그인 하시겠습니까?")){
-            console.log(pre_iamData);
             iamData=pre_iamData;
         }
     }
@@ -71,7 +72,8 @@ function loginAction(){
             "name":user_name,
             "speed":5,
             "color":"#fff",
-            "down_key_json":{}
+            "down_key_json":{},
+            "set_target":false
         };
     }
 
@@ -110,6 +112,11 @@ function gameLoop(){
         if(game_opt["is_load"]==false){
             game_opt["is_load"]=true;
             socket.emit("requestData",iamData);
+            if(iamData!=null){
+                if(iamData.set_target){
+                    iamData.set_target=false;
+                }
+            }
         }
     },game_opt.loop_delay);
 }
@@ -146,22 +153,24 @@ function drawUnits(){
     }
 }
 function onKeyDown(e){
-    if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
-        iamData.is_move=true;
-    }
-    if(e.keyCode==38){
-        iamData.down_key_json["up"]=true;
-        iamData.down_key_json["down"]=false;
-    }else if(e.keyCode==40){
-        iamData.down_key_json["down"]=true;
-        iamData.down_key_json["up"]=false;
-    }
-    if(e.keyCode==37){
-        iamData.down_key_json["left"]=true;
-        iamData.down_key_json["right"]=false;
-    }else if(e.keyCode==39){
-        iamData.down_key_json["right"]=true;
-        iamData.down_key_json["left"]=false;
+    if(iamData!=null){
+        if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
+            iamData.is_move=true;
+        }
+        if(e.keyCode==38){
+            iamData.down_key_json["up"]=true;
+            iamData.down_key_json["down"]=false;
+        }else if(e.keyCode==40){
+            iamData.down_key_json["down"]=true;
+            iamData.down_key_json["up"]=false;
+        }
+        if(e.keyCode==37){
+            iamData.down_key_json["left"]=true;
+            iamData.down_key_json["right"]=false;
+        }else if(e.keyCode==39){
+            iamData.down_key_json["right"]=true;
+            iamData.down_key_json["left"]=false;
+        }
     }
 
     if(e.keyCode==13){
@@ -171,20 +180,33 @@ function onKeyDown(e){
     }
 }
 function onKeyUp(e){
-    if(e.keyCode==38){
-        iamData.down_key_json["up"]=false;
-    }else if(e.keyCode==40){
-        iamData.down_key_json["down"]=false;
-    }
-    if(e.keyCode==37){
-        iamData.down_key_json["left"]=false;
-    }else if(e.keyCode==39){
-        iamData.down_key_json["right"]=false;
-    }
-    if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
-        if(iamData.down_key_json["up"]==false&&iamData.down_key_json["down"]==false
-            &&iamData.down_key_json["left"]==false&&iamData.down_key_json["right"]==false){
-                iamData.is_move=false;
+    if(iamData!=null){
+        if(e.keyCode==38){
+            iamData.down_key_json["up"]=false;
+        }else if(e.keyCode==40){
+            iamData.down_key_json["down"]=false;
         }
+        if(e.keyCode==37){
+            iamData.down_key_json["left"]=false;
+        }else if(e.keyCode==39){
+            iamData.down_key_json["right"]=false;
+        }
+        if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
+            if(iamData.down_key_json["up"]==false&&iamData.down_key_json["down"]==false
+                &&iamData.down_key_json["left"]==false&&iamData.down_key_json["right"]==false){
+                    iamData.is_move=false;
+            }
+        }
+    }
+}
+function onClickCanvas(e){
+    if(iamData!=null){
+        iamData.set_target=true;
+        iamData.target_x=e.offsetX;
+        iamData.target_y=e.offsetY;
+        iamData.down_key_json["up"]=false;
+        iamData.down_key_json["down"]=false;
+        iamData.down_key_json["left"]=false;
+        iamData.down_key_json["right"]=false;
     }
 }

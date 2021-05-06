@@ -3,6 +3,10 @@ exports.Unit=function(init_data){
         name:"",
         x:50,
         y:100,
+        set_target:false,
+        is_target:false,
+        target_x:0,
+        target_y:0,
         shape:"circle",//rect
         is_move:false,
         speed:0,
@@ -17,7 +21,7 @@ exports.Unit=function(init_data){
         },
         width:50,
         height:50,
-        color:"#fff",
+        color:"#fff"
     };
     this.getData=function(){
         var result_data={};
