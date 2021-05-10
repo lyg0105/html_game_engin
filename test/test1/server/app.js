@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 
 var unit_arr=[];
 var game_opt={
+    loop_delay:10,
     map_width:1000,
     map_height:600
 };
@@ -71,7 +72,7 @@ function gameLoop(){
     setInterval(function(){
         moveUnits();
         checkCollision();
-    },10);
+    },game_opt.loop_delay);
 }
 
 function moveUnits(){
@@ -157,24 +158,6 @@ function moveUnits(){
             unit.y+=my;
         }
 
-
-        var min_x=unit.width/2;
-        var min_y=unit.height/2+20;
-        var max_x=game_opt.map_width-(unit.width/2);
-        var max_y=game_opt.map_height-(unit.height/2);
-
-        if(unit.x<min_x){
-            unit.x=min_x
-        }else if(unit.x>max_x){
-            unit.x=max_x;
-        }
-
-        if(unit.y<min_y){
-            unit.y=min_y;
-        }else if(unit.y>max_y){
-            unit.y=max_y;
-        }
-
         unit_arr[i]=unit;
     }
 }
@@ -198,26 +181,56 @@ function checkCollision(){
                 //거리
                 var tmp_distance=getDistance(unit.x,unit.y,unit2.x,unit2.y);
                 if(tmp_distance<=(unit.width/2+unit2.width/2)){
-                    //내가밀려나자
+                    //반반 밀려나자
                     var collision_power=unit.speed-unit2.speed;
                     if(collision_power<0){
                         collision_power=-collision_power;
                     }
+                    collision_power+=(unit.width/2+unit2.width/2)-tmp_distance;
+                    var collision_power2=parseInt(collision_power/2);
                     console.log(collision_power);
                     if(unit.x<unit2.x){
-                        unit.x-=collision_power;
+                        unit.x-=collision_power2;
+                        unit2.x+=collision_power2;
                     }else if(unit.x>unit2.x){
-                        unit.x+=collision_power;
+                        unit.x+=collision_power2;
+                        unit.x2-=collision_power2;
                     }
                     if(unit.y<unit2.y){
-                        unit.y-=collision_power;
+                        unit.y-=collision_power2;
+                        unit2.y+=collision_power2;
                     }else if(unit.y>unit2.y){
-                        unit.y+=collision_power;
+                        unit.y+=collision_power2;
+                        unit2.y-=collision_power2;
                     }
                     unit_arr[i]=unit;
+                    unit_arr[j]=unit2;
                 }
             }
         }
+    }
+
+    //벽충돌 검사
+    for(var i=0;i<unit_len;i++){
+        var unit=unit_arr[i];
+
+        var min_x=unit.width/2;
+        var min_y=unit.height/2+20;
+        var max_x=game_opt.map_width-(unit.width/2);
+        var max_y=game_opt.map_height-(unit.height/2);
+
+        if(unit.x<min_x){
+            unit.x=min_x
+        }else if(unit.x>max_x){
+            unit.x=max_x;
+        }
+
+        if(unit.y<min_y){
+            unit.y=min_y;
+        }else if(unit.y>max_y){
+            unit.y=max_y;
+        }
+        unit_arr[i]=unit;
     }
 }
 

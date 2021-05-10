@@ -31,7 +31,6 @@ window.onload=function(){
 
     document.addEventListener("keydown",onKeyDown);
     document.addEventListener("keyup",onKeyUp);
-    document.getElementById("speed_input").addEventListener("change",updateIamDataByInput);
     document.getElementById("color_input").addEventListener("change",updateIamDataByInput);
 
     document.getElementById("login_btn").addEventListener("click",loginAction);
@@ -41,7 +40,6 @@ window.onload=function(){
 };
 function openLoginPage(){
     document.getElementById("login_name_input").value='';
-    document.getElementById("speed_input").value='';
     document.getElementById("color_input").value='';
     document.getElementById("name_input").value='';
     document.getElementById("login_div").style.display="";
@@ -77,7 +75,6 @@ function loginAction(){
         };
     }
 
-    document.getElementById("speed_input").value=iamData.speed;
     document.getElementById("color_input").value=iamData.color;
     document.getElementById("name_input").value=iamData.name;
     document.getElementById("login_div").style.display="none";
@@ -94,8 +91,6 @@ function updateIamDataByInput(){
     }
 
     iamData.color=document.getElementById("color_input").value;
-    iamData.speed=document.getElementById("speed_input").value;
-    iamData.speed=parseInt(iamData.speed);
     
     socket.emit("updateData",iamData);
 }
@@ -143,9 +138,16 @@ function drawUnits(){
         }else{
             ctx.fillRect(unit.x-(unit.width/2),unit.y-(unit.height/2),unit.width,unit.height);
         }
+
+        ctx.restore();
+    }
+
+    for(var i=0;i<unit_len;i++){
+        var unit=unit_arr[i];
+        ctx.save();
         //이름
-        ctx.font="11px";
-        ctx.fillStyle = "#fff";
+        ctx.font="13px";
+        ctx.fillStyle = "#1ff";
         ctx.textAlign = "center";
         ctx.fillText(unit.name,unit.x,unit.y-(unit.height/2)-6);
 
