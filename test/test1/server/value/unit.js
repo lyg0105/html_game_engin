@@ -21,7 +21,12 @@ exports.Unit=function(init_data){
         },
         width:50,
         height:50,
-        color:"#fff"
+        color:"#fff",
+        life:1,
+        life_max:10,
+        recover_term:100,
+        recover_time:0,
+        recover_life:1
     };
     this.getData=function(){
         var result_data={};

@@ -26,12 +26,10 @@ window.onload=function(){
     socket.on('updateUnitArr',updateUnitArr);
     gameLoop();
 
-    //updateIamDataByInput();
     openLoginPage();
 
     document.addEventListener("keydown",onKeyDown);
     document.addEventListener("keyup",onKeyUp);
-    document.getElementById("color_input").addEventListener("change",updateIamDataByInput);
 
     document.getElementById("login_btn").addEventListener("click",loginAction);
     document.getElementById("login_out_btn").addEventListener("click",logOutAction);
@@ -40,7 +38,6 @@ window.onload=function(){
 };
 function openLoginPage(){
     document.getElementById("login_name_input").value='';
-    document.getElementById("color_input").value='';
     document.getElementById("name_input").value='';
     document.getElementById("login_div").style.display="";
     document.getElementById("login_name_input").focus();
@@ -75,7 +72,6 @@ function loginAction(){
         };
     }
 
-    document.getElementById("color_input").value=iamData.color;
     document.getElementById("name_input").value=iamData.name;
     document.getElementById("login_div").style.display="none";
     updateIamDataByInput();
@@ -90,14 +86,31 @@ function updateIamDataByInput(){
         return false;
     }
 
-    iamData.color=document.getElementById("color_input").value;
+    iamData.set_login=true;
     
     socket.emit("updateData",iamData);
+    iamData.set_login=false;
 }
 
 function updateUnitArr(in_unit_arr){
     game_opt["is_load"]=false;
     unit_arr=in_unit_arr;
+    if(iamData!=null){
+        var unit_len=unit_arr.length;
+        var tmp_iamData=null;
+        for(var i=0;i<unit_len;i++){
+            if(unit_arr[i].name==iamData.name){
+                tmp_iamData=unit_arr[i];
+            }
+        }
+        if(tmp_iamData==null){
+            iamData=null;
+            openLoginPage();
+        }else{
+            iamData.life=tmp_iamData.life;
+            iamData.life_max=tmp_iamData.life_max;
+        }
+    }
 }
 
 function gameLoop(){
@@ -108,9 +121,8 @@ function gameLoop(){
             game_opt["is_load"]=true;
             socket.emit("requestData",iamData);
             if(iamData!=null){
-                if(iamData.set_target){
-                    iamData.set_target=false;
-                }
+                iamData.set_target=false;
+                iamData.set_move=false;
             }
         }
     },game_opt.loop_delay);
@@ -142,20 +154,50 @@ function drawUnits(){
         ctx.restore();
     }
 
+    //유저수 표시
+    ctx.font="13px Arial";
+    ctx.fillStyle = "#1ff";
+    ctx.textAlign = "left";
+    ctx.fillText(unit_len+" 명 접속 중",0,12);
+
     for(var i=0;i<unit_len;i++){
         var unit=unit_arr[i];
         ctx.save();
+
         //이름
-        ctx.font="13px";
+        ctx.font="13px Arial";
         ctx.fillStyle = "#1ff";
         ctx.textAlign = "center";
-        ctx.fillText(unit.name,unit.x,unit.y-(unit.height/2)-6);
+        ctx.fillText(unit.name,unit.x,unit.y-(unit.height/2)-7);
+        //체력
+        ctx.beginPath();
+        ctx.strokeStyle = "#ffe";
+        ctx.moveTo(unit.x-(unit.width/2),unit.y-(unit.height/2)-3);
+        ctx.lineTo(unit.x+(unit.width/2),unit.y-(unit.height/2)-3);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "red";
+        var life_x=0;
+        if(unit.life!=undefined){
+            unit.life=parseInt(unit.life);
+            unit.life_max=parseInt(unit.life_max);
+            life_x=unit.width-unit.width*(unit.life/unit.life_max);
+            life_x=parseInt(life_x);
+        }
+        ctx.moveTo(unit.x-(unit.width/2)+life_x,unit.y-(unit.height/2)-3);
+        ctx.lineTo(unit.x+(unit.width/2),unit.y-(unit.height/2)-3);
+        ctx.stroke();
+
+        ctx.fillStyle = "#00a";
+        ctx.fillText(unit.life+"/"+unit.life_max,unit.x,unit.y+3);
 
         ctx.restore();
     }
 }
 function onKeyDown(e){
     if(iamData!=null){
+        iamData.set_move=true;
         if(e.keyCode==38||e.keyCode==40||e.keyCode==37||e.keyCode==39){
             iamData.is_move=true;
         }
@@ -183,6 +225,7 @@ function onKeyDown(e){
 }
 function onKeyUp(e){
     if(iamData!=null){
+        iamData.set_move=true;
         if(e.keyCode==38){
             iamData.down_key_json["up"]=false;
         }else if(e.keyCode==40){
