@@ -107,6 +107,7 @@ function updateUnitArr(in_unit_arr){
             iamData=null;
             openLoginPage();
         }else{
+            document.getElementById("login_div").style.display="none";
             iamData.life=tmp_iamData.life;
             iamData.life_max=tmp_iamData.life_max;
         }
