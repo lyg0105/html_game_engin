@@ -172,13 +172,13 @@ function drawUnits(){
         ctx.fillText(unit.name,unit.x,unit.y-(unit.height/2)-7);
         //체력
         ctx.beginPath();
-        ctx.strokeStyle = "#ffe";
+        ctx.strokeStyle = "#333";
         ctx.moveTo(unit.x-(unit.width/2),unit.y-(unit.height/2)-3);
         ctx.lineTo(unit.x+(unit.width/2),unit.y-(unit.height/2)-3);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "#fff";
         var life_x=0;
         if(unit.life!=undefined){
             unit.life=parseInt(unit.life);

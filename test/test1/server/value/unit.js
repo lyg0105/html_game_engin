@@ -39,6 +39,13 @@ exports.Unit=function(init_data){
         for(var key in init_data){
             this.data[key]=init_data[key];
         }
+        if(init_data["color"]!=undefined){
+            var random_num=parseInt(Math.random()*10);
+            var random_num2=parseInt(Math.random()*10);
+            var random_num3=parseInt(Math.random()*10);
+            this.data["color"]="#"+random_num+""+random_num2+""+random_num3;
+            console.log(random_num);
+        }
     }
     this.init();
 };
