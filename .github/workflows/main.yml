@@ -14,19 +14,19 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    steps:
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}
-        script: |
-          echo "publish"
-          cd /home/html_game_engin/
-          git pull origin master
-          pm2 stop 0
-          pm2 start 0
-          echo "publish finish"
+    #steps:
+    #- name: executing remote ssh commands using password
+    #  uses: appleboy/ssh-action@master
+    #  with:
+        #host: ${{ secrets.HOST }}
+        #username: ${{ secrets.USERNAME }}
+        #password: ${{ secrets.PASSWORD }}
+        #port: ${{ secrets.PORT }}
+        #script: |
+        #  echo "publish"
+        #  cd /home/html_game_engin/
+        #  git pull origin master
+        #  pm2 stop 0
+        #  pm2 start 0
+        #  echo "publish finish"
           
