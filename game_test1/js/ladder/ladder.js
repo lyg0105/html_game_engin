@@ -1,4 +1,5 @@
 import LygLadderButton from './obj/ladder_button.js';
+import LygLadderGameEvent from './event/event.js';
 /*
 사다리게임 만들기
 
@@ -65,7 +66,8 @@ class LygLadderGame
   init(){
     this.opt.canvas_obj=document.getElementById(this.opt.canvas_id);
     this.ctx=this.opt.canvas_obj.getContext("2d");
-    this.set_event();
+    let lygLadderGameEvent=new LygLadderGameEvent(this);
+    lygLadderGameEvent.set_event();
     this.set_ladder_size();
     this.set_split_line_arr();
     this.set_mid_line_cnt();
@@ -111,6 +113,7 @@ class LygLadderGame
         btn_text=this.opt.top_name_arr[split_i];
       }
       var text_btn=new LygLadderButton({
+        ladder_obj:this_obj,
         x:btn_x,
         y:this.opt.ladder_top_margin,
         width:this.opt.split_line_width-20,
@@ -145,6 +148,7 @@ class LygLadderGame
         btn_text=this.opt.bottom_name_arr[split_i];
       }
       var text_btn=new LygLadderButton({
+        ladder_obj:this_obj,
         x:btn_x,
         y:this.screen.ladder_height-25,
         width:this.opt.split_line_width-20,
@@ -167,43 +171,6 @@ class LygLadderGame
         }
       });
       this.page_data.button_arr.push(text_btn);
-    }
-  }
-  set_event(){
-    var this_obj=this;
-    this.opt.canvas_obj.addEventListener("mousemove", function(e){
-      this_obj.screen.mouse_x=e.offsetX;
-      this_obj.screen.mouse_y=e.offsetY;
-      this_obj.on_hover_button();
-    });
-    this.opt.canvas_obj.addEventListener("click", function(e){
-      this_obj.screen.mouse_x=e.offsetX;
-      this_obj.screen.mouse_y=e.offsetY;
-      this_obj.on_click_button();
-    });
-  }
-  on_hover_button(){
-    let btn_cnt=this.page_data.button_arr.length;
-    var is_in_hover=false;
-    for(let btn_i=0;btn_i<btn_cnt;btn_i++){
-      let btn=this.page_data.button_arr[btn_i];
-      if(btn.is_enter_mouse(this.screen.mouse_x,this.screen.mouse_y)){
-        is_in_hover=true;
-      }
-    }
-    if(is_in_hover){
-      this.opt.canvas_obj.style.cursor='pointer';
-    }else{
-      this.opt.canvas_obj.style.cursor='';
-    }
-  }
-  on_click_button(){
-    let btn_cnt=this.page_data.button_arr.length;
-    for(let btn_i=0;btn_i<btn_cnt;btn_i++){
-      let btn=this.page_data.button_arr[btn_i];
-      if(btn.is_enter_mouse(this.screen.mouse_x,this.screen.mouse_y)){
-        btn.opt.on_click();
-      }
     }
   }
 
@@ -406,6 +373,7 @@ class LygLadderGame
 
     //실행버튼
     var excute_btn=new LygLadderButton({
+      ladder_obj:this_obj,
       x:this.screen.canvas_width/2-20,
       y:this.screen.canvas_height-30,
       width:70,
