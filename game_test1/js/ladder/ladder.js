@@ -1,5 +1,10 @@
 import LygLadderButton from './obj/ladder_button.js';
 import LygLadderGameEvent from './event/event.js';
+import LygLadderGamePageInput from './page/input_page.js';
+import LygLadderGamePageLadder from './page/ladder_page.js';
+import LygLadderGamePageResult from './page/result_page.js';
+import LygLadderGamePageDraw from './draw/draw.js';
+import LygLadderGameInputObj from './obj/input_obj.js';
 /*
 사다리게임 만들기
 
@@ -35,7 +40,7 @@ class LygLadderGame
     bottom_name_arr:[],
     mid_min_max_per_split:{
       min:1,
-      max:3
+      max:4
     },
     mid_line_cnt_arr:[],
     mid_line_arr:[],//[{start:{x:0,y:0,idx:0},end:{x:1,y:1,idx:1}}]
@@ -123,14 +128,15 @@ class LygLadderGame
         target_id:"top_name_arr",
         target_idx:split_i,
         on_click:function(){
-          this_obj.add_input_obj({
+          LygLadderGameInputObj.add_input_obj({
+            ladder:this_obj,
             x:btn_x,
             y:25,
             target_id:"top_name_arr",
             target_idx:split_i,
             value:this_obj.opt.top_name_arr[split_i],
             on_change:function(){
-              this_obj.draw_ladder();
+              this_obj.draw();
             }
           });
         }
@@ -158,20 +164,22 @@ class LygLadderGame
         target_id:"bottom_name_arr",
         target_idx:split_i,
         on_click:function(){
-          this_obj.add_input_obj({
+          LygLadderGameInputObj.add_input_obj({
+            ladder:this_obj,
             x:btn_x,
             y:this_obj.screen.ladder_height-25,
             target_id:"bottom_name_arr",
             target_idx:split_i,
             value:this_obj.opt.bottom_name_arr[split_i],
             on_change:function(){
-              this_obj.draw_ladder();
+              this_obj.draw();
             }
           });
         }
       });
       this.page_data.button_arr.push(text_btn);
     }
+    
   }
 
   set_mid_line_cnt(){
@@ -255,11 +263,12 @@ class LygLadderGame
       //끝데이터 세팅
       this.opt.result_data[line_num].top_name="TOP "+line_num;
       this.opt.result_data[line_num].bottom_name="BOTTOM "+this.opt.result_data[line_num].end.x;
+      let end_line=this.opt.result_data[line_num].end.x;
       if(this.opt.top_name_arr[line_num]!=undefined){
         this.opt.result_data[line_num].top_name=this.opt.top_name_arr[line_num];
       }
-      if(this.opt.bottom_name_arr[line_num]!=undefined){
-        this.opt.result_data[line_num].bottom_name=this.opt.bottom_name_arr[line_num];
+      if(this.opt.bottom_name_arr[end_line]!=undefined){
+        this.opt.result_data[line_num].bottom_name=this.opt.bottom_name_arr[end_line];
       }
     }else{
       //다음으로 이동
@@ -344,81 +353,20 @@ class LygLadderGame
     }
   }
   reset_pagedata(){
+    let this_obj=this;
     this.page_data.page_id="input";
     this.page_data.button_arr=[];
     this.page_data.line_arr=[];
-    this.remmove_input_obj();
+    LygLadderGameInputObj.remmove_input_obj({ladder:this_obj});
   }
   draw_clear(){
     this.ctx.clearRect(0,0,this.screen.canvas_width,this.screen.canvas_height);
   }
-  draw_ladder(){
-    this.draw_clear();
-    this.ctx.save();
+  draw(){
     var this_obj=this;
-    //입력바버튼
-    this.set_text_btn();
-    for(let btn_i=0;btn_i<this.page_data.button_arr.length;btn_i++) {
-      this.page_data.button_arr[btn_i].draw(this.ctx);
-    }
-
-    //가운데선
-    for(let split_i=0;split_i<this.opt.split_line_arr.length;split_i++){
-      let split_line=this.opt.split_line_arr[split_i];
-      this.ctx.moveTo(split_line.start.x,split_line.start.y);
-      this.ctx.lineTo(split_line.end.x,split_line.end.y);
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
-
-    //실행버튼
-    var excute_btn=new LygLadderButton({
-      ladder_obj:this_obj,
-      x:this.screen.canvas_width/2-20,
-      y:this.screen.canvas_height-30,
-      width:70,
-      height:22,
-      type:"text",//text,button,custom_button
-      text:"실행",
-      target_id:"",
-      target_idx:0,
-      on_click:function(){
-        console.log("실행페이지로가기");
-        this_obj.go_page("ladder");
-      }
+    LygLadderGamePageDraw.action({
+      ladder:this_obj
     });
-    this.page_data.button_arr.push(excute_btn);
-    excute_btn.draw(this.ctx);
-    //결과보기
-
-    this.ctx.restore();
-  }
-  draw_mid_lines(){
-    this.ctx.save();
-    var this_obj=this;
-
-    var mid_line_cnt=this.opt.mid_line_arr.length;
-    for(let mid_i=0;mid_i<mid_line_cnt;mid_i++){
-      var mid_line=this.opt.mid_line_arr[mid_i];
-      var start_p=mid_line["start"];
-      var end_p=mid_line["end"];
-
-      let start_x=this.opt.split_line_width*start_p.x;
-      start_x+=this.opt.ladder_left_margin;//시작왼쪽마진
-      start_x+=start_p.x*this.opt.ladder_split_left_margin;//왼쪽마진
-      start_x+=(this.opt.split_line_width-20)/2;//가운데로
-      let end_x=this.opt.split_line_width*end_p.x;
-      end_x+=this.opt.ladder_left_margin;//시작왼쪽마진
-      end_x+=end_p.x*this.opt.ladder_split_left_margin;//왼쪽마진
-      end_x+=(this.opt.split_line_width-20)/2;//가운데로
-      this.ctx.beginPath();
-      this.ctx.moveTo(start_x,start_p.y);
-      this.ctx.lineTo(end_x,end_p.y);
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
-
-    this.ctx.restore();
   }
   draw_pick_line(line_num,top_bottom){
 
@@ -426,88 +374,29 @@ class LygLadderGame
   go_page(page_id){
     this.reset_pagedata();
     this.screen.page_id=page_id;
-    switch(page_id){
-      case "input":this.draw_input_page();
-      break;
-      case "ladder":this.draw_ladder_page();
-      break;
-      case "result":this.draw_result_page();
-      break;
-      default:this.draw_input_page();
-      break;
-    }
-  }
-  draw_input_page(){
-    this.draw_ladder();
-  }
-  draw_ladder_page(){
-    this.draw_ladder();
-    this.draw_mid_lines();
-  }
-  draw_result_page(){
-
-  }
-  add_input_obj(in_opt_obj){
-    if(in_opt_obj==undefined){in_opt_obj={};}
-    var btn_opt_obj={
-      x:0,
-      y:0,
-      target_id:"",
-      target_idx:0,
-      value:"",
-      on_change:function(){
-        console.log("Change");
-      }
-    };
-    for(let key in in_opt_obj){
-      btn_opt_obj[key]=in_opt_obj[key];
-    }
-    btn_opt_obj["target_idx"]=parseInt(btn_opt_obj["target_idx"]);
     var this_obj=this;
-    this.remmove_input_obj();
-    var input_obj=document.createElement("INPUT");
-    this.opt.canvas_obj.parentElement.appendChild(input_obj);
-    input_obj.type="text";
-    input_obj.id="lyg_ladder_input";
-    input_obj.style.width="80px";
-    input_obj.style.height="22px";
-    input_obj.style.border="0px";
-    input_obj.style.textAlign="center";
-    input_obj.style.position="absolute";
-    input_obj.style.left=btn_opt_obj.x+"px";
-    input_obj.style.top=btn_opt_obj.y+"px";
-    input_obj.style.opacity=0.5;
-    input_obj.target_id=btn_opt_obj.target_id;
-    input_obj.target_idx=btn_opt_obj.target_idx;
-    input_obj.value=btn_opt_obj.value;
-    input_obj.focus();
-    this.page_data.input_obj=input_obj;
-
-    input_obj.onkeydown=function(e){
-      if(e.keyCode==9){
-        return false;
-      }
-    }
-    input_obj.onblur=function(){
-      if(this_obj.page_data.input_obj!=null){
-        if(this_obj.opt[btn_opt_obj["target_id"]]){
-          this_obj.opt[btn_opt_obj["target_id"]][btn_opt_obj["target_idx"]]=input_obj.value;
-        }
-        this_obj.remmove_input_obj();
-        btn_opt_obj.on_change();
-      }
-    }
-    input_obj.onkeyup=function(e){
-      btn_opt_obj.on_change();
-      if(e.keyCode==13||e.keyCode==9){
-        console.log("Next");
-      }
-    }
-  }
-  remmove_input_obj(){
-    this.page_data.input_obj=null;
-    if(document.getElementById("lyg_ladder_input")){
-      document.getElementById("lyg_ladder_input").remove();
+    
+    switch(page_id){
+      case "input":
+        LygLadderGamePageInput.action({
+          ladder:this_obj
+        });
+      break;
+      case "ladder":
+        LygLadderGamePageLadder.action({
+          ladder:this_obj
+        });
+      break;
+      case "result":
+        LygLadderGamePageResult.action({
+          ladder:this_obj
+        });
+      break;
+      default:
+        LygLadderGamePageInput.action({
+          ladder:this_obj
+        });
+      break;
     }
   }
   random(min,max){
