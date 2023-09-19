@@ -19,6 +19,7 @@ var game_opt={
 app.use(express.static(__dirname + '/../'));
 
 function onConnection(socket){
+    console.log("onConnection!!");
     //socket_arr.push(socket);
     socket.on('updateData', updateData);
     socket.on('requestData',function(rowData){
