@@ -7,7 +7,7 @@ module.exports = (server) => {
   wss.on('connection', (ws, req) => { // 클라이언트가 서버와 웹소켓 연결 시 발생하는 이벤트
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress; // 클라이언트의 IP
     console.log('새로운 클라이언트 접속', ip);
-    ws.send('새로운 클라이언트 접속');
+    ws.send('new client connected!!');
     
     ws.on('message', (message) => { // 클라이언트로부터 메시지가 왔을 때
       console.log(message);
