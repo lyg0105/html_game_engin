@@ -9,6 +9,8 @@ let corsOptions = {
   credentials: true
 }
 
+app.use(express.static(__dirname + '/html/'));
+
 app.use(cors(corsOptions));
 
 const webSocket = require('./socket/socket');
