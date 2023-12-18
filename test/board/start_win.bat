@@ -1,0 +1,1 @@
+start cmd /k "cd /d D:\work\game\js\html_game_engin\test\board\server&&pm2 start server.js
