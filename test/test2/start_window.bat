@@ -1,1 +1,1 @@
-pm2 start app.js --watch
+start cmd /k "cd /d D:\work\game\js\html_game_engin\test\test2&&pm2 start app.js --watch
