@@ -4,25 +4,27 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link href="/css/base.css" rel="stylesheet" />
     <link href="/css/canvas.css" rel="stylesheet" />
+    <script src="/js/canvas/make_canvas.js"></script>
     <title>CharMoveTest</title>
   </head>
   <body>
     <div class="canvas_wrap" id="canvas_wrap">
     <script>
-      let canvas_wrap=document.getElementById("canvas_wrap");
       let screen_w=canvas_wrap.offsetWidth;
       let screen_h=canvas_wrap.offsetHeight;
-      let canvas=document.createElement("canvas");
-      canvas.id="canvas";
-      canvas.width=screen_w;
-      canvas.height=screen_h;
-      canvas_wrap.appendChild(canvas);
+      let canvas=MakeCanvas.make("canvas_wrap");
+      
       const ctx = canvas.getContext("2d");
-
       ctx.beginPath();
       ctx.lineWidth = "10";
       ctx.strokeStyle = "blue";
       ctx.rect(0, 0, screen_w, screen_h);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.lineWidth = "10";
+      ctx.strokeStyle = "red";
+      ctx.rect(0, 0, screen_w/2, screen_h/2);
       ctx.stroke();
       
     </script>
