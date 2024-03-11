@@ -30,8 +30,8 @@ class Map
     //스크린그리기
     ctx.beginPath();
     ctx.rect(
-      this_obj.screen.x,
-      this_obj.screen.y,
+      0,
+      0,
       this_obj.screen.w,
       this_obj.screen.h
     );

@@ -26,15 +26,16 @@
 
   </script>
   <script>
+    let speed=5;
     function onKeyDown(e) {
       if(e.keyCode==38){
-        map.screen.y-=1;
+        map.screen.y-=speed;
       }else if(e.keyCode==37){
-        map.screen.x-=1;
+        map.screen.x-=speed;
       }else if(e.keyCode==40){
-        map.screen.y+=1;
+        map.screen.y+=speed;
       }else if(e.keyCode==39){
-        map.screen.x+=1;
+        map.screen.x+=speed;
       }
       map.draw();
     }
