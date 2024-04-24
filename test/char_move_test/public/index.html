@@ -7,35 +7,22 @@
   <link href="/css/canvas.css" rel="stylesheet" />
   <script src="/js/canvas/make_canvas.js"></script>
   <script src="/js/map/map.js"></script>
-  <script src="/js/game/main.js"></script>
   <script src="/js/event/controler.js"></script>
+  <script src="/js/game/loop/index.js"></script>
+  <script src="/js/game/main.js"></script>
   <title>CharMoveTest</title>
 </head>
 
-<body onkeydown="onKeyDown(event);" onload="initGame();">
+<body onload="initGame();">
   <img id="back_img1" src="/img/back/universe.jpg" width="2000" />
   <div class="canvas_wrap" id="canvas_wrap"></div>
   <script>
-    let gameMain=null;
-    function initGame(){
-      gameMain=new GameMain();
+    let gameMain = null;
+    function initGame() {
+      gameMain = new GameMain();
       gameMain.init();
     };
   </script>
-  <script>
-    let speed=5;
-    function onKeyDown(e) {
-      if(e.keyCode==38){
-        gameMain.map.screen.y-=speed;
-      }else if(e.keyCode==37){
-        gameMain.map.screen.x-=speed;
-      }else if(e.keyCode==40){
-        gameMain.map.screen.y+=speed;
-      }else if(e.keyCode==39){
-        gameMain.map.screen.x+=speed;
-      }
-      gameMain.map.draw();
-    }
-  </script>
 </body>
+
 </html>

@@ -5,6 +5,7 @@ class Map
     w:1000,
     h:1000,
     color:"black",
+    move_speed:10,
   };
   screen={
     x:0,
@@ -22,6 +23,18 @@ class Map
   set_screen(x,y){
     this.screen.x=x;
     this.screen.y=y;
+  }
+  move(control){
+    if(control["map_left"]){
+      this.screen.x-=this.data.move_speed;
+    }else if(control["map_right"]){
+      this.screen.x+=this.data.move_speed;
+    }
+    if(control["map_up"]){
+      this.screen.y-=this.data.move_speed;
+    }else if(control["map_down"]){
+      this.screen.y+=this.data.move_speed;
+    }
   }
   draw(){
     let ctx=this.ctx;

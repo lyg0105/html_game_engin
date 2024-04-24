@@ -1,8 +1,9 @@
 class GameMain
 {
   canvas=null;
-  controller=null;
+  control=null;
   map=null;
+  game_loop=null;
 
   init(){
     let canvas_wrap=document.getElementById("canvas_wrap");
@@ -13,7 +14,10 @@ class GameMain
     this.map = new Map(2000, 2000, screen_w, screen_h, ctx);
     this.map.draw();
 
-    this.controller=new Controler();
-    this.controller.init();
+    this.control=new Controler();
+    this.control.init();
+
+    this.game_loop=new GameLoop();
+    this.game_loop.init(this);
   }
 }
