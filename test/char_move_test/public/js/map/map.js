@@ -35,6 +35,20 @@ class Map
     }else if(control["map_down"]){
       this.screen.y+=this.data.move_speed;
     }
+    if(this.screen.x>0){
+      this.screen.x=0;
+    }
+    if(this.screen.y>0){
+      this.screen.y=0;
+    }
+    let min_x=this.screen.w-this.data.w;
+    let min_y=this.screen.h-this.data.h;
+    if(this.screen.x<min_x){
+      this.screen.x=min_x;
+    }
+    if(this.screen.y<min_y){
+      this.screen.y=min_y;
+    }
   }
   draw(){
     let ctx=this.ctx;
