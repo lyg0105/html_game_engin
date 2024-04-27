@@ -26,15 +26,25 @@ class Map
   }
   move(control){
     if(control["map_left"]){
-      this.screen.x-=this.data.move_speed;
-    }else if(control["map_right"]){
       this.screen.x+=this.data.move_speed;
+    }else if(control["map_right"]){
+      this.screen.x-=this.data.move_speed;
     }
     if(control["map_up"]){
-      this.screen.y-=this.data.move_speed;
-    }else if(control["map_down"]){
       this.screen.y+=this.data.move_speed;
+    }else if(control["map_down"]){
+      this.screen.y-=this.data.move_speed;
     }
+
+    this.check_min_max();
+  }
+  move_center_xy(center_x,center_y){
+    this.screen.x=-center_x+this.screen.w/2;
+    this.screen.y=-center_y+this.screen.h/2;
+
+    this.check_min_max();
+  }
+  check_min_max(){
     if(this.screen.x>0){
       this.screen.x=0;
     }
