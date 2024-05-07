@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/login.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <title>Land Win Game</title>
+</head>
+
+<body>
+  <div class="login_wrap">
+    <div>Login</div>
+    <table style="width:100%;margin-top:10px;">
+      <colgroup>
+        <col width="20%" />
+        <col width="80%" />
+      </colgroup>
+      <tbody>
+        <tr>
+          <th>아이디</th>
+          <td>
+            <input type="text" id="user_id" value="lyg"/>
+          </td>
+        </tr>
+        <tr>
+          <th>비밀번호</th>
+          <td>
+            <input type="password" id="user_pw" value="1"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;">
+      <button class="btn btn_gray" style="width:250px;" onclick="go_login();">로그인</button>
+    </div>
+    <script>
+      function go_login() {
+        let user_id_input=document.getElementById("user_id");
+        let user_pw_input=document.getElementById("user_pw");
+
+        if(user_id_input.value==""){
+          alert("아이디 입력 필요.");
+          return false;
+        }
+        if(user_pw_input.value==""){
+          alert("암호 입력 필요.");
+          return false;
+        }
+
+        fetch("/api/comp/user/login/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: user_id_input.value,
+            pw: user_pw_input.value,
+          }),
+        })
+          .then((response) => {
+            response.json();
+          })
+          .then((result) => {
+            console.log(result);
+          });
+      }
+    </script>
+  </div>
+</body>
+
+</html>

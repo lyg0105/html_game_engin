@@ -1,0 +1,21 @@
+.btn{
+  line-height: 25px;
+  padding:0px 5px;
+  font-size: 14px;
+  border:1px solid gray;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+}
+.btn_gray{
+  background: #929292;
+  color:#fff;
+}
+.btn_gray:hover{
+  background: #aaa;
+  color:#fff;
+}
+.btn_red{
+  background: red;
+  color:#fff;
+}
