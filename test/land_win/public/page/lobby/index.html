@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <link href="/css/layout.css" rel="stylesheet" />
+  <script src="/js/lib/string.js"></script>
+  <script src="/js/login/login.js"></script>
+  <title>Land Win Game</title>
+</head>
+
+<body onload="on_load_window();">
+  <div class="lobby_wrap">
+    <div>로비</div>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray">게임시작</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray">랭킹보드</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray" onclick="go_logout();">로그아웃</button>
+    </div>
+    <script>
+      function on_load_window() {
+        LygLoginFunc.get_login_data();
+        if (strFunc.is_empty(LygLoginFunc.login_data.token_id)
+          || strFunc.is_empty(LygLoginFunc.login_data.client_info["user_seq"])) {
+          alert("로그인필요.");
+          location.href = "/";
+          return false;
+        }
+      }
+      function go_logout() {
+        fetch("/api/comp/user/login/logout", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token_id: LygLoginFunc.login_data.token_id,
+          }),
+        })
+          .then((response) => {
+            response.json()
+              .then((result) => {
+                if (result["result"] == "true") {
+                  strFunc.set_storage("token_id", "");
+                  strFunc.set_storage("client_info", "");
+                  location.href = "/";
+                } else {
+                  alert(result["msg"]);
+                }
+              });
+          });
+      }
+    </script>
+  </div>
+</body>
+
+</html>

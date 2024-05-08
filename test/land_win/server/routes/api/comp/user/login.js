@@ -11,6 +11,11 @@ class LoginClass extends BaseApi
     in_opt_obj.req=this.request;
     return await customService.login(in_opt_obj);
   }
+  async logout(in_opt_obj){
+    let customService=new LoginService();
+    in_opt_obj.req=this.request;
+    return await customService.logout(in_opt_obj);
+  }
 }
 
 module.exports = LoginClass;
