@@ -7,11 +7,8 @@ class GetLoginInfo
 {
   static async action(in_opt_obj){
     var opt_obj={
-      "api_key":"",
       "user_seq":"",
       "req":null,
-
-      "is_addon_api_key":"",
     };
     for(var key in in_opt_obj){
       opt_obj[key] = in_opt_obj[key];
