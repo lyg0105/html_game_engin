@@ -45,12 +45,12 @@
     </div>
     <script>
       function on_load_window() {
-        
+
       }
       function go_join() {
         let user_id_input = document.getElementById("user_id");
         let user_pw_input = document.getElementById("user_pw");
-        let user_name_input=document.getElementById("user_name");
+        let user_name_input = document.getElementById("user_name");
 
         if (user_id_input.value == "") {
           alert("아이디 입력 필요.");
@@ -65,24 +65,33 @@
           return false;
         }
 
+        let write_row = {
+          a_seq:"",
+          a_user_grade:"c",
+          a_user_id: user_id_input.value,
+          a_user_pw: user_pw_input.value,
+          a_user_name: user_name_input.value,
+          a_is_login:"1",
+        };
+        let form_json_data = {
+          data_arr: [write_row],
+          is_default_val: "1"
+        };
+
         fetch("/api/comp/user/user/write", {
           method: "POST",
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            id: user_id_input.value,
-            pw: user_pw_input.value,
-            name:user_name_input.value,
-          }),
+          body: JSON.stringify(form_json_data),
         })
           .then((response) => {
             response.json()
               .then((result) => {
                 if (result["result"] == "true") {
                   alert("성공.");
-                  location.href="/";
+                  location.href = "/";
                 } else {
                   alert(result["msg"]);
                 }

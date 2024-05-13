@@ -20,6 +20,9 @@
     <div style="margin-top: 10px;">
       <button class="btn btn_gray">랭킹보드</button>
     </div>
+    <div style="margin-top: 10px;display: none;" id="go_manage_btn_wrap" >
+      <button class="btn btn_gray" onclick="location.href='/page/manager/basic/user/list/';">관리자</button>
+    </div>
     <div style="margin-top: 10px;">
       <button class="btn btn_gray" onclick="go_logout();">로그아웃</button>
     </div>
@@ -31,6 +34,10 @@
           alert("로그인필요.");
           location.href = "/";
           return false;
+        }
+        if(LygLoginFunc.login_data.client_info["user_grade"]=="m"){
+          let go_manage_btn_wrap=document.getElementById("go_manage_btn_wrap");
+          go_manage_btn_wrap.style.display="";
         }
       }
       function go_logout() {

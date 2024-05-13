@@ -1,5 +1,6 @@
 //var BaseModel= require(LygLandConstant.ABS+'model/base/baseModel');
 var Model= require(global.LygLandConstant.ABS+'model/base/model');
+var StrFunc=require(global.LygLandConstant.ABS+'lib/lyg/string_func');
 var TableArr= require(global.LygLandConstant.ABS+'value/table/table_arr');
 var BaseWrite= require('./common/write/BaseWrite');
 var BaseDelete= require('./common/delete/BaseDelete');
@@ -29,8 +30,12 @@ class BaseModel
     }
     if(opt_obj["server_num"]==""){
       if(opt_obj["login_info"]!=undefined&&opt_obj["login_info"]!=null){
-        opt_obj["server_num"]=opt_obj["login_info"]["server_num"];
-        opt_obj["db_name"]=opt_obj["login_info"]["db_name"];
+        if(!StrFunc.is_empty(opt_obj["login_info"]["server_num"])){
+          opt_obj["server_num"]=opt_obj["login_info"]["server_num"];
+        }
+        if(!StrFunc.is_empty(opt_obj["login_info"]["db_name"])){
+          opt_obj["db_name"]=opt_obj["login_info"]["db_name"];
+        }
       }
       if(opt_obj["server_num"]==""){
         opt_obj["server_num"]="main";

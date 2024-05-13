@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/login.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <script src="/js/lib/string.js"></script>
+  <script src="/js/login/login.js"></script>
+  <title>Land Win Game</title>
+</head>
+
+<body onload="on_load_window();">
+  <div class="login_wrap">
+    <div>회원리스트</div>
+    <table style="width:100%;margin-top:10px;">
+      <colgroup>
+        <col width="20%" />
+        <col width="80%" />
+      </colgroup>
+      <tbody>
+
+      </tbody>
+    </table>
+    <script>
+      function on_load_window() {
+        LygLoginFunc.get_login_data();
+        console.log(LygLoginFunc.login_data.client_info["user_grade"]);
+        if(LygLoginFunc.login_data.client_info["user_grade"]=="m"){
+          
+        }
+        list();
+      }
+      function list() {
+        let form_json_data = {
+          api_token_id:strFunc.get_storage("token_id"),
+          "now_page":"1",
+          "num_per_page":"20",
+          "order_id":"",
+        };
+        fetch("/api/comp/user/user/list", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form_json_data),
+        })
+          .then((response) => {
+            response.json()
+              .then((result) => {
+                if (result["result"] == "true") {
+                  console.log(result["data"]["info_arr"]);
+                } else {
+                  
+                }
+              });
+          });
+      }
+    </script>
+  </div>
+</body>
+
+</html>
