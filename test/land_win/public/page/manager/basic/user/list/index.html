@@ -19,17 +19,14 @@
         <col width="20%" />
         <col width="80%" />
       </colgroup>
-      <tbody>
+      <tbody id="user_tbody">
 
       </tbody>
     </table>
     <script>
       function on_load_window() {
         LygLoginFunc.get_login_data();
-        console.log(LygLoginFunc.login_data.client_info["user_grade"]);
-        if(LygLoginFunc.login_data.client_info["user_grade"]=="m"){
-          
-        }
+        //LygLoginFunc.login_data.client_info
         list();
       }
       function list() {
@@ -51,6 +48,15 @@
             response.json()
               .then((result) => {
                 if (result["result"] == "true") {
+                  let user_tbody=document.getElementById("user_tbody");
+                  for(let i=0;i<result["data"]["info_arr"].length;i++){
+                    let info=result["data"]["info_arr"][i];
+                    let tr_str="<tr>";
+                    tr_str+="<td>"+(i+1)+"</td>";
+                    tr_str+="<td>"+info["a_user_name"]+"</td>";
+                    tr_str+="</tr>";
+                    user_tbody.innerHTML+=tr_str;
+                  }
                   console.log(result["data"]["info_arr"]);
                 } else {
                   
