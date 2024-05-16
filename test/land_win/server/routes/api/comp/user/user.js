@@ -11,6 +11,10 @@ class APIClass extends BaseApi
     let customService=new UserService();
     return await customService.list(in_opt_obj);
   }
+  async delete(in_opt_obj){
+    let customService=new UserService();
+    return await customService.delete(in_opt_obj);
+  }
 }
 
 module.exports = APIClass;

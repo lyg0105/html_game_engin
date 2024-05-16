@@ -2,6 +2,7 @@
 var BaseService= require(LygLandConstant.ABS+'service/base_service');
 var Write=require("./write");
 var List=require("./list");
+var Delete=require("./delete");
 
 class UserService extends BaseService
 {
@@ -11,6 +12,10 @@ class UserService extends BaseService
   }
   async list(in_opt_obj){
     var result_arr=await List.action(in_opt_obj);
+    return result_arr;
+  }
+  async delete(in_opt_obj){
+    var result_arr=await Delete.action(in_opt_obj);
     return result_arr;
   }
 }

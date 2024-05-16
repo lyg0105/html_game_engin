@@ -14,6 +14,7 @@
 <body onload="on_load_window();">
   <div class="lobby_wrap">
     <div>로비</div>
+    <div style="margin-top: 10px;color:aqua;" id="lobby_sub_title"></div>
     <div style="margin-top: 10px;">
       <button class="btn btn_gray">게임시작</button>
     </div>
@@ -39,6 +40,8 @@
           let go_manage_btn_wrap=document.getElementById("go_manage_btn_wrap");
           go_manage_btn_wrap.style.display="";
         }
+        let lobby_sub_title_obj=document.getElementById("lobby_sub_title");
+        lobby_sub_title_obj.innerHTML=LygLoginFunc.login_data.client_info["user_name"];
       }
       function go_logout() {
         fetch("/api/comp/user/login/logout", {

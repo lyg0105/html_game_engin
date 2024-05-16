@@ -6,6 +6,7 @@
   <link href="/css/base.css" rel="stylesheet" />
   <link href="/css/login.css" rel="stylesheet" />
   <link href="/css/button.css" rel="stylesheet" />
+  <link href="/css/table.css" rel="stylesheet" />
   <script src="/js/lib/string.js"></script>
   <script src="/js/login/login.js"></script>
   <title>Land Win Game</title>
@@ -14,15 +15,21 @@
 <body onload="on_load_window();">
   <div class="login_wrap">
     <div>회원리스트</div>
-    <table style="width:100%;margin-top:10px;">
-      <colgroup>
-        <col width="20%" />
-        <col width="80%" />
-      </colgroup>
-      <tbody id="user_tbody">
+    <div class="write_table_small">
+      <table style="width:100%;margin-top:10px;">
+        <colgroup>
+          <col width="20%" />
+          <col width="60%" />
+          <col width="20%" />
+        </colgroup>
+        <tbody id="user_tbody" >
 
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align: center;margin-top: 5px;">
+      <button class="btn btn_gray" onclick="location.href='/page/lobby';">뒤로가기</button>
+    </div>
     <script>
       function on_load_window() {
         LygLoginFunc.get_login_data();
@@ -31,11 +38,13 @@
       }
       function list() {
         let form_json_data = {
-          api_token_id:strFunc.get_storage("token_id"),
-          "now_page":"1",
-          "num_per_page":"20",
-          "order_id":"",
+          api_token_id: strFunc.get_storage("token_id"),
+          "now_page": "1",
+          "num_per_page": "20",
+          "order_id": "",
         };
+        let user_tbody = document.getElementById("user_tbody");
+        user_tbody.innerHTML="";
         fetch("/api/comp/user/user/list", {
           method: "POST",
           headers: {
@@ -48,22 +57,78 @@
             response.json()
               .then((result) => {
                 if (result["result"] == "true") {
-                  let user_tbody=document.getElementById("user_tbody");
-                  for(let i=0;i<result["data"]["info_arr"].length;i++){
-                    let info=result["data"]["info_arr"][i];
-                    let tr_str="<tr>";
-                    tr_str+="<td>"+(i+1)+"</td>";
-                    tr_str+="<td>"+info["a_user_name"]+"</td>";
-                    tr_str+="</tr>";
-                    user_tbody.innerHTML+=tr_str;
-                  }
-                  console.log(result["data"]["info_arr"]);
-                } else {
                   
+                  for (let i = 0; i < result["data"]["info_arr"].length; i++) {
+                    let info = result["data"]["info_arr"][i];
+                    let tr_str = "<tr>";
+                    tr_str += "<td>" + (i + 1) + "</td>";
+                    tr_str += "<td>" + info["a_user_name"] + "</td>";
+                    tr_str += 
+                      "<td>"+
+                        "<button class='btn_s btn_gray'>보기</button>"+
+                        "<button class='btn_s btn_red' style='margin-left:5px;' "+
+                        " onclick=\"go_delete({pri_val_arr:["+info["a_seq"]+"]});\">X</button>"+
+                      "</td>";
+                    tr_str += "</tr>";
+                    user_tbody.innerHTML += tr_str;
+                  }
+                } else {
+
                 }
               });
           });
       }
+      function go_delete(inData){
+        let opt_obj={
+          pri_val_arr:[],
+          ...inData
+        };
+        let pri_val_arr=[];
+        for(let i=0;i<opt_obj["pri_val_arr"].length;i++){
+          if(!strFunc.is_empty(opt_obj["pri_val_arr"][i])){
+            pri_val_arr.push(opt_obj["pri_val_arr"][i]);
+          }
+        }
+        if(pri_val_arr.length==0){
+          alert("키가 없습니다.");
+          return false;
+        }
+
+        if(!confirm(pri_val_arr.length+"명 유저를 삭제 하시겠습니까?")){
+          return false;
+        }
+
+        let del_data_arr=[];
+        for(let i=0;i<pri_val_arr.length;i++){
+          del_data_arr.push({
+            a_seq:pri_val_arr[i]
+          });
+        }
+
+        let form_json_data = {
+          api_token_id: strFunc.get_storage("token_id"),
+          "data_arr":del_data_arr,
+        };
+        fetch("/api/comp/user/user/delete", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form_json_data),
+        })
+          .then((response) => {
+            response.json()
+              .then((result) => {
+                if (result["result"] == "true") {
+                  alert(result["msg"]);
+                  list();
+                } else {
+                  alert(result["msg"]);
+                }
+              });
+          });
+      };
     </script>
   </div>
 </body>

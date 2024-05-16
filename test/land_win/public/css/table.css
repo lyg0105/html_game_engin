@@ -1,0 +1,13 @@
+.write_table_small{
+  width: 100%;
+}
+.write_table_small table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.write_table_small th, .write_table_small td{
+  border:1px solid #d8d8d8;
+  padding:2px 2px;
+  min-width: 35px;
+  font-size: 13px;
+}
