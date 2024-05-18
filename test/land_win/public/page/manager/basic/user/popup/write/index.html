@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/login.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <link href="/css/table.css" rel="stylesheet" />
+  <script src="/js/lib/string.js"></script>
+  <script src="/js/login/login.js"></script>
+  <title>Land Win Game</title>
+</head>
+
+<body onload="on_load_window();">
+  <div class="login_wrap">
+    <div>회원관리</div>
+    <div class="write_table_small">
+      <table style="width:100%;margin-top:10px;">
+        <colgroup>
+          <col width="20%" />
+          <col width="80%" />
+        </colgroup>
+        <tbody>
+          <tr>
+            <th>이름</th>
+            <td>
+              <input />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align: center;margin-top: 5px;">
+      <button class="btn btn_gray" onclick="window.close();">닫기</button>
+    </div>
+    <script>
+      function on_load_window() {
+        LygLoginFunc.get_login_data();
+        //LygLoginFunc.login_data.client_info
+      }
+      function list() {
+        let form_json_data = {
+          api_token_id: strFunc.get_storage("token_id"),
+          "now_page": "1",
+          "num_per_page": "20",
+          "order_id": "",
+        };
+        let user_tbody = document.getElementById("user_tbody");
+        user_tbody.innerHTML="";
+        fetch("/api/comp/user/user/list", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form_json_data),
+        })
+          .then((response) => {
+            response.json()
+              .then((result) => {
+                if (result["result"] == "true") {
+                  
+                } else {
+
+                }
+              });
+          });
+      }
+    </script>
+  </div>
+</body>
+
+</html>

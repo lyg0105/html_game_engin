@@ -1,0 +1,13 @@
+const { createServer } = require('node:http');
+var app = require('../server');
+const ChatSocketClass=require("../socket/chat");
+const server = createServer(app);
+
+const chat_class=new ChatSocketClass();
+chat_class.init({
+  server:server
+});
+
+server.listen(LygLandConstant.PORT, () => {
+  console.log('server running at http://localhost:'+LygLandConstant.PORT);
+});

@@ -9,21 +9,109 @@
   <link href="/css/table.css" rel="stylesheet" />
   <script src="/js/lib/string.js"></script>
   <script src="/js/login/login.js"></script>
+  <script src="/page/manager/basic/user/list/js/page.js"></script>
   <title>Land Win Game</title>
 </head>
 
-<body onload="on_load_window();">
-  <div class="login_wrap">
-    <div>회원리스트</div>
-    <div class="write_table_small">
-      <table style="width:100%;margin-top:10px;">
+<body onload="on_load_window();" id="win_body">
+  <div style="max-width: 1000px;margin:0 auto;padding-top:50px;">
+    <div>
+      회원리스트
+      <button class="btn btn_gray" style="margin-left: 5px;" 
+        onclick="pageClass.go_select_info(-1);">신규</button>
+    </div>
+    <div style="margin-top:10px;">
+      <table>
         <colgroup>
-          <col width="20%" />
-          <col width="60%" />
-          <col width="20%" />
+          <col width="50%">
+          <col width="50%">
         </colgroup>
-        <tbody id="user_tbody" >
+        <tbody>
+          <tr>
+            <td style="vertical-align: top;">
+              <div class="write_table_small" style="min-width: 400px;">
+                <table style="width:100%;">
+                  <colgroup>
+                    <col width="20%" />
+                    <col width="20%" />
+                    <col width="20%" />
+                    <col width="20%" />
+                    <col width="20%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>아이디</th>
+                      <th>이름</th>
+                      <th>닉네임</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="user_tbody">
 
+                  </tbody>
+                </table>
+              </div>
+            </td>
+            <td style="padding-left: 10px;vertical-align: top;">
+              <input type="hidden" id="write_user_seq" />
+              <div class="write_table_small" style="min-width: 400px;">
+                <table style="width:100%;">
+                  <colgroup>
+                    <col width="20%" />
+                    <col width="80%" />
+                  </colgroup>
+                  <tbody>
+                    <tr>
+                      <th>아이디</th>
+                      <td>
+                        <input type="text" id="write_user_id" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>비번</th>
+                      <td>
+                        <input type="password" id="write_user_pw" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>이름</th>
+                      <td>
+                        <input type="text" id="write_user_name" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>닉네임</th>
+                      <td>
+                        <input type="text" id="write_user_nickname" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>등급</th>
+                      <td>
+                        <select id="write_user_grade">
+                          <option value="m">마스터</option>
+                          <option value="c">고객</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>로그인</th>
+                      <td>
+                        <select id="write_is_login">
+                          <option value="1">허용</option>
+                          <option value="">미허용</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <button class="btn btn_gray" onclick="pageClass.go_write_right();">저장</button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -31,104 +119,12 @@
       <button class="btn btn_gray" onclick="location.href='/page/lobby';">뒤로가기</button>
     </div>
     <script>
+      let pageClass = new PageClass();
       function on_load_window() {
         LygLoginFunc.get_login_data();
         //LygLoginFunc.login_data.client_info
-        list();
+        pageClass.list();
       }
-      function list() {
-        let form_json_data = {
-          api_token_id: strFunc.get_storage("token_id"),
-          "now_page": "1",
-          "num_per_page": "20",
-          "order_id": "",
-        };
-        let user_tbody = document.getElementById("user_tbody");
-        user_tbody.innerHTML="";
-        fetch("/api/comp/user/user/list", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form_json_data),
-        })
-          .then((response) => {
-            response.json()
-              .then((result) => {
-                if (result["result"] == "true") {
-                  
-                  for (let i = 0; i < result["data"]["info_arr"].length; i++) {
-                    let info = result["data"]["info_arr"][i];
-                    let tr_str = "<tr>";
-                    tr_str += "<td>" + (i + 1) + "</td>";
-                    tr_str += "<td>" + info["a_user_name"] + "</td>";
-                    tr_str += 
-                      "<td>"+
-                        "<button class='btn_s btn_gray'>보기</button>"+
-                        "<button class='btn_s btn_red' style='margin-left:5px;' "+
-                        " onclick=\"go_delete({pri_val_arr:["+info["a_seq"]+"]});\">X</button>"+
-                      "</td>";
-                    tr_str += "</tr>";
-                    user_tbody.innerHTML += tr_str;
-                  }
-                } else {
-
-                }
-              });
-          });
-      }
-      function go_delete(inData){
-        let opt_obj={
-          pri_val_arr:[],
-          ...inData
-        };
-        let pri_val_arr=[];
-        for(let i=0;i<opt_obj["pri_val_arr"].length;i++){
-          if(!strFunc.is_empty(opt_obj["pri_val_arr"][i])){
-            pri_val_arr.push(opt_obj["pri_val_arr"][i]);
-          }
-        }
-        if(pri_val_arr.length==0){
-          alert("키가 없습니다.");
-          return false;
-        }
-
-        if(!confirm(pri_val_arr.length+"명 유저를 삭제 하시겠습니까?")){
-          return false;
-        }
-
-        let del_data_arr=[];
-        for(let i=0;i<pri_val_arr.length;i++){
-          del_data_arr.push({
-            a_seq:pri_val_arr[i]
-          });
-        }
-
-        let form_json_data = {
-          api_token_id: strFunc.get_storage("token_id"),
-          "data_arr":del_data_arr,
-        };
-        fetch("/api/comp/user/user/delete", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form_json_data),
-        })
-          .then((response) => {
-            response.json()
-              .then((result) => {
-                if (result["result"] == "true") {
-                  alert(result["msg"]);
-                  list();
-                } else {
-                  alert(result["msg"]);
-                }
-              });
-          });
-      };
     </script>
   </div>
 </body>
