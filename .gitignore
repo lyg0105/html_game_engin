@@ -1,1 +1,8 @@
 node_modules
+.well-known
+.env
+.env.backup
+app_vhost_server.js
+app_vhosts_server.js
+fcm_key_json.json
+allow_url.txt
