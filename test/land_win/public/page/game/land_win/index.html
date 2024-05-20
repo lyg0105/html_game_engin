@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <script src="/js/lib/string.js"></script>
+  <script src="/js/login/login.js"></script>
+  <title>Land Win Game</title>
+</head>
+
+<body>
+  <div style="max-width: 1000px;margin:0 auto;padding-top:50px;">
+    <div style="text-align: center;margin-top: 5px;">
+      <button class="btn btn_gray" onclick="location.href='/page/lobby';">뒤로가기</button>
+    </div>
+    <script type="module">
+      import a,{b} from './js/main.js';
+      console.log(a); // 10
+      console.log(b); // 10
+      window.addEventListener("load",()=>{
+        LygLoginFunc.get_login_data();
+        console.log(LygLoginFunc.login_data.client_info);
+      });
+    </script>
+  </div>
+</body>
+
+</html>
