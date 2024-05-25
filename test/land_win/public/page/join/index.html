@@ -15,8 +15,8 @@
     <div>회원가입</div>
     <table style="width:100%;margin-top:10px;">
       <colgroup>
-        <col width="20%" />
-        <col width="80%" />
+        <col width="30%" />
+        <col width="70%" />
       </colgroup>
       <tbody>
         <tr>
@@ -37,6 +37,12 @@
             <input type="text" id="user_name" value="" />
           </td>
         </tr>
+        <tr>
+          <th>닉네임</th>
+          <td>
+            <input type="text" id="user_nickname" value="" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <div style="margin-top:10px;">
@@ -51,6 +57,7 @@
         let user_id_input = document.getElementById("user_id");
         let user_pw_input = document.getElementById("user_pw");
         let user_name_input = document.getElementById("user_name");
+        let user_nickname_input=document.getElementById("user_nickname");
 
         if (user_id_input.value == "") {
           alert("아이디 입력 필요.");
@@ -71,6 +78,7 @@
           a_user_id: user_id_input.value,
           a_user_pw: user_pw_input.value,
           a_user_name: user_name_input.value,
+          a_user_nickname:user_nickname_input.value,
           a_is_login:"1",
         };
         let form_json_data = {

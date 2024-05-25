@@ -1,5 +1,6 @@
 .login_wrap{
-  width: 400px;
+  max-width: 300px;
+  width: 100%;
   margin:0 auto;
   margin-top: 200px;
   padding:10px;
