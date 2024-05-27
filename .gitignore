@@ -6,3 +6,5 @@ app_vhost_server.js
 app_vhosts_server.js
 fcm_key_json.json
 allow_url.txt
+
+env.js
