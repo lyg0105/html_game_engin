@@ -9,7 +9,13 @@ class ChatSocketClass {
     };
     let this_obj = this;
     this.server = opt_obj.server;
-    this.io = new Server(this.server);
+    this.io = new Server(this.server,{
+      cors: {
+        //origin: global.PrjChatConstant.ALLOW_SERVER_URL,
+        origin:"*",
+        methods: ["GET", "POST"]
+      }
+    });
 
     this.io.on('connection', (socket) => {
       console.log('a user connected');
