@@ -10,21 +10,40 @@
   <title>Land Win Game</title>
 </head>
 
-<body>
-  <div style="max-width: 1000px;margin:0 auto;padding-top:50px;">
-    <div style="text-align: center;margin-top: 5px;">
-      <button class="btn btn_gray" onclick="location.href='/page/lobby';">뒤로가기</button>
-    </div>
-    <script type="module">
-      import a,{b} from './js/main.js';
-      console.log(a); // 10
-      console.log(b); // 10
-      window.addEventListener("load",()=>{
-        LygLoginFunc.get_login_data();
-        console.log(LygLoginFunc.login_data.client_info);
-      });
-    </script>
+<body id="game_body">
+  <div id="script_div"></div>
+  <button class="btn btn_gray" onclick="location.href='/page/lobby';" style="position:fixed;left:2;top:2;">뒤로가기</button>
+  <div>
+
   </div>
+  <script type="module">
+    import Myconstant from "/js/env.js";
+    import LandGame from './js/main.js';
+    let client_info = null;
+    let socket = null;
+
+    function go_start_game() {
+      let landGame = new LandGame({
+        io: io,
+        game_body: document.getElementById("game_body"),
+        client_info:client_info,
+      });
+      landGame.start();
+    };
+
+    window.addEventListener("load", () => {
+      LygLoginFunc.get_login_data();
+      client_info = LygLoginFunc.login_data.client_info;
+      let script_div = document.getElementById("script_div");
+      const io_script = document.createElement("script");
+      io_script.async = false;
+      io_script.src = Myconstant.chat_url + "/socket.io/socket.io.js";
+      script_div.appendChild(io_script);
+      setTimeout(() => {
+        go_start_game();
+      }, 500);
+    });
+  </script>
 </body>
 
 </html>
