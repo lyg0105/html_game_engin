@@ -1,5 +1,6 @@
 class GameChat{
   io=null;
+  Myconstant={};
   game_body=null;
   socket=null;
   elements={
@@ -26,12 +27,14 @@ class GameChat{
       io:null,
       game_body:null,
       client_info:{},
+      Myconstant:{},
       ...inData
     };
     let this_obj=this;
     this.io=opt_obj.io;
     this.game_body=opt_obj.game_body;
     this.client_info=opt_obj.client_info;
+    this.Myconstant=opt_obj.Myconstant;
     this.make_element();
     this.elements.open_btn.addEventListener("click",()=>{
       let chat_wrap=this_obj.elements.chat_wrap;
@@ -48,7 +51,13 @@ class GameChat{
   }
   start(){
     let this_obj=this;
-    this.socket = this.io();
+    let cors_opt={
+      cors: {
+        origin: "*",
+      },
+      secure: true
+    };
+    this.socket = this.io(this.Myconstant.chat_url,cors_opt);
     this.user_data={
       "room_id": "public",
       "user_name": this.client_info["user_name"],
