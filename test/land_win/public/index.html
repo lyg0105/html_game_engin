@@ -8,13 +8,14 @@
   <link href="/css/button.css" rel="stylesheet" />
   <script src="/js/lib/string.js"></script>
   <script src="/js/login/login.js"></script>
+  <script src="/page/login/js/login.js"></script>
   <title>Land Win Game</title>
 </head>
 
-<body onload="on_load_window();">
+<body>
   <div class="login_wrap">
     <div>Login</div>
-    <table style="width:100%;margin-top:10px;">
+    <table>
       <colgroup>
         <col width="30%" />
         <col width="70%" />
@@ -23,70 +24,21 @@
         <tr>
           <th>아이디</th>
           <td>
-            <input type="text" id="user_id" value="lyg" />
+            <input type="text" id="user_id" />
           </td>
         </tr>
         <tr>
           <th>비밀번호</th>
           <td>
-            <input type="password" id="user_pw" value="1" />
+            <input type="password" id="user_pw" />
           </td>
         </tr>
       </tbody>
     </table>
-    <div style="margin-top:10px;">
-      <button class="btn btn_gray" style="width:250px;" onclick="go_login();">로그인</button>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray" onclick="go_login();">로그인</button>
+      <button class="btn btn_gray" onclick="register();">회원가입</button>
     </div>
-    <div style="margin-top:10px;">
-      <button class="btn btn_gray" style="width:250px;" onclick="location.href='/page/join';">회원가입</button>
-    </div>
-    <script>
-      function on_load_window() {
-        LygLoginFunc.get_login_data();
-        if(!strFunc.is_empty(LygLoginFunc.login_data.token_id)
-          &&!strFunc.is_empty(LygLoginFunc.login_data.client_info["user_seq"])){
-          location.href="/page/lobby";
-          return false;
-        }
-      }
-      function go_login() {
-        let user_id_input = document.getElementById("user_id");
-        let user_pw_input = document.getElementById("user_pw");
-
-        if (user_id_input.value == "") {
-          alert("아이디 입력 필요.");
-          return false;
-        }
-        if (user_pw_input.value == "") {
-          alert("암호 입력 필요.");
-          return false;
-        }
-
-        fetch("/api/comp/user/login/login", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: user_id_input.value,
-            pw: user_pw_input.value,
-          }),
-        })
-          .then((response) => {
-            response.json()
-              .then((result) => {
-                if (result["result"] == "true") {
-                  strFunc.set_storage("token_id", result["data"]["token_id"]);
-                  strFunc.set_storage("client_info", JSON.stringify(result["data"]["client_info"]));
-                  location.href="/page/lobby";
-                } else {
-                  alert(result["msg"]);
-                }
-              });
-          });
-      }
-    </script>
   </div>
 </body>
 
