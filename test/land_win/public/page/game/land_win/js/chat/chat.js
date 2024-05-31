@@ -80,9 +80,17 @@ class GameChat{
     });
     this.socket.on('chat_msg', (data) => {
       let chat_msg_wrap=this_obj.elements.chat_msg_wrap;
-      let msg_row=document.createElement("div");
-      msg_row.innerHTML=data.msg;
-      chat_msg_wrap.appendChild(msg_row);
+      let user_name_color="#6c90ff";
+      if(this_obj.client_info["user_seq"]==data.user_seq){
+        user_name_color="#29ff29";
+      }
+      let u_name_style="color:"+user_name_color+";font-weight:bold;";
+      let msg_row_str=
+        "<div>"+
+          "<span style='"+u_name_style+"' >"+data.user_name+"</span>"+
+          "<span style='margin-left:3px;' >"+data.msg+"</span>"+
+        "</div>";
+      chat_msg_wrap.innerHTML+=msg_row_str;
       chat_msg_wrap.scrollTop=chat_msg_wrap.scrollHeight;
     });
     let send_msg_btn=this_obj.elements.send_msg_btn;
@@ -108,6 +116,7 @@ class GameChat{
     this.elements.send_msg_wrap.style.borderTop="1px solid green";
 
     this.elements.msg_input=document.createElement("input");
+    this.elements.msg_input.style.width="217px";
     this.elements.send_msg_btn=document.createElement("button");
     this.elements.send_msg_btn.innerHTML="보내기";
     this.elements.msg_clear_btn=document.createElement("button");
