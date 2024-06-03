@@ -64,7 +64,6 @@ class CanvasMain
         if(start_y>max_draw_y){
           break;
         }
-        count++;
         this.ctx.fillRect(start_x, start_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
         this.ctx.strokeRect(start_x, start_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
       }
