@@ -1,3 +1,6 @@
+import GameData from "./data/game_data.js";
+import CanvasMain from "./canvas/index.js";
+
 class GameMain {
     io = null;
     game_body = null;
@@ -9,6 +12,7 @@ class GameMain {
         "user_name": "",
         "user_seq": "",
     };
+    game_data={};
     constructor(inData) {
         let opt_obj = {
             io: null,
@@ -27,6 +31,11 @@ class GameMain {
     }
     init() {
         console.log('GameMain init');
+        this.game_data = new GameData();
+        this.game_data.canvas.class=new CanvasMain({
+            game_data:this.game_data,
+            game_body:this.game_body,
+        });
     }
 }
 export default GameMain;

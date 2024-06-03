@@ -98,17 +98,20 @@ class GameChat{
   make_element(){
     //메세지박스
     this.elements.chat_msg_wrap=document.createElement("div");
-    this.elements.chat_msg_wrap.style.height="350px";
+    this.elements.chat_msg_wrap.style.flexGrow="1";
     this.elements.chat_msg_wrap.style.overflow="auto";
+    this.elements.chat_msg_wrap.style.background="#000";
 
     //보내기박스
     this.elements.send_msg_wrap=document.createElement("div");
     this.elements.send_msg_wrap.style.borderTop="1px solid green";
+    this.elements.send_msg_wrap.style.display="flex";
 
     this.elements.msg_input=document.createElement("input");
-    this.elements.msg_input.style.width="217px";
+    this.elements.msg_input.style.width="213px";
+    this.elements.msg_input.style.flexGrow="1";
     this.elements.send_msg_btn=document.createElement("button");
-    this.elements.send_msg_btn.innerHTML="보내기";
+    this.elements.send_msg_btn.innerHTML="Send";
     this.elements.msg_clear_btn=document.createElement("button");
     this.elements.msg_clear_btn.innerHTML="Clear";
     this.elements.send_msg_wrap.appendChild(this.elements.msg_input);
@@ -118,6 +121,9 @@ class GameChat{
     //내용박스
     this.elements.chat_wrap_con=document.createElement("div");
     this.elements.chat_wrap_con.style.position="relative";
+    this.elements.chat_wrap_con.style.display="flex";
+    this.elements.chat_wrap_con.style.flexDirection="column";
+    this.elements.chat_wrap_con.style.height="100%";
     this.elements.chat_wrap_con.appendChild(this.elements.chat_msg_wrap);
     this.elements.chat_wrap_con.appendChild(this.elements.send_msg_wrap);
 
@@ -125,10 +131,11 @@ class GameChat{
     this.elements.chat_wrap=document.createElement("div");
     this.elements.chat_wrap.style.position="fixed";
     this.elements.chat_wrap.style.left="0px";
-    this.elements.chat_wrap.style.bottom="0px";
-    this.elements.chat_wrap.style.minHeight="400px";
+    this.elements.chat_wrap.style.bottom="30px";
+    this.elements.chat_wrap.style.height="400px";
     this.elements.chat_wrap.style.width="300px";
     this.elements.chat_wrap.style.border="1px solid #ddd";
+    this.elements.chat_wrap.style.background="#000";
     this.elements.chat_wrap.appendChild(this.elements.chat_wrap_con);
 
     //채팅열기버튼
