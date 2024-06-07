@@ -28,8 +28,6 @@ class LandGame{
     this.Myconstant=opt_obj.Myconstant;
   }
   start(){
-    console.log("Game Start");
-
     let this_obj=this;
     let cors_opt={
       cors: {

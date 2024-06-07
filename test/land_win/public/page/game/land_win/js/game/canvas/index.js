@@ -16,7 +16,6 @@ class CanvasMain
   }
   init()
   {
-    console.log('CanvasMain init');
     this.game_data.canvas.width=this.game_body.offsetWidth;
     this.game_data.canvas.height=this.game_body.offsetHeight;
     this.game_data.screen.width=this.game_data.canvas.width;

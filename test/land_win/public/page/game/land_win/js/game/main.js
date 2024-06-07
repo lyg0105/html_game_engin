@@ -1,5 +1,7 @@
 import GameData from "./data/game_data.js";
 import CanvasMain from "./canvas/index.js";
+import EventMain from "./event/index.js";
+import ProcessMain from "./process/index.js";
 
 class GameMain {
     io = null;
@@ -13,6 +15,7 @@ class GameMain {
         "user_seq": "",
     };
     game_data={};
+    process=null;
     constructor(inData) {
         let opt_obj = {
             io: null,
@@ -30,11 +33,17 @@ class GameMain {
         this.init();
     }
     init() {
-        console.log('GameMain init');
         this.game_data = new GameData();
         this.game_data.canvas.class=new CanvasMain({
             game_data:this.game_data,
             game_body:this.game_body,
+        });
+        this.game_data.event=new EventMain({
+            game_data:this.game_data,
+            game_body:this.game_body,
+        });
+        this.process=new ProcessMain({
+            game_data:this.game_data,
         });
     }
 }
