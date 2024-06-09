@@ -4,6 +4,7 @@ class GameData {
     height: 0,
     x:0,
     y:0,
+    speed:10,
   };
   canvas = {
     class:null,
@@ -18,10 +19,11 @@ class GameData {
     cell_width:60,
     cell_height:60,
   };
+  event=null;
+  control=null;
   units=[];//build,unit {id:0,x:0,y:0,sort:'build'}
   player_units=[];//id arr [1,2,3..]
   epects=[];
-  event={};
   actions=[];
 };
 

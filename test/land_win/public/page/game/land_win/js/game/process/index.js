@@ -17,13 +17,12 @@ class ProcessMain
   init()
   {
     let this_obj=this;
-    this_obj.start();
-    
   }
   start()
   {
     let this_obj=this;
     this.loop=setInterval(()=>{
+      this_obj.game_data.control.action();
       this_obj.game_data.canvas.class.draw();
     },this.data.loop_wait);
   }

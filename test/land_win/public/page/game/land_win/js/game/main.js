@@ -2,6 +2,7 @@ import GameData from "./data/game_data.js";
 import CanvasMain from "./canvas/index.js";
 import EventMain from "./event/index.js";
 import ProcessMain from "./process/index.js";
+import GameControl from "./control/index.js";
 
 class GameMain {
     io = null;
@@ -42,9 +43,13 @@ class GameMain {
             game_data:this.game_data,
             game_body:this.game_body,
         });
+        this.game_data.control=new GameControl({
+            game_data:this.game_data,
+        });
         this.process=new ProcessMain({
             game_data:this.game_data,
         });
+        this.process.start();
     }
 }
 export default GameMain;
