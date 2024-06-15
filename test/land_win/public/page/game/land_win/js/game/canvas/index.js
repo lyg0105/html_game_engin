@@ -41,19 +41,19 @@ class CanvasMain
     this.clear();
     this.ctx.fillStyle = '#444444';
     this.ctx.strokeStyle = '#ffffff';
-    let min_draw_x=this.game_data.screen.x;
-    let min_draw_y=this.game_data.screen.y;
+    let min_draw_x=this.game_data.screen.x-this.game_data.map.cell_width;
+    let min_draw_y=this.game_data.screen.y-this.game_data.map.cell_height;
     let max_draw_x=this.game_data.screen.x+this.game_data.screen.width;
     let max_draw_y=this.game_data.screen.y+this.game_data.screen.height;
 
     for(let i=0;i<this.game_data.map.cell_size;i++){
       let start_x=i*this.game_data.map.cell_width;
-
       if(start_x<min_draw_x){
         continue;
       }
       for(let j=0;j<this.game_data.map.cell_size;j++){
         let start_y=j*this.game_data.map.cell_height;
+
         if(start_y<min_draw_y){
           continue;
         }
@@ -63,8 +63,15 @@ class CanvasMain
         if(start_y>max_draw_y){
           break;
         }
-        this.ctx.fillRect(start_x, start_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
-        this.ctx.strokeRect(start_x, start_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
+        let draw_x=start_x-this.game_data.screen.x;
+        let draw_y=start_y-this.game_data.screen.y;
+
+        this.ctx.fillStyle = '#444444';
+        this.ctx.fillRect(draw_x, draw_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
+        this.ctx.strokeRect(draw_x, draw_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.font = "12px Arial";
+        this.ctx.fillText(i+","+j, draw_x+5, draw_y+15);
       }
     }
   }

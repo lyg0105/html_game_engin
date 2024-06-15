@@ -20,6 +20,13 @@ class ScreenControl{
     if(control_json.map_right){
       screen_data.x+=screen_data.speed;
     }
+
+    if(screen_data.x<0){
+      screen_data.x=0;
+    }
+    if(screen_data.y<0){
+      screen_data.y=0;
+    }
   };
 }
 export default ScreenControl;
