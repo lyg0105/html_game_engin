@@ -39,6 +39,15 @@ class EventMain
     this.game_body.addEventListener('keyup',(e)=>{
       this_obj.on_key_up(e);
     });
+    this.game_body.addEventListener('touchstart',(e)=>{
+      this_obj.on_mouse_down(e);
+    });
+    this.game_body.addEventListener('touchend',(e)=>{
+      this_obj.on_mouse_up(e);
+    });
+    this.game_body.addEventListener('touchmove',(e)=>{
+      this_obj.on_mouse_move(e);
+    });
   }
   on_mouse_down(e){
     let this_obj=this;
@@ -76,6 +85,15 @@ class EventMain
     this.on_key_custom_up(e);
   }
   on_key_custom_up(e){
+
+  }
+  on_mouse_move(e){
+    let this_obj=this;
+    this_obj.data.mouse_x=e.touches[0].clientX;
+    this_obj.data.mouse_y=e.touches[0].clientY;
+    this.on_mouse_custom_move(e);
+  }
+  on_mouse_custom_move(e){
 
   }
 }
