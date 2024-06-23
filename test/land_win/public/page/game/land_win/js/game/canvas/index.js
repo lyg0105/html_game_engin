@@ -74,6 +74,11 @@ class CanvasMain
         this.ctx.fillText(i+","+j, draw_x+5, draw_y+15);
       }
     }
+
+    this.ctx.strokeStyle = "#2EFE2E";
+    let drag_rect=this.game_data.event.data.drag_rect;
+
+    this.ctx.strokeRect(drag_rect.x, drag_rect.y, drag_rect.w, drag_rect.h);
   }
 }
 export default CanvasMain;

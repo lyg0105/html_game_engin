@@ -35,16 +35,16 @@ class GameMain {
     }
     init() {
         this.game_data = new GameData();
-        this.game_data.canvas.class=new CanvasMain({
-            game_data:this.game_data,
-            game_body:this.game_body,
-        });
         this.game_data.event=new EventMain({
             game_data:this.game_data,
             game_body:this.game_body,
         });
         this.game_data.control=new GameControl({
             game_data:this.game_data,
+        });
+        this.game_data.canvas.class=new CanvasMain({
+            game_data:this.game_data,
+            game_body:this.game_body,
         });
         this.process=new ProcessMain({
             game_data:this.game_data,

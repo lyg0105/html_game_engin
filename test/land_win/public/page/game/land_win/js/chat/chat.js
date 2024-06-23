@@ -43,8 +43,10 @@ class GameChat{
       let chat_wrap=this_obj.elements.chat_wrap;
       if(chat_wrap.style.display=="none"){
         chat_wrap.style.display="block";
+        strFunc.set_storage("is_open_chat_box","1");
       }else{
         chat_wrap.style.display="none";
+        strFunc.set_storage("is_open_chat_box","");
       }
     });
     this.elements.msg_clear_btn.addEventListener("click",()=>{
@@ -144,6 +146,11 @@ class GameChat{
     this.elements.open_btn.style.left="2px";
     this.elements.open_btn.style.bottom="2px";
     this.elements.open_btn.innerHTML="채팅";
+    if(strFunc.get_storage("is_open_chat_box")=="1"){
+      this.elements.chat_wrap.style.display="block";
+    }else{
+      this.elements.chat_wrap.style.display="none";
+    }
 
     //body에추가
     this.game_body.appendChild(this.elements.chat_wrap);
