@@ -32,12 +32,12 @@ class GameControl{
   }
   init(){
     let this_obj=this;
-    this.game_data.event.on_key_custom_down=(e)=>{
+    this.game_data.event.on_key_down_custom=(e)=>{
       this_obj.key_down({
         keyCode:e.keyCode,
       });
     };
-    this.game_data.event.on_key_custom_up=(e)=>{
+    this.game_data.event.on_key_up_custom=(e)=>{
       this_obj.key_up({
         keyCode:e.keyCode,
       });

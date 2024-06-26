@@ -1,3 +1,5 @@
+import Stage1Process from './stage1/index.js';
+
 class ProcessMain
 {
   game_data={};
@@ -21,8 +23,12 @@ class ProcessMain
   start()
   {
     let this_obj=this;
+    let stage1_process=new Stage1Process({
+      game_data:this_obj.game_data,
+    });
     this.loop=setInterval(()=>{
       this_obj.game_data.control.action();
+      stage1_process.run();
       this_obj.game_data.canvas.class.draw();
     },this.data.loop_wait);
   }

@@ -38,6 +38,7 @@ class CanvasMain
   }
   draw()
   {
+    let this_obj=this;
     this.clear();
     this.ctx.fillStyle = '#444444';
     this.ctx.strokeStyle = '#ffffff';
@@ -65,8 +66,19 @@ class CanvasMain
         }
         let draw_x=start_x-this.game_data.screen.x;
         let draw_y=start_y-this.game_data.screen.y;
+        let draw_xy_str=i+"_"+j;
+        let is_selected_cell=false;
+        if(this.game_data.func.stringFunc.str_in_array(draw_xy_str,this_obj.game_data.selected_cells)!=-1){
+          is_selected_cell=true;
+        }
 
         this.ctx.fillStyle = '#444444';
+        this.ctx.strokeStyle = '#ffffff';
+        //선택된건지 확인하기.
+        if(is_selected_cell){
+          this.ctx.fillStyle = '#44aa22';
+        }
+
         this.ctx.fillRect(draw_x, draw_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
         this.ctx.strokeRect(draw_x, draw_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
         this.ctx.fillStyle = "#ffffff";

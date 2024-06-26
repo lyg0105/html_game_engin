@@ -66,9 +66,9 @@ class EventMain
       this_obj.data.drag_rect.x=e.touches[0].clientX;
       this_obj.data.drag_rect.y=e.touches[0].clientY;
     }
-    this.on_mouse_custom(e);
+    this.on_mouse_down_custom(e);
   }
-  on_mouse_custom(e){
+  on_mouse_down_custom(e){
 
   }
   on_mouse_up(e){
@@ -84,9 +84,9 @@ class EventMain
       this_obj.data.mouse_up_y=e.clientY;
     }
     this_obj.data.drag_rect={x:0,y:0,w:0,h:0};
-    this.on_mouse_custom_up(e);
+    this.on_mouse_up_custom(e);
   }
-  on_mouse_custom_up(e){
+  on_mouse_up_custom(e){
 
   }
   on_mouse_move(e){
@@ -106,25 +106,25 @@ class EventMain
         this_obj.data.drag_rect.h=e.touches[0].clientY-this_obj.data.drag_rect.y;
       }
     }
-    this.on_mouse_custom_move(e);
+    this.on_mouse_move_custom(e);
   }
-  on_mouse_custom_move(e){
+  on_mouse_move_custom(e){
 
   }
   on_key_down(e){
     let this_obj=this;
     this_obj.data.key_downs[e.keyCode]=true;
-    this.on_key_custom_down(e);
+    this.on_key_down_custom(e);
   }
-  on_key_custom_down(e){
+  on_key_down_custom(e){
 
   }
   on_key_up(e){
     let this_obj=this;
     delete this_obj.data.key_downs[e.keyCode];
-    this.on_key_custom_up(e);
+    this.on_key_up_custom(e);
   }
-  on_key_custom_up(e){
+  on_key_up_custom(e){
 
   }
 }
