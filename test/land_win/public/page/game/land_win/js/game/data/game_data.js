@@ -24,9 +24,11 @@ class GameData {
   units={};//build,unit {"1":{id:0,x:0,y:0,sort:'build'},...}
   player_units=[];//id arr [1,2,3..]
   selected_cells=[];
+  buttons=[];//[{}]
   epects=[];
   actions=[];
   func={
+    collisionFunc:null,
     stringFunc:null,
     cellFunc:null,
   };

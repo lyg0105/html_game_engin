@@ -21,6 +21,11 @@ class GameControl{
     map_down:false,
     map_left:false,
     map_right:false,
+    map_move_toggle:false,
+  };
+  map_drag_json={
+    pre_x:0,
+    pre_x:0,
   };
   constructor(inData){
     let opt_obj={
@@ -54,6 +59,25 @@ class GameControl{
     for(let key in this.key_code_json){
       if(this.key_code_json[key]==key_code){
         this.control_json[key]=false;
+      }
+    }
+  }
+  mouse_down=()=>{
+    let this_obj=this;
+    this_obj.map_drag_json.pre_x=this_obj.game_data.event.data.mouse_x;
+    this_obj.map_drag_json.pre_y=this_obj.game_data.event.data.mouse_y;
+  };
+  mouse_move(){
+    let this_obj=this;
+    //마우스로 맵움직임
+    if(this_obj.control_json.map_move_toggle){
+      if(this_obj.game_data.event.data.is_mouse_down){
+        let change_x=this_obj.map_drag_json.pre_x-this_obj.game_data.event.data.mouse_up_x;
+        let change_y=this_obj.map_drag_json.pre_y-this_obj.game_data.event.data.mouse_up_y;
+        this_obj.game_data.screen.x+=change_x;
+        this_obj.game_data.screen.y+=change_y;
+        this_obj.map_drag_json.pre_x=this_obj.game_data.event.data.mouse_up_x;
+        this_obj.map_drag_json.pre_y=this_obj.game_data.event.data.mouse_up_y;
       }
     }
   }

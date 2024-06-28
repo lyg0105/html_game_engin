@@ -3,6 +3,7 @@ import CanvasMain from "./canvas/index.js";
 import EventMain from "./event/index.js";
 import ProcessMain from "./process/index.js";
 import GameControl from "./control/index.js";
+import CollisionFunc from "./func/collision/index.js";
 import StringFunc from "./func/string/index.js";
 import CellFunc from "./func/cell/index.js";
 
@@ -37,6 +38,7 @@ class GameMain {
     }
     init() {
         this.game_data = new GameData();
+        this.game_data.func.collisionFunc=CollisionFunc;
         this.game_data.func.stringFunc=new StringFunc();
         this.game_data.func.cellFunc=new CellFunc();
         this.game_data.event=new EventMain({

@@ -83,14 +83,22 @@ class CanvasMain
         this.ctx.strokeRect(draw_x, draw_y, this.game_data.map.cell_width, this.game_data.map.cell_height);
         this.ctx.fillStyle = "#ffffff";
         this.ctx.font = "12px Arial";
+        this.ctx.textAlign ="left";
         this.ctx.fillText(i+","+j, draw_x+5, draw_y+15);
       }
     }
 
-    this.ctx.strokeStyle = "#2EFE2E";
-    let drag_rect=this.game_data.event.data.drag_rect;
+    //드래그 사각형 그리기
+    if(this_obj.game_data.control.control_json.map_move_toggle==false){
+      this.ctx.strokeStyle = "#2EFE2E";
+      let drag_rect=this.game_data.event.data.drag_rect;
+      this.ctx.strokeRect(drag_rect.x, drag_rect.y, drag_rect.w, drag_rect.h);
+    }
 
-    this.ctx.strokeRect(drag_rect.x, drag_rect.y, drag_rect.w, drag_rect.h);
+    //버튼 그리기
+    this.game_data.buttons.forEach((button)=>{
+      button.draw(this.ctx);
+    });
   }
 }
 export default CanvasMain;
