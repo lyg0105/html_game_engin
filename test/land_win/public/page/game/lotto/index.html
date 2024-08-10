@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./img/lotto_logo.png" type="image/x-icon" />
+  <title>로또번호 생성기</title>
+</head>
+<body style="background: #bbb;">
+  <div style="width: 500px;margin:0 auto;background:#fff;padding:20px;">
+    <h5>
+      로또번호 박스
+    </h5>
+    <div>
+      <button id="lotto_btn">로또번호 생성</button>
+      <button id="auto_add_btn">자동생성</button>
+      <button id="auto_add_stop_btn">중지</button>
+      <button id="remove_all_btn">초기화</button>
+    </div>
+    <div style="margin-top:5px;">
+      매치:
+      <input id="match_num1" style="width:20px;text-align: center;"/>
+      <input id="match_num2" style="width:20px;text-align: center;"/>
+      <input id="match_num3" style="width:20px;text-align: center;"/>
+      <input id="match_num4" style="width:20px;text-align: center;"/>
+      <input id="match_num5" style="width:20px;text-align: center;"/>
+      <input id="match_num6" style="width:20px;text-align: center;"/>
+    </div>
+    <div>
+      Total:
+      <span id="total_span" style="margin-left:3px;"></span>
+    </div>
+    <div id="lotto_list" style="margin-top:5px;max-height: 280px;overflow: auto;">
+
+    </div>
+  </div>
+  <script type="module">
+    import Main from './js/main.js';
+    let main=new Main();
+    main.init();
+  </script>
+</body>
+</html>
