@@ -75,3 +75,4 @@ class LygMath{
     return up_num_arr;
   };
 }
+export default LygMath;

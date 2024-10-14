@@ -1,26 +1,39 @@
-let inven_items=[];
-function farming(){
-  inven_items.push("Item.."+LygMath.random(0,100));
-  showInven();
-}
-function showInven(){
-  let inven_div=document.getElementById("inven");
-  inven_div.innerHTML="";
-  for(let i=0;i<inven_items.length;i++){
-    inven_div.innerHTML+=
-      "<p>"+
-        inven_items[i]+
-        "<button onclick='removeItem("+i+");' >X</button>"+
-      "</p>";
+import GameData from './data/data.js';
+import GameControl from "./control/index.js";
+import GameEvent from "./event/index.js";
+import GameView from "./view/index.js";
+import GameProcess from "./process/index.js";
+import LygMath from "./func/math.js";
+import LygString from "./func/string.js";
+
+class Main
+{
+  gameData=null;
+  gameControl=null;
+  gameEvent=null;
+  gameView=null
+  gameProcess=null;
+  func={
+    math:LygMath,
+    string:LygString
+  };
+  constructor(){
+    this.init();
+  }
+  init(){
+    this.gameData = new GameData();
+    let in_construct_obj={
+      main:this
+    };
+    this.gameView = new GameView(in_construct_obj);
+    this.gameEvent = new GameEvent(in_construct_obj);
+    this.gameControl = new GameControl(in_construct_obj);
+    this.gameProcess = new GameProcess(in_construct_obj);
+
+    this.gameView.init_html();
+    this.gameEvent.add_event_to_html();
+    this.gameControl.init();
+    this.gameControl.start();
   }
 }
-function removeItem(idx){
-  let new_inven_items=[];
-  for(let i=0;i<inven_items.length;i++){
-    if(i!=idx){
-      new_inven_items.push(inven_items[i]);
-    }
-  }
-  inven_items=new_inven_items;
-  showInven();
-}
+export default Main;

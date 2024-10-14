@@ -1,0 +1,18 @@
+.gold_table{
+  width: 80%;
+  margin: 0 auto;
+  border:1px solid #999;
+  border-radius: 10px;
+  padding: 10px;
+}
+.gold_table table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.gold_table table th,.gold_table table td{
+  text-align: center;
+  font-size: 16px;
+}
+#gold_span{
+  color: gold;
+}

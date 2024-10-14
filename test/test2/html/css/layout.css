@@ -1,0 +1,24 @@
+.game_wrap{
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+}
+.game_content_wrap{
+  max-width: 500px;
+  height: 100%;
+  margin: 0 auto;
+}
+.game_title{
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.farm_btn_wrap{
+  text-align: center;
+  padding:5px;
+  border:1px solid #84c67e;
+  border-radius: 5px;
+  margin: 10px;
+}
