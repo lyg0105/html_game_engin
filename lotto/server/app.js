@@ -2,12 +2,15 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var cors = require('cors');
 var logger = require('morgan');
 
 global.LottoConstant=require('./config/my_constant');
+global.LottoConstant.conn_pools = require('./model/static/db_pool');//db_pool 전역변수
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var apiRouter = require('./routes/api');
 
 var app = express();
 
@@ -21,8 +24,20 @@ app.use(express.urlencoded({ extended: true,limit:"100mb",parameterLimit: 100000
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+var corsOptionsDelegate = function (req, callback) {
+  let allow_list = global.LottoConstant.ALLOW_URL_ARR;
+  let corsOptions;
+  if(allow_list.indexOf(req.header('origin')) !== -1){
+    corsOptions = { origin: true,credentials: true };
+  } else {
+    corsOptions = { origin: false };
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+// app.use('/', indexRouter);
+// app.use('/users', usersRouter);
+app.use('/api',cors(corsOptionsDelegate), apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+
+<body>
+  <form method="post" action="/api/test/mytest/test">
+    <button type="submit">Submit</button>
+  </form>
+  <form method="post" action="/api/test/mytest/test2">
+    <button type="submit">Submit2</button>
+  </form>
+  <script>
+    async function lotto_crolling_ajax() {
+      let drw_no = document.getElementById("drw_no").value;
+      fetch('/api/test/mytest/lotto_crolling', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          drw_no: drw_no,
+        }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result["result"] == "true") {
+            alert(result["msg"]);
+          } else {
+            alert(result["msg"]);
+          }
+        });
+    };
+    async function lotto_crolling_all_ajax() {
+      fetch('/api/test/mytest/lotto_crolling_all', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          drw_no: "",
+        }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result["result"] == "true") {
+            alert(result["msg"]);
+          } else {
+            alert(result["msg"]);
+          }
+        });
+    }
+    async function lotto_crolling_next_ajax() {
+      fetch('/api/lotto/number_list/next_crolling', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          drw_no: "",
+        }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result["result"] == "true") {
+            alert(result["msg"]);
+          } else {
+            alert(result["msg"]);
+          }
+        });
+    }
+    
+  </script>
+  <input type="text" id="drw_no" name="drw_no" value="600" style="width: 50px;" />
+  <button onclick="lotto_crolling_ajax();">크롤링</button>
+  <div>
+    <button onclick="lotto_crolling_all_ajax();">로또 모두가져오기</button>
+  </div>
+  <div>
+    <button onclick="lotto_crolling_next_ajax();">다음 로또 크롤링</button>
+  </div>
+</body>
+
+</html>
