@@ -1,0 +1,99 @@
+letsencrypt 이용 SSL 인증서 만들기
+standalone : 서버 자체에서 인증을 시도하는 방식
+webroot : 외부 웹에서 사이트에 접속해 문제가 없는지를 확인해 인증하는 방식
+
+webroot 방식으로 할 것임.
+
+snapd 설치
+sudo yum install snapd
+
+스넵소켓허용
+sudo systemctl enable --now snapd.socket
+
+링크
+sudo ln -s /var/lib/snapd/snap /snap
+
+스넵업데이트
+sudo snap install core
+sudo snap refresh core
+
+기존 윰으로 깔린것은 삭제
+sudo yum remove certbot
+
+(스넵봇)설치에러시 처리
+error: too early for operation, device not yet seeded or device model not acknowledged
+스넵엑티여부 확인
+systemctl status snapd.seeded.service
+인엑티브면 먼가덜깔린거임 더깔자
+snap install terragrunt
+스넵시작
+systemctl start snapd.seeded.service
+서트봇 설치 진행...
+
+서트봇 설치
+sudo snap install --classic certbot
+
+링크
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+웹루트로 설치해보자
+sudo certbot certonly --webroot
+
+웹루트경로에 .well-known 폴더 생성
+cd public
+mkdir .well-known
+chmod 777 .well-known
+
+인증서발급(단계에 따라 필요한 내용 입력)
+sudo certbot certonly --webroot
+1.이메일입력
+2.기간동의
+3.이메일수신동의(계정등록완료)
+4.도메인입력 mydomain.com
+5.웹루트경로 입력
+6.성공메세지 확인, 인증서 경로 확인
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/mydomain.com/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/mydomain.com/privkey.pem
+This certificate expires on 2024-03-09.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+리뉴얼가능한지 테스트
+sudo certbot renew --dry-run
+
+크론탭등록
+//크론탭 주기 설명
+*　　　　　　*　　　　　　*　　　　　　*　　　　　　*
+분(0-59)　　시간(0-23)　　일(1-31)　　월(1-12)　　　요일(0-7)
+
+//확인
+sudo crontab -l
+//수정
+sudo crontab -e
+
+05 1 * * * certbot renew
+(매일 1시 05분 실행)
+
+만료일 확인
+certbot certificates
+
+삭제
+certbot delete --cert-name mydomain.com
+
+
+최신버전으로 설치
+
+1.기존설치삭제
+snap remove certbot
+yum remove snapd
+
+2.업데이트
+yum update
+
+3. 처음단계부터 다시 snap 설치, certbot 설치. SSL발급.
+
+
+설치가 잘 안되면 repo도 확인해 보자.
+cd /etc/yum.repos.d
+​

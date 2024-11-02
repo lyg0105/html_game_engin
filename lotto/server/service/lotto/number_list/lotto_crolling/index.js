@@ -1,6 +1,7 @@
 var Response = require(global.LottoConstant.ABS + 'lib/response/response');
 var Model = require(global.LottoConstant.ABS + 'model/base/model');
 var StrFunc = require(global.LottoConstant.ABS + 'lib/lyg/string_func');
+var fetch = require("node-fetch");
 
 class LottoCrolling {
   static async action(inData) {

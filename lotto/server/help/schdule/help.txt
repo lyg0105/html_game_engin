@@ -1,0 +1,17 @@
+리눅스 서버에 스케줄 걸어놈
+
+//크론탭 주기 설명
+*　　　　　　*　　　　　　*　　　　　　*　　　　　　*
+분(0-59)　　시간(0-23)　　일(1-31)　　월(1-12)　　　요일(0-7)
+
+//확인
+sudo crontab -l
+//수정
+sudo crontab -e
+
+//한시간마다 계속 실행
+50 20 * * 6 sudo curl --data-urlencode "tmp_data_row=1" https://lotto.lyg.co.kr/api/lotto/number_list/next_crolling
+
+/lotto/api/lotto/number_list/next_crolling
+
+lotto.lyg.co.kr
