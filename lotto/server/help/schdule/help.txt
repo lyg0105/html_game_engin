@@ -1,5 +1,11 @@
 리눅스 서버에 스케줄 걸어놈
 
+서비스 확인
+systemctl status crond
+
+서비스 시작
+systemctl start crond
+
 //크론탭 주기 설명
 *　　　　　　*　　　　　　*　　　　　　*　　　　　　*
 분(0-59)　　시간(0-23)　　일(1-31)　　월(1-12)　　　요일(0-7)
@@ -12,4 +18,4 @@ sudo crontab -e
 //한시간마다 계속 실행
 55 20 * * 6 sudo curl --data-urlencode "tmp_data_row=1" https://lotto.lyg.co.kr/api/lotto/number_list/next_crolling
 
-* * * * * sudo curl --data-urlencode "tmp_data_row=1" https://lotto.lyg.co.kr/api/lotto/schedule/per_min
+* * * * * sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_min
