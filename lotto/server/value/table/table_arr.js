@@ -4,7 +4,7 @@ var DateFunc=require(global.LottoConstant.ABS+'lib/lyg/date_func');
 class TableArr
 {
   static tb={
-    "corp":{"table":"ba_corp","name":"자사","split":"","type":"comp","col_prefix":"corp"},
+    "sche_excute_log":{"table":"ba_corp","name":"자사","split":"","type":"lotto","col_prefix":"schedule"},
   };
   static get(table_str){
     var result_data={

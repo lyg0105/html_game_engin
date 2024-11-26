@@ -76,7 +76,25 @@
           }
         });
     }
-    
+    async function sche_per_ajax() {
+      let tmp_form_data={};
+      fetch('/api/lotto/schedule/per_min', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tmp_form_data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result["result"] == "true") {
+            alert(result["msg"]);
+          } else {
+            alert(result["msg"]);
+          }
+        });
+    }
   </script>
   <input type="text" id="drw_no" name="drw_no" value="600" style="width: 50px;" />
   <button onclick="lotto_crolling_ajax();">크롤링</button>
@@ -85,6 +103,9 @@
   </div>
   <div>
     <button onclick="lotto_crolling_next_ajax();">다음 로또 크롤링</button>
+  </div>
+  <div>
+    <button onclick="sche_per_ajax();">스케줄 per min</button>
   </div>
 </body>
 
