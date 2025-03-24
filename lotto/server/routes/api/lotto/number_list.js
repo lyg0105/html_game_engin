@@ -10,6 +10,10 @@ class ApiClass extends BaseApi {
     let numberListService=new NumberListService();
     return await numberListService.next_crolling(in_opt_obj);
   }
+  async list(in_opt_obj){
+    let numberListService=new NumberListService();
+    return await numberListService.list(in_opt_obj);
+  }
 }
 
 module.exports = ApiClass;
