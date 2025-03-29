@@ -48,6 +48,10 @@ class ListAction extends BaseList
       }
     }
 
+    if(!StrFunc.is_empty(this.s_list_opt["s_no"])){
+      where_arr.push("AND drw_no='"+this.s_list_opt["s_no"]+"'");
+    }
+
     if(!StrFunc.is_empty(this.s_list_opt["s_no1"])){
       where_arr.push("AND drwt_no1='"+this.s_list_opt["s_no1"]+"'");
     }

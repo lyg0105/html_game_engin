@@ -16,6 +16,5 @@ sudo crontab -l
 sudo crontab -e
 
 //한시간마다 계속 실행
-55 20 * * 6 sudo curl --data-urlencode "tmp_data_row=1" https://lotto.lyg.co.kr/api/lotto/number_list/next_crolling
-
 * * * * * sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_min
+5 * * * * sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_hour

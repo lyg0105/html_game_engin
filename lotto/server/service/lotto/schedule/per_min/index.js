@@ -8,8 +8,8 @@ class PerMinSchedule{
       ...inData
     };
 
+    /*
     let model = new Model();
-
     var now_ymdhis=DateFunc.get_date_format(new Date(),"Y-m-d h:i:s");
     let log_col_val_arr={
       schedule_sort: "per_min",
@@ -24,6 +24,7 @@ class PerMinSchedule{
     if (is_success==false) {
       return Response.get({ result: "false", msg: "저장 중 오류." });
     }
+    */
 
     return Response.get();
   };
