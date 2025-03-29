@@ -30,5 +30,43 @@ class StringFunc {
     }
     return num;
   };
+  static comma(num_str) {
+    num_str = num_str + "";
+    let is_minus = false;
+    if (num_str.split("-").length == 2) {
+      is_minus = true;
+    }
+    num_str = num_str.replace(/[^0-9]/g, "");
+    let num = Number(num_str);
+    if (is_minus) {
+      num = num * -1;
+    }
+    let str_num = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return str_num;
+  }
+  static uncomma(num_str) {
+    num_str = num_str + "";
+    let is_minus = false;
+    if (num_str.split("-").length == 2) {
+      is_minus = true;
+    }
+    num_str = num_str.replace(/[^0-9]/g, "");
+    let num = Number(num_str);
+    if (is_minus) {
+      num = num * -1;
+    }
+    return num;
+  }
+  static get_local_storage(key,default_value) {
+    let storage_value = localStorage.getItem(key);
+    if (storage_value == null) {
+      return default_value;
+    } else {
+      return storage_value;
+    }
+  }
+  static set_local_storage(key, value) {
+    localStorage.setItem(key, value);
+  }
 }
 export default StringFunc;

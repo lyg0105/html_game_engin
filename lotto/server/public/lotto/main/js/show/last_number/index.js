@@ -1,3 +1,4 @@
+import LottoDataFunc from "/lotto/common/js/func/data_func/index.js";
 
 class LastNumber
 {
@@ -18,14 +19,34 @@ class LastNumber
     //최근로또번호보여주기
     let lotto_number_con=document.getElementById("lotto_number_con");
     let number_div_arr=lotto_number_con.getElementsByClassName("lotto_number");
-    number_div_arr[0].innerHTML=last_lotto_info["drwt_no1"];
-    number_div_arr[1].innerHTML=last_lotto_info["drwt_no2"];
-    number_div_arr[2].innerHTML=last_lotto_info["drwt_no3"];
-    number_div_arr[3].innerHTML=last_lotto_info["drwt_no4"];
-    number_div_arr[4].innerHTML=last_lotto_info["drwt_no5"];
-    number_div_arr[5].innerHTML=last_lotto_info["drwt_no6"];
-    
-    number_div_arr[7].innerHTML=last_lotto_info["bnus_no"];
+    let match_num_data_arr=[
+      {div_idx:0,num:last_lotto_info["drwt_no1"]},
+      {div_idx:1,num:last_lotto_info["drwt_no2"]},
+      {div_idx:2,num:last_lotto_info["drwt_no3"]},
+      {div_idx:3,num:last_lotto_info["drwt_no4"]},
+      {div_idx:4,num:last_lotto_info["drwt_no5"]},
+      {div_idx:5,num:last_lotto_info["drwt_no6"]},
+      {div_idx:7,num:last_lotto_info["bnus_no"]},
+    ];
+    for(let i=0;i<match_num_data_arr.length;i++){
+      let row_match_num=match_num_data_arr[i];
+      let lotto_num=row_match_num.num;
+      let lotto_num_div=number_div_arr[row_match_num.div_idx];
+      lotto_num_div.innerHTML=lotto_num;
+      let ball_color=LottoDataFunc.ball_color;
+      lotto_num_div.style.color="#fff";
+      if(lotto_num>40){
+        lotto_num_div.style.background=ball_color["40"];
+      }else if(lotto_num>30){
+        lotto_num_div.style.background=ball_color["30"];
+      }else if(lotto_num>20){
+        lotto_num_div.style.background=ball_color["20"];
+      }else if(lotto_num>10){
+        lotto_num_div.style.background=ball_color["10"];
+      }else{
+        lotto_num_div.style.background=ball_color["1"];
+      }
+    }
   }
 }
 export default LastNumber;

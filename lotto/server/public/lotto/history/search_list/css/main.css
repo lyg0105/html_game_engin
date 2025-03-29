@@ -1,0 +1,26 @@
+.lotto_list_table{
+  width:100%;
+  margin:0 auto;
+}
+.lotto_list_table table{
+  width:100%;
+  border-collapse:collapse;
+  border-spacing:0;
+}
+.lotto_list_table th,.lotto_list_table td{
+  padding:0px 2px;
+  line-height: 30px;
+  text-align:center;
+  border-bottom:1px solid #ddd;
+}
+
+.lotto_num_span{
+  display:inline-block;
+  width:20px;
+  height:20px;
+  line-height:20px;
+  text-align:center;
+  border-radius:50%;
+  font-size:12px;
+  color:#fff;
+}

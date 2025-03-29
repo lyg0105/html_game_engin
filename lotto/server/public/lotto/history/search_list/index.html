@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/common/img/ico/coin_ico.png" type="image/x-icon">
+  <link rel="stylesheet" href="/common/css/base.css">
+  <link rel="stylesheet" href="./css/main.css">
+  <title>로또 메인메뉴</title>
+</head>
+
+<body>
+  <div class="body_wrap">
+    리스트
+    <div class="lotto_list_table" style="margin-top:10px;">
+      <table>
+        <colgroup>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>회차</th>
+            <th>당첨번호</th>
+            <th>보너스번호</th>
+            <th>당첨금</th>
+            <th>1등당첨자수</th>
+          </tr>
+        </thead>
+        <tbody id="lotto_list_body"></tbody>
+      </table>
+    </div>
+    <div class="center" style="margin-top:10px;">
+      <button class="btn" onclick="location.href='/';">뒤로</button>
+    </div>
+  </div>
+  <script type="module">
+    import Main from './js/main.js';
+    let main = new Main();
+    main.init();
+  </script>
+</body>
+
+</html>

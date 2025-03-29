@@ -1,3 +1,4 @@
+//import DateFunc from "/common/js/date/index.js";
 class DateFunc
 {
   //var d_obj=DateFunc.get_date_json(new Date());

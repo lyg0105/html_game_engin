@@ -10,8 +10,8 @@ class Main{
     let this_obj=this;
     this.data=InitData.getInitData();
     this.control=new ControlMain(this);
-    await this.control.get_last_lotto_by_ajax();
     this.show=ShowMain;
+    
     this.show.show({
       main:this_obj,
     });
