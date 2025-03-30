@@ -63,5 +63,21 @@ class LottoDataFunc {
     }
     return lotto_list;
   };
+  static get_color_by_num(num){
+    let ball_color=LottoDataFunc.ball_color;
+    let num_color="#fff";
+    if(num>40){
+      num_color=ball_color["40"];
+    }else if(num>30){
+      num_color=ball_color["30"];
+    }else if(num>20){
+      num_color=ball_color["20"];
+    }else if(num>10){
+      num_color=ball_color["10"];
+    }else{
+      num_color=ball_color["1"];
+    }
+    return num_color;
+  }
 }
 export default LottoDataFunc;

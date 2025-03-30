@@ -9,18 +9,18 @@
 }
 .lotto_list_table th,.lotto_list_table td{
   padding:0px 2px;
-  line-height: 30px;
+  line-height: 22px;
   text-align:center;
   border-bottom:1px solid #ddd;
 }
 
 .lotto_num_span{
   display:inline-block;
-  width:20px;
-  height:20px;
-  line-height:20px;
+  width:22px;
+  height:22px;
+  line-height:22px;
   text-align:center;
   border-radius:50%;
-  font-size:12px;
+  font-size:14px;
   color:#fff;
 }
