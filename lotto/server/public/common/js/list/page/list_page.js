@@ -114,7 +114,7 @@ class ListPage {
     ul.style.justifyContent="center";
     ul.style.alignItems="center";
     ul.style.gap="6px";
-    if(this_obj.data.is_show_prev_next){
+    if(this_obj.data.is_show_prev_next&&this_obj.data.before_block>0){
       let prev_li=document.createElement("li");
       let prev_btn=document.createElement("button");
       prev_btn.className="btn";
@@ -127,7 +127,7 @@ class ListPage {
     for(let i=0;i<num_btn_arr.length;i++){
       ul.appendChild(num_btn_arr[i]);
     }
-    if(this_obj.data.is_show_prev_next){
+    if(this_obj.data.is_show_prev_next&&this_obj.data.next_block<=this_obj.data.max_end_num){
       let next_li=document.createElement("li");
       let next_btn=document.createElement("button");
       next_btn.className="btn";

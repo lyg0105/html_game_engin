@@ -15,6 +15,9 @@ class LastNumber
     //최근로또 날짜보여주기
     let lotto_number_sub_title=document.getElementById("lotto_number_sub_title");
     lotto_number_sub_title.innerHTML=last_lotto_info["drw_no_date"];
+    //회차
+    let lotto_title_num=document.getElementById("lotto_title_num");
+    lotto_title_num.innerHTML=last_lotto_info["drw_no"];
 
     //최근로또번호보여주기
     let lotto_number_con=document.getElementById("lotto_number_con");
@@ -33,19 +36,8 @@ class LastNumber
       let lotto_num=row_match_num.num;
       let lotto_num_div=number_div_arr[row_match_num.div_idx];
       lotto_num_div.innerHTML=lotto_num;
-      let ball_color=LottoDataFunc.ball_color;
       lotto_num_div.style.color="#fff";
-      if(lotto_num>40){
-        lotto_num_div.style.background=ball_color["40"];
-      }else if(lotto_num>30){
-        lotto_num_div.style.background=ball_color["30"];
-      }else if(lotto_num>20){
-        lotto_num_div.style.background=ball_color["20"];
-      }else if(lotto_num>10){
-        lotto_num_div.style.background=ball_color["10"];
-      }else{
-        lotto_num_div.style.background=ball_color["1"];
-      }
+      lotto_num_div.style.background=LottoDataFunc.get_color_by_num(lotto_num);
     }
   }
 }

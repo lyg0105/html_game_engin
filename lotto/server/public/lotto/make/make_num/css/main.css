@@ -1,0 +1,19 @@
+.option_box{
+  text-align: center;
+  margin-top: 10px;
+}
+.option_con{
+  text-align: center;
+  margin-top: 5px;
+  min-height: 40px;
+}
+
+.lotto_number{
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  background: #fff;
+  color: #000;
+  border-radius: 50%;
+}

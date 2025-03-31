@@ -12,6 +12,9 @@
   font-size: 25px;
   line-height: 30px;
 }
+#lotto_title_num{
+  color:#f1ffa7;
+}
 .lotto_number_sub_title{
   margin-top:10px;
   text-align: center;
@@ -29,8 +32,7 @@
   display: inline-block;
   width: 35px;
   height: 35px;
-  line-height: 34px;
-  margin: 2px;
+  line-height: 35px;
   background: #fff;
   color: #000;
   border-radius: 50%;

@@ -10,6 +10,9 @@ class InitData
       util:{},
       data:{
         lotto_info_arr:[],
+        make_lotto_arr:[],//{num_arr:[],match_arr:[]}
+        except_num_arr:[],
+        include_num_arr:[],
       },
       list_opt:{
         now_page:1,

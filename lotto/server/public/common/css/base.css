@@ -14,7 +14,9 @@ body{
   height: 100%;
   min-width: 300px;
 }
-
+.body_con{
+  padding:5px 8px;
+}
 
 .center{
   text-align: center;
