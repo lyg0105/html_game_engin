@@ -21,6 +21,13 @@ class ControlMain{
         num_sort:"except_num_arr",
       });
     };
+    let make_num_btn=document.getElementById("make_num_btn");
+    make_num_btn.onclick=function(){
+      this_obj.make_num();
+      this_obj.main.show.show({
+        main:this_obj.main,
+      });
+    };
   }
   async get_last_lotto_by_ajax(){
     let lotto_list=await LottoDataFunc.get_lotto_list_by_local();
@@ -40,5 +47,17 @@ class ControlMain{
       num_sort:opt_obj.num_sort,
     });
   }
+  make_num(){
+    let this_obj=this;
+    let make_num_arr=LottoDataFunc.get_lotto_num_arr_by_opt({
+      except_num_arr:this_obj.main.data.data.except_num_arr,
+      include_num_arr:this_obj.main.data.data.include_num_arr,
+    });
+    make_num_arr.sort(function(a,b){
+      return a-b;
+    });
+    this_obj.main.data.data.make_num_arr=make_num_arr;
+    //this_obj.main.data.data.make_num_arr_arr.push(make_num_arr);
+  };
 }
 export default ControlMain;

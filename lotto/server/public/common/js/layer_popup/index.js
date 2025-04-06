@@ -23,6 +23,7 @@ class LayerPopup
     onShow:function(){},
     popup_element:null,
     title_element:null,
+    title_span_element:null,
     content_element:null,
     close_btn_element:null,
   };
@@ -50,12 +51,15 @@ class LayerPopup
     if (this.data.content) {
       this.createContent();
     }
-    this.data.is_show && this.show();
   }
   createTitle() {
     this.data.title_element = document.createElement("div");
     this.data.title_element.className = this.data.title_class_name;
-    this.data.title_element.innerHTML = this.data.title;
+
+    this.data.title_span_element = document.createElement("span");
+    this.data.title_span_element.innerHTML = this.data.title;
+    this.data.title_element.appendChild(this.data.title_span_element);
+
     this.data.title_style && Object.assign(this.data.title_element.style, this.data.title_style);
     this.data.popup_element.appendChild(this.data.title_element);
   }
@@ -90,8 +94,8 @@ class LayerPopup
   }
   setTitle(title) {
     this.data.title = title;
-    if (this.data.title_element) {
-      this.data.title_element.innerHTML = title;
+    if (this.data.title_span_element) {
+      this.data.title_span_element.innerHTML = title;
     }
   }
   setContent(content) {

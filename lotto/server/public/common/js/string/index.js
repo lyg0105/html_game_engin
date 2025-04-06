@@ -9,7 +9,6 @@ class StringFunc {
     return is_match;
   }
   static remove_str_in_array(search_str, str_arr){
-    var is_match = -1;
     for (var i = 0; i < str_arr.length; i++) {
       if (str_arr[i] == search_str) {
         str_arr.splice(i, 1);
@@ -17,6 +16,15 @@ class StringFunc {
       }
     }
     return str_arr;
+  }
+  static remove_idx_in_array(idx, str_arr){
+    let new_arr=[];
+    for (var i = 0; i < str_arr.length; i++) {
+      if (i != idx) {
+        new_arr.push(str_arr[i]);
+      }
+    }
+    return new_arr;
   }
   static str_replace(search, replace, content) {
     while (content.indexOf(search) != -1) {

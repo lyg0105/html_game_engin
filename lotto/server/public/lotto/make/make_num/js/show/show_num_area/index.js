@@ -9,17 +9,17 @@ class ShowNumArea {
     let this_obj = this;
     ShowNumArr.show({
       ...opt_obj,
-      div_id: "except_num_div",
+      div_obj: document.getElementById("except_num_div"),
       num_arr:opt_obj.main.data.data.except_num_arr,
     });
     ShowNumArr.show({
       ...opt_obj,
-      div_id: "include_num_div",
+      div_obj: document.getElementById("include_num_div"),
       num_arr:opt_obj.main.data.data.include_num_arr,
     });
     ShowNumArr.show({
       ...opt_obj,
-      div_id: "make_num_div",
+      div_obj: document.getElementById("make_num_div"),
       num_arr:opt_obj.main.data.data.make_num_arr,
     });
   }

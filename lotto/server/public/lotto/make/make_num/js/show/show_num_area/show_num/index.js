@@ -4,12 +4,12 @@ class ShowNumArr {
   static show(inData) {
     let opt_obj = {
       main: {},
-      div_id: "except_num_div",
+      div_obj: null,
       num_arr:[],
       ...inData
     };
     let this_obj = this;
-    let except_num_div = document.getElementById(opt_obj.div_id);
+    let except_num_div = opt_obj.div_obj;
     except_num_div.innerHTML = "";
     let num_arr = opt_obj.num_arr;
     if (num_arr.length == 0) {
