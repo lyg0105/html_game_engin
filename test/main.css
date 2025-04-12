@@ -558,6 +558,8 @@ body.layout-detail .main_top_banner {
   position: absolute !important;
   right: 0px;
   top: 40px;
+  display: inline-block !important;
+  width: auto !important;
 }
 
 
