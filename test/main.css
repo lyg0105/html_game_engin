@@ -267,6 +267,11 @@ body, div, p, span, a, input, button, textarea {
 /* 테마01 : 상단 메뉴 */
 #header {background-color: #ffffff !important;}
 #header .inner .top_nav_box .top_category .sub-category li:hover > a {background-color:#ffffff}
+#header .inner{
+  position:relative;
+  display: block;
+  text-align: center;
+}
 
 /* 테마02 : 상단 메뉴 */
 .theme02 #header {background-color: #f6e5dd !important;}
@@ -374,10 +379,11 @@ body, div, p, span, a, input, button, textarea {
     display: none !important;
   }
 }
-/* 헤더 전체가 고정되지 않도록 처리 */
+/* 헤더 전체가 고정되지 않도록 처리
 #header {
   position: relative !important;
 }
+*/
 
 /* 로고 박스가 따라오지 않게 */
 #header .logo-container {
@@ -419,48 +425,43 @@ body, div, p, span, a, input, button, textarea {
 }
 @media screen and (max-width: 1024px) {
   /* 1. 쿠폰 배너 */
-  header .main_top_banner[data-ez-module="top-banner"] {
-    position: fixed !important;
-    top: 0;
-    left: 0;
+  #header .main_top_banner[data-ez-module="top-banner"] {
+    position:relative;
     width: 100%;
-    height: 32px !important;
-    background-color: #000 !important;
+    height: 32px;
+    background-color: #000t;
     color: #fff;
-    z-index: 10000 !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 12px !important;
+    padding: 0 12px;
     box-sizing: border-box;
   }
 
-  header .main_top_banner .top_banner_box_inner {
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+  #header .main_top_banner .top_banner_box_inner {
+    text-align:left;
   }
 
-  header .main_top_banner .top_banner_text {
+  #header .main_top_banner .top_banner_text {
     font-size: 11.5px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    flex: 1 1 auto !important;
+  }
+  #header .main_top_banner .top_banner_close{
+    position:absolute;
+    top:-6px;
+    right:0px;
   }
 
-  /* 2. header 전체 고정 (로고+햄버거 포함) */
+  /* 2. header 전체 고정 (로고+햄버거 포함)
   #header {
     position: fixed !important;
-    top: 32px; /* 쿠폰 아래 */
+    top: 32px;
     left: 0;
     width: 100%;
     background-color: #fff;
     z-index: 9999;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   }
+  */
 
   /* 3. 로고 박스 */
   .logo-container {
@@ -468,14 +469,13 @@ body, div, p, span, a, input, button, textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 76px !important;
     background-color: #fff;
     z-index: 9999;
   }
 
   .logo-container img {
-    height: 46px !important;
-    max-width: 120px !important;
+    height: 46px;
+    max-width: 160px;
     width: auto;
   }
 
@@ -547,18 +547,22 @@ body.layout-detail .main_top_banner {
   padding: 0 20px !important;
 }
 }
-@media screen and (min-width: 1025px) {
-  #header {
-    min-height: 100px !important; /* 로고 영역 유지 */
-  }
 
-  #container {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
 
-  #contents {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+#header .inner {
+  display: block;
+  text-align: center;
+}
+
+#header .top_nav_box {
+  position: absolute !important;
+  right: 0px;
+  top: 40px;
+}
+
+
+@media (max-width: 1024px) {
+  #header .top_nav_box {
+    top: 0px;
   }
 }
