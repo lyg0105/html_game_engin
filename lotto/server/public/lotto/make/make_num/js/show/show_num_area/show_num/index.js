@@ -6,6 +6,11 @@ class ShowNumArr {
       main: {},
       div_obj: null,
       num_arr:[],
+      is_match_color:false,
+      match_num_arr:[],
+      match_color:"#ff0000",
+      bonus_num:0,
+      is_bonus_color:false,
       ...inData
     };
     let this_obj = this;
@@ -27,7 +32,42 @@ class ShowNumArr {
       num_span.innerHTML = tmp_num;
 
       let num_color = LottoDataFunc.get_color_by_num(tmp_num);
-      num_span.style.background = num_color;
+      if(opt_obj.is_match_color) {
+        let match_num_arr = opt_obj.match_num_arr;
+        if (match_num_arr.indexOf(tmp_num) > -1) {
+          num_span.style.background = num_color;
+          if(opt_obj.match_color) {
+            num_span.style.background = opt_obj.match_color;
+          }
+        }
+      }else{
+        num_span.style.background = num_color;
+      }
+      
+      except_num_div.appendChild(num_span);
+    }
+    if(opt_obj.bonus_num>0){
+      let plus_span = document.createElement("span");
+      plus_span.innerHTML = "+";
+      except_num_div.appendChild(plus_span);
+
+      let num_span = document.createElement("span");
+      num_span.className = "lotto_number";
+      num_span.innerHTML = opt_obj.bonus_num;
+
+      let num_color = LottoDataFunc.get_color_by_num(opt_obj.bonus_num);
+      if(opt_obj.is_match_color) {
+        let match_num_arr = opt_obj.match_num_arr;
+        if (match_num_arr.indexOf(opt_obj.bonus_num) > -1&&opt_obj.is_bonus_color) {
+          num_span.style.background = num_color;
+          if(opt_obj.match_color) {
+            num_span.style.background = opt_obj.match_color;
+          }
+        }
+      }else{
+        num_span.style.background = num_color;
+      }
+      
       except_num_div.appendChild(num_span);
     }
   }

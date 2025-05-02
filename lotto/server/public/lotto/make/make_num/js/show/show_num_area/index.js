@@ -1,4 +1,5 @@
 import ShowNumArr from "./show_num/index.js";
+import ResultArea from "./result_area/index.js";
 
 class ShowNumArea {
   static show(inData) {
@@ -17,10 +18,8 @@ class ShowNumArea {
       div_obj: document.getElementById("include_num_div"),
       num_arr:opt_obj.main.data.data.include_num_arr,
     });
-    ShowNumArr.show({
+    ResultArea.show({
       ...opt_obj,
-      div_obj: document.getElementById("make_num_div"),
-      num_arr:opt_obj.main.data.data.make_num_arr,
     });
   }
 }

@@ -151,5 +151,153 @@ class LottoDataFunc {
 
     return make_num_arr;
   };
+  static get_match_stats_by_match_data_arr(inData){
+    let opt_obj={
+      match_data_arr:[],
+      ...inData
+    };
+    let match_data_arr=opt_obj.match_data_arr;
+    let stats_data={
+      top_rank:99,
+      top_rank_data:null,
+      group_by_rank:{},
+    };
+    for(let i=0;i<match_data_arr.length;i++){
+      let match_data=match_data_arr[i];
+      let rank=parseInt(match_data["rank"]+"");
+      if(rank<stats_data.top_rank){
+        stats_data.top_rank_data=match_data;
+        stats_data.top_rank=rank;
+      }
+
+      if(stats_data.group_by_rank[rank]==undefined){
+        stats_data.group_by_rank[rank]={
+          count:0,
+          arr:[],
+        };
+      }
+      stats_data.group_by_rank[rank]["count"]++;
+      stats_data.group_by_rank[rank]["arr"].push(match_data);
+    }
+    return stats_data;
+  };
+  static get_match_data_arr_by_num_arr(inData){
+    let opt_obj={
+      num_arr:[],
+      lotto_info_arr:[],
+      ...inData
+    };
+    let this_obj=this;
+    let num_arr=opt_obj.num_arr;
+    let lotto_info_arr=opt_obj.lotto_info_arr;
+    let match_data_arr=[];
+    for(let i=0;i<lotto_info_arr.length;i++){
+      let lotto_info=lotto_info_arr[i];
+      let match_data=this_obj.get_math_num_arr_by_num_row({
+        num_arr:num_arr,
+        lotto_info:lotto_info,
+      });
+      if(match_data["rank"]<=0){
+        continue;
+      }
+      match_data["num_arr"]=num_arr;
+      match_data["lotto_idx"]=lotto_info["drw_no"];
+      match_data["date"]=lotto_info["drw_no_date"];
+      match_data["first_money"]=lotto_info["first_winamnt"];
+      match_data_arr.push(match_data);
+    }
+    //순서정렬
+    let match_order_arr=[];
+    for(let i=0;i<match_data_arr.length;i++){
+      let match_data=match_data_arr[i];
+      let lotto_idx_str=StringFunc.str_pad({
+        "str": match_data["lotto_idx"],
+        "pad_str": "0",
+        "pad_length": 5,
+        "direction": "left"
+      });
+      let order_num=parseFloat(match_data["rank"]+"."+lotto_idx_str);
+      match_order_arr.push(order_num);
+    }
+    match_order_arr.sort(function(a,b){
+      return a-b;
+    });
+
+    let new_match_data_arr=[];
+    for(let order_i=0;order_i<match_order_arr.length;order_i++){
+      let row_order_num=match_order_arr[order_i];
+      for(let i=0;i<match_data_arr.length;i++){
+        let match_data=match_data_arr[i];
+        let lotto_idx_str=StringFunc.str_pad({
+          "str": match_data["lotto_idx"],
+          "pad_str": "0",
+          "pad_length": 5,
+          "direction": "left"
+        });
+        let order_num=parseFloat(match_data["rank"]+"."+lotto_idx_str);
+        if(row_order_num==order_num){
+          new_match_data_arr.push(match_data);
+        }
+      }
+    }
+    match_data_arr=new_match_data_arr;
+
+    return match_data_arr;
+  }
+  static get_math_num_arr_by_num_row(inData){
+    let opt_obj={
+      num_arr:[],
+      lotto_info:{},
+      ...inData
+    };
+    let num_arr=opt_obj.num_arr;
+    let lotto_info=opt_obj.lotto_info;
+    let match_num_arr=[];
+    let is_match_bonus=false;
+    let rank=0;
+    let lotto_num_arr=[
+      lotto_info["drwt_no1"],
+      lotto_info["drwt_no2"],
+      lotto_info["drwt_no3"],
+      lotto_info["drwt_no4"],
+      lotto_info["drwt_no5"],
+      lotto_info["drwt_no6"],
+    ];
+    let bonus_num=lotto_info["bnus_no"];
+    for(let i=0;i<num_arr.length;i++){
+      let num=num_arr[i];
+      if(StringFunc.str_in_array(num,lotto_num_arr)!=-1){
+        match_num_arr.push(num);
+      }
+      if(num==bonus_num){
+        is_match_bonus=true;
+      }
+    }
+    if(match_num_arr.length==6){
+      rank=1;
+    }
+    else if(match_num_arr.length==5 && is_match_bonus==true){
+      rank=2;
+    }
+    else if(match_num_arr.length==5){
+      rank=3;
+    }
+    else if(match_num_arr.length==4){
+      rank=4;
+    }
+    else if(match_num_arr.length==3){
+      rank=5;
+    }
+    else{
+      rank=0;
+    }
+    return {
+      lotto_num_arr:lotto_num_arr,
+      match_num_arr:match_num_arr,
+      bonus_num:bonus_num,
+      is_match_bonus:is_match_bonus,
+      rank:rank,
+    };
+  };
 }
 export default LottoDataFunc;

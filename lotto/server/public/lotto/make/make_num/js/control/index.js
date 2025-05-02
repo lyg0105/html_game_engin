@@ -56,8 +56,36 @@ class ControlMain{
     make_num_arr.sort(function(a,b){
       return a-b;
     });
-    this_obj.main.data.data.make_num_arr=make_num_arr;
-    //this_obj.main.data.data.make_num_arr_arr.push(make_num_arr);
+    let match_arr=LottoDataFunc.get_match_data_arr_by_num_arr({
+      num_arr:make_num_arr,
+      lotto_info_arr:this_obj.main.data.data.lotto_info_arr,
+    });
+    let make_num_match={
+      num_arr:make_num_arr,
+      match_arr:match_arr,
+      top_rank:99,
+      top_rank_data:{},
+      group_by_rank:{},
+      is_show_detail:false,
+    };
+    let match_stats_data=LottoDataFunc.get_match_stats_by_match_data_arr({
+      match_data_arr:match_arr,
+    });
+    make_num_match={
+      ...make_num_match,
+      ...match_stats_data,
+    };
+    this_obj.main.data.data.make_num_match_arr.push(make_num_match);
+  };
+  remove_make_num(inData){
+    let opt_obj={
+      index:0,
+      ...inData
+    };
+    this.main.data.data.make_num_match_arr.splice(opt_obj.index,1);
+  }
+  remove_all_make_num(){
+    this.main.data.data.make_num_match_arr=[];
   };
 }
 export default ControlMain;
