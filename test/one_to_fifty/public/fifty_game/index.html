@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>식물 키우기 게임</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      margin: 0;
+      background: #e3fcec;
+    }
+
+    #plant {
+      width: 125px;
+      height: 237px;
+      margin: 20px auto;
+      background-image: url(/img/plant/plant1_sprite.png);
+      background-size: 626px 237px;
+      background-position: 0px 0px;
+    }
+
+    #grow-area {
+      padding: 40px;
+      border: 2px dashed #4caf50;
+      margin: 30px;
+      cursor: pointer;
+      background: #d7f5df;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🌱 식물 키우기</h1>
+  <div>
+    <p>Money <span id="money">0</span></p>
+  </div>
+  <div class="exp_area">
+    <p>경험치: <span id="exp">0</span></p>
+    <p>최대 경험치: <span id="expMax">100</span></p>
+  </div>
+  <div id="grow-area">
+    <div id="plant"></div>
+    <p id="stage-text">현재 단계: 0</p>
+  </div>
+  <button id="harvest-btn" disabled>수확하기</button>
+
+  <script>
+    const moneySpan = document.getElementById('money');
+    const expSpan = document.getElementById('exp');
+    const expMaxSpan = document.getElementById('expMax');
+    const growArea = document.getElementById('grow-area');
+    const plantImg = document.getElementById('plant');
+    const stageText = document.getElementById('stage-text');
+    const harvestBtn = document.getElementById('harvest-btn');
+
+    let exp = 0;
+    let expMax = 100;
+    let stage = 0;
+    const maxStage = 4;
+    let money=0;
+
+    function updatePlant() {
+      plantImg.style.backgroundPosition = `-${stage * 125}px 0px`;
+      stageText.textContent = `현재 단계: ${stage}`;
+      if (stage >= maxStage) {
+        harvestBtn.disabled = false;
+      }
+      expSpan.textContent = exp;
+      expMaxSpan.textContent = expMax;
+      moneySpan.textContent = money;
+    }
+
+    growArea.addEventListener('click', () => {
+      exp += 15;
+      if (exp >= expMax) {
+        exp = 0;
+        if (stage < maxStage) {
+          expMax += 100;
+          stage++;
+        }else{
+          money += 100;
+        }
+      }
+      updatePlant();
+    });
+
+    harvestBtn.addEventListener('click', () => {
+      stage = 0;
+      harvestBtn.disabled = true;
+      updatePlant();
+    });
+
+    updatePlant(); // 초기 상태 표시
+  </script>
+</body>
+
+</html>
