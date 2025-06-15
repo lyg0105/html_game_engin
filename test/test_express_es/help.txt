@@ -1,0 +1,81 @@
+docker build -f Dockerfile -t es6_img .
+
+docker images
+
+docker rmi -f es6_img
+
+docker run -it -d --name volume_es6 -p 8080:8080 -v D:/work/game/js/html_game_engin/test/test_express_es:/app es6_img
+
+-i  –interactive 옵션으로 STDIN(표준입력)으로 컨테이너를 생성
+-t  Allocate a pseudo-TTY 컨테이너를 터미널을 이용하여 연결 할 수있도록 하는 옵션
+-d 백그라운드실행 
+-p 포트포워딩 로컬:컨테이너
+-v 볼륨지정 로컬:컨테이너
+--name 컨테이너명
+마지막이름 불러올이미지
+
+//핫리로드 위해 넣어주는 환경변수 -e CHOKIDAR_USEPOLLING=true
+
+Docker inspect volume_es6
+
+docker start volume_es6
+
+docker stop volume_es6
+
+docker rm volume_es6
+
+docker ps -a
+
+docker exec -it volume_es6 /bin/bash
+docker exec -it volume_es6 /bin/sh
+
+su -
+
+cd /app
+
+apt-get update
+apt-get upgrade
+
+apt-get install curl
+apt-get install vim
+
+nvm을 이용해 설치하는게 좋다.
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+source ~/.bashrc
+nvm --version
+
+nvm ls-remote
+
+nvm install v22.15.0
+node -v
+
+npm install express-generator -g
+
+express --view=ejs server
+
+cd /app/server
+
+npm install
+
+npm start
+
+탈출
+Crl+p+q
+
+
+Docker nvm설치
+https://hyeondong.com/dockerfile-nvm-error/
+
+
+npm install socket.io
+
+const { Server } = require('socket.io');
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+</script>

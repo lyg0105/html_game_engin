@@ -1,4 +1,5 @@
-var TestChatIo = require('../chat/test_chat');
+import TestChatIo from './chat/test_chat/index.js';
+import TestMoveTestIo from './move/move_test/index.js';
 
 class IoMain{
   io;
@@ -8,7 +9,8 @@ class IoMain{
     this.io.on('connection', (socket) => {
       console.log('a user connected');
       new TestChatIo(this_obj.io, socket);
+      new TestMoveTestIo(this_obj.io, socket);
     });
   }
 }
-module.exports = IoMain;
+export default IoMain;

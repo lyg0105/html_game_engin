@@ -3,12 +3,12 @@
 /**
  * Module dependencies.
  */
-
-var app = require('../app');
-var debug = require('debug')('server:server');
-var http = require('http');
-const { Server } = require('socket.io');
-var IoMain = require('../io/main');
+import app from '../app.js';
+import debug_func from 'debug';
+var debug=debug_func('server:server');
+import http from 'http';
+import {Server} from 'socket.io';
+import IoMain from '../io/main/index.js';
 /**
  * Get port from environment and store in Express.
  */

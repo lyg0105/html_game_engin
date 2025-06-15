@@ -10,4 +10,4 @@ class TestChatIo {
     });
   }
 }
-module.exports = TestChatIo;
+export default TestChatIo;

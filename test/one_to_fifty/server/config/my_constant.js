@@ -1,4 +1,6 @@
-var fs=require('fs');
+import fs from 'fs';
+import { fileURLToPath } from "url";
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 /*
 //app.js 에서 선언한다.  LygLandConstant 는 쓰고싶은 이름으로
 //쓸때는 global.LygLandConstant.ABS
@@ -95,4 +97,4 @@ function getAllowUrlArrByFile(file_src){
     return url_arr;
 }
 
-module.exports=constant;
+export default constant;
