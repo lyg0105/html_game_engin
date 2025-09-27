@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>아이템 강화 파밍 게임</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #222;
+      color: #eee;
+      text-align: center;
+    }
+
+    #game {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    #inventory,
+    #shop,
+    #battle {
+      border: 1px solid #555;
+      padding: 10px;
+      width: 40%;
+      border-radius: 10px;
+      background: #333;
+    }
+
+    #shop.hidden {
+      display: none;
+    }
+
+    .battle-area.hidden {
+      display: none;
+    }
+
+    .battle-log.hidden {
+      display: none;
+    }
+
+    #fieldSelect.hidden {
+      display: none;
+    }
+
+    .inventory-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 5px 0;
+      font-size: 12px;
+    }
+
+    .inventory-table th {
+      background: #444;
+      color: #fff;
+      padding: 4px;
+      text-align: left;
+      border: 1px solid #555;
+      font-size: 12px;
+    }
+
+    .inventory-table td {
+      padding: 4px;
+      border: 1px solid #555;
+      background: #222;
+      vertical-align: middle;
+    }
+
+    .inventory-table .equipped {
+      background: #2a4a2a;
+      border: 2px solid #4a8;
+    }
+
+    .inventory-table button {
+      padding: 4px 8px;
+      margin: 2px;
+      font-size: 11px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      min-width: 40px;
+      min-height: 24px;
+      line-height: 1.2;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .inventory-table button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .inventory-table button:active {
+      transform: scale(0.95);
+    }
+
+    /* 터치 기기 대응 */
+    @media (hover: none) {
+      .inventory-table button {
+        min-height: 32px;
+        min-width: 48px;
+        padding: 6px 10px;
+      }
+    }
+
+    /* 작은 화면 대응 */
+    @media (max-width: 768px) {
+      .inventory-table button {
+        font-size: 10px;
+        padding: 3px 6px;
+        min-width: 35px;
+        min-height: 28px;
+      }
+    }
+
+    .inventory-table .equip-btn {
+      background: #4a8;
+      color: white;
+    }
+
+    .inventory-table .equip-btn:hover {
+      background: #5b9;
+    }
+
+    .inventory-table .sell-btn {
+      background: #a84;
+      color: white;
+    }
+
+    .inventory-table .sell-btn:hover {
+      background: #b95;
+    }
+
+    .inventory-table .upgrade-btn {
+      background: #84a;
+      color: white;
+    }
+
+    .inventory-table .upgrade-btn:hover {
+      background: #95b;
+    }
+
+    .item-name {
+      font-weight: bold;
+    }
+
+    .equipped-section {
+      background: #2a3a2a;
+      border: 2px solid #4a8;
+      border-radius: 5px;
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    .equipped-title {
+      color: #4f8;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .battle-log {
+      background: #1a1a1a;
+      border: 1px solid #555;
+      border-radius: 5px;
+      padding: 8px;
+      margin: 10px 0;
+      height: 100px;
+      overflow-y: auto;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .log-container {
+      margin: 10px 0;
+    }
+
+    .log-toggle {
+      background: #444;
+      color: #fff;
+      border: 1px solid #666;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .log-toggle:hover {
+      background: #555;
+    }
+
+    .battle-info {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .battle-info.show {
+      opacity: 1;
+    }
+
+    .battle-area {
+      position: relative;
+    }
+
+    .damage-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 0, 0, 0.9);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 20;
+      animation: damageFloat 1s ease-out forwards;
+    }
+
+    .damage-popup.heal {
+      background: rgba(0, 255, 0, 0.9);
+    }
+
+    .damage-popup.gold {
+      background: rgba(255, 215, 0, 0.9);
+      color: black;
+    }
+
+    @keyframes damageFloat {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translate(-50%, -70%) scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-50%, -100%) scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    @keyframes damageFloatMonster {
+      0% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translate(-50%, -20px) scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-50%, -40px) scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .log {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #555;
+      padding: 5px;
+      text-align: left;
+      background: #111;
+    }
+
+    .selected {
+      border: 2px solid yellow;
+    }
+
+    .monster {
+      margin-top: 10px;
+    }
+
+    .weapon-common {
+      color: #ccc;
+    }
+
+    .weapon-rare {
+      color: #4af;
+      font-weight: bold;
+    }
+
+    .weapon-epic {
+      color: #a4f;
+      font-weight: bold;
+    }
+
+    .weapon-legendary {
+      color: gold;
+      font-weight: bold;
+      text-shadow: 0 0 5px gold;
+    }
+
+    .weapon-mythic {
+      color: red;
+      font-weight: bold;
+      text-shadow: 0 0 5px red;
+    }
+
+    .character-sprite {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 10px auto;
+      border: 2px solid #555;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #2a2a2a, #404040);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      transition: all 0.3s ease;
+    }
+
+    .character-sprite.attacking {
+      transform: scale(1.1) translateX(5px);
+      box-shadow: 0 0 20px rgba(255, 100, 100, 0.5);
+    }
+
+    .monster-sprite {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 10px auto;
+      border: 2px solid #855;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #3a1a1a, #501a1a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      transition: all 0.3s ease;
+    }
+
+    .monster-sprite.attacking {
+      transform: scale(1.1) translateX(-5px);
+      box-shadow: 0 0 20px rgba(255, 50, 50, 0.5);
+    }
+
+    .monster-sprite.hurt {
+      animation: shake 0.3s ease-in-out;
+      filter: brightness(1.5) hue-rotate(20deg);
+    }
+
+    .character-sprite.hurt {
+      animation: shake 0.3s ease-in-out;
+      filter: brightness(1.5) hue-rotate(-20deg);
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-5px);
+      }
+
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    .weapon-icon {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      font-size: 24px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .battle-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 20px 0;
+      padding: 20px;
+      background: linear-gradient(45deg, #1a1a2e, #16213e);
+      border-radius: 15px;
+      border: 2px solid #333;
+      min-height: 400px;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: visible; /* 팝업이 보이도록 */
+    }
+
+    .battle-unit {
+      width: 160px;
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: visible; /* 팝업이 보이도록 */
+    }
+
+    .battle-vs {
+      font-size: 30px;
+      color: #666;
+      min-width: 40px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .unit_area {
+      height: 80px;
+      overflow: visible; 
+      border: 1px solid #555;
+      padding: 5px;
+      text-align: left;
+      background: #111;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 12px;
+    }
+
+    .monster-name {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #ff6b6b;
+    }
+
+    .character-name {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #4ecdc4;
+    }
+
+    .monsters-container {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 110px;
+      max-width: 200px;
+      max-height: 300px;
+      overflow: visible; /* 팝업이 보이도록 변경 */
+      flex: 1;
+    }
+
+    /* 몬스터가 많을 때를 위한 스크롤 영역 */
+    .monsters-scroll-area {
+      max-height: 300px;
+      overflow-x: visible;
+    }
+
+    .monster-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #555;
+      border-radius: 5px;
+      padding: 3px;
+      background: #2a2a2a;
+      min-width: 85px;
+      margin-bottom: 2px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .monster-unit.attacking {
+      transform: scale(1.1) translateX(-5px);
+      box-shadow: 0 0 20px rgba(255, 50, 50, 0.5);
+      background: #4a2a2a;
+    }
+
+    .monster-info {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 20px;
+    }
+
+    /* 상점 스타일 */
+    .shop-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
+      border-radius: 10px;
+      border: 1px solid #444;
+    }
+
+    .shop-section h3 {
+      margin: 0 0 10px 0;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    }
+
+    .shop-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .shop-btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+      text-align: center;
+      min-width: 90px;
+      min-height: 50px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .shop-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .shop-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .shop-btn .price {
+      display: block;
+      font-size: 10px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    /* 각 버튼별 색상 */
+    .gem-btn {
+      background: linear-gradient(135deg, #9c27b0, #673ab7);
+      color: white;
+    }
+
+    .weapon-btn {
+      background: linear-gradient(135deg, #f44336, #e91e63);
+      color: white;
+    }
+
+    .armor-btn {
+      background: linear-gradient(135deg, #2196f3, #03a9f4);
+      color: white;
+    }
+
+    .helmet-btn {
+      background: linear-gradient(135deg, #ff9800, #ff5722);
+      color: white;
+    }
+
+    .pants-btn {
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+      color: white;
+    }
+
+    .shoes-btn {
+      background: linear-gradient(135deg, #795548, #607d8b);
+      color: white;
+    }
+
+    .necklace-btn {
+      background: linear-gradient(135deg, #ffeb3b, #ffc107);
+      color: #333;
+    }
+
+    .ring-btn {
+      background: linear-gradient(135deg, #e91e63, #9c27b0);
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>아이템 강화 파밍 게임</h1>
+  <div>
+    코인: <span id="coins">0</span> | 보석: <span id="gems">0</span> | 처치: <span id="killCount">0</span>마리
+    <span id="progressMessage" style="color: #888; font-size: 12px; margin-left: 10px;"></span>
+  </div>
+  <div id="game">
+    <div id="inventory">
+      <h2>인벤토리</h2>
+      <div id="inventoryList"></div>
+    </div>
+    <div id="shop">
+      <h2>상점</h2>
+      <div class="shop-section">
+        <h3>🔹 기본 아이템</h3>
+        <div class="shop-buttons">
+          <button class="shop-btn gem-btn" onclick="buyGem()">💎 보석 구매<br><span class="price">50코인</span></button>
+          <button class="shop-btn weapon-btn" onclick="buyWeapon()">⚔️ 무기 구매<br><span class="price">100코인</span></button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>🛡️ 방어 장비</h3>
+        <div class="shop-buttons">
+          <button class="shop-btn armor-btn" onclick="buyArmor()">🛡️ 방어구<br><span class="price">120코인</span></button>
+          <button class="shop-btn helmet-btn" onclick="buyHelmet()">⛑️ 모자<br><span class="price">80코인</span></button>
+          <button class="shop-btn pants-btn" onclick="buyPants()">👖 바지<br><span class="price">90코인</span></button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>💍 액세서리</h3>
+        <div class="shop-buttons">
+          <button class="shop-btn shoes-btn" onclick="buyShoes()">👞 신발<br><span class="price">70코인</span></button>
+          <button class="shop-btn necklace-btn" onclick="buyNecklace()">📿 목걸이<br><span class="price">150코인</span></button>
+          <button class="shop-btn ring-btn" onclick="buyRing()">💍 반지<br><span class="price">110코인</span></button>
+        </div>
+      </div>
+    </div>
+    <div id="battle">
+      <h2>사냥터</h2>
+      <div class="battle-area">
+        <div class="battle-info" id="battleInfo"></div>
+        <div class="battle-unit">
+          <div class="character-name">용사</div>
+          <div class="character-sprite" id="characterSprite">🧙‍♂️
+            <div class="weapon-icon" id="weaponIcon"></div>
+          </div>
+          <div class="unit_area" id="playerArea"></div>
+        </div>
+        <div class="battle-vs">⚔️</div>
+        <div class="monsters-container" id="monstersContainer">
+          <div class="monster-info">몬스터 없음</div>
+        </div>
+      </div>
+      <div class="battle-log" id="battleLog"></div>
+      <div id="fieldSelect"></div>
+      <div id="huntControls">
+        <button onclick="toggleAutoHunt()" id="autoHuntBtn">사냥시작</button>
+      </div>
+    </div>
+  </div>
+  <div class="log-container">
+    <button class="log-toggle" onclick="toggleLog()" id="logToggle">로그 보기/숨기기</button>
+    <div class="log" id="log" style="display: none;"></div>
+  </div>
+
+  <script>
+    let coins = 200;
+    let gems = 3;
+    let inventory = [];
+    let armorInventory = [];
+    let helmetInventory = [];
+    let pantsInventory = [];
+    let shoesInventory = [];
+    let necklaceInventory = [];
+    let ringInventory = [];
+    let equipped = null;
+    let equippedArmor = null;
+    let equippedHelmet = null;
+    let equippedPants = null;
+    let equippedShoes = null;
+    let equippedNecklace = null;
+    let equippedRing = null;
+    let monsters = [];
+    let monsterIdCounter = 0; // 몬스터 고유 ID 카운터
+    let player = {
+      hp: 100,
+      maxHp: 100,
+      atkSpd: 800, // ms, 공격속도(낮을수록 빠름)
+      alive: true,
+      def: 0, // 방어력
+      dodge: 0, // 회피율 (모자)
+      speed: 0, // 이동속도 (바지)
+      jump: 0, // 점프력 (신발)
+      bonusHp: 0, // 추가 체력 (목걸이)
+      bonusAtk: 0 // 추가 공격력 (반지)
+    };
+
+    let autoHunt = false;
+    let autoHuntTimeout = null;
+
+    // 사냥터 정보 (몬스터 수는 [최소, 최대] 범위, unlock: 해금 조건)
+    const fields = [
+      { name: "초원", hp: [50, 90], atk: [5, 12], def: [5, 15], reward: 35, monsterCount: [1, 3], unlock: 0 },
+      { name: "숲", hp: [120, 200], atk: [18, 30], def: [15, 25], reward: 70, monsterCount: [1, 3], unlock: 10 },
+      { name: "동굴", hp: [220, 350], atk: [28, 50], def: [25, 40], reward: 130, monsterCount: [2, 4], unlock: 30 },
+      { name: "화산", hp: [400, 700], atk: [45, 90], def: [40, 60], reward: 220, monsterCount: [2, 5], unlock: 60 },
+      { name: "빙하", hp: [800, 1200], atk: [80, 140], def: [70, 100], reward: 380, monsterCount: [3, 6], unlock: 100 },
+      { name: "사막", hp: [1300, 1800], atk: [120, 200], def: [90, 140], reward: 550, monsterCount: [3, 7], unlock: 150 },
+      { name: "심연", hp: [2000, 2800], atk: [180, 280], def: [130, 180], reward: 750, monsterCount: [4, 8], unlock: 220 },
+      { name: "천공성", hp: [3000, 4200], atk: [250, 380], def: [170, 230], reward: 1050, monsterCount: [4, 9], unlock: 300 },
+      { name: "어둠의 영역", hp: [4500, 6000], atk: [320, 480], def: [210, 280], reward: 1400, monsterCount: [5, 10], unlock: 400 },
+      { name: "시공의 틈", hp: [6500, 8500], atk: [420, 600], def: [260, 340], reward: 1900, monsterCount: [6, 12], unlock: 520 },
+      { name: "절대신역", hp: [9000, 12000], atk: [550, 750], def: [320, 420], reward: 2600, monsterCount: [7, 15], unlock: 666 }
+    ];
+
+    let totalMonstersKilled = 0; // 총 처치한 몬스터 수 (게임 진행도 측정)
+    let currentField = 0;
+    function updateFieldSelect() {
+      const el = document.getElementById("fieldSelect");
+      el.innerHTML = fields.map((f, i) => {
+        const isUnlocked = totalMonstersKilled >= f.unlock;
+        const isSelected = currentField === i;
+        const disabled = !isUnlocked ? 'disabled' : '';
+        const style = isSelected ? "background:#fa4;color:#fff;" : (isUnlocked ? "background:#333;color:#fff;" : "background:#666;color:#999;");
+        const onclick = isUnlocked ? `selectField(${i})` : '';
+        const unlockText = isUnlocked ? '' : ` (${f.unlock}마리)`;
+        return `<button ${disabled} onclick='${onclick}' style='${style}margin:2px;padding:5px 8px;border:1px solid #777;border-radius:3px;cursor:${isUnlocked ? 'pointer' : 'not-allowed'};'>${f.name}${unlockText}</button>`;
+      }).join("");
+    }
+    function selectField(idx) {
+      // 해금 조건 확인
+      if (totalMonstersKilled < fields[idx].unlock) {
+        log(`${fields[idx].name}은(는) ${fields[idx].unlock}마리 처치 후 해금됩니다. (현재: ${totalMonstersKilled}마리)`);
+        return;
+      }
+
+      currentField = idx;
+      log(`사냥터를 [${fields[idx].name}]으로 이동!`);
+      updateFieldSelect();
+      // 자동사냥 중이면 즉시 몬스터 리스폰
+      if (autoHunt) {
+        // 모든 몬스터 제거
+        monsters.length = 0;
+        updateMonstersDisplay();
+        if (autoHuntTimeout) clearTimeout(autoHuntTimeout);
+        // 기본 딜레이 3초, 점프력에 따라 감소 (최소 0.5초)
+        const baseDelay = 3000;
+        const jumpReduction = player.jump * 50; // 점프력 1당 50ms 감소
+        const finalDelay = Math.max(500, baseDelay - jumpReduction);
+        autoHuntTimeout = setTimeout(() => { spawnMonster(); }, finalDelay);
+      }
+    }
+
+    function toggleAutoHunt() {
+      autoHunt = !autoHunt;
+      document.getElementById("autoHuntBtn").textContent = (autoHunt ? "사냥종료" : "사냥시작");
+
+      if (autoHunt) {
+        // 사냥 시작: 살아있는 몬스터가 없으면 새로 생성
+        if (monsters.filter(m => m.alive).length === 0) {
+          spawnMonster();
+        } else {
+          // 이미 살아있는 몬스터가 있으면 전투 시작
+          if (equipped != null && inventory[equipped]) {
+            startAutoBattle();
+          }
+        }
+      } else {
+        // 사냥 종료: 전투 중단하고 몬스터들 정리
+        if (autoBattleInterval) clearInterval(autoBattleInterval);
+        if (autoHuntTimeout) clearTimeout(autoHuntTimeout);
+        monsters.length = 0; // 모든 몬스터 제거
+        updateMonstersDisplay();
+      }
+
+      updateUIVisibility(); // 자동사냥 상태 변경 시 UI 업데이트
+    }
+
+    // 방어구 종류
+    const armors = [
+      { name: "가죽 갑옷", baseDef: [30, 50] },
+      { name: "사슬 갑옷", baseDef: [40, 70] },
+      { name: "철 갑옷", baseDef: [70, 120] },
+      { name: "마법 로브", baseDef: [30, 80] },
+      { name: "드래곤 갑옷", baseDef: [100, 180] }
+    ];
+
+    // 모자 종류 (회피율 증가, 최대 75%까지)
+    const helmets = [
+      { name: "가죽 모자", baseDodge: [5, 10] },
+      { name: "철 가면", baseDodge: [8, 15] },
+      { name: "마법 모자", baseDodge: [12, 20] },
+      { name: "노블 왕관", baseDodge: [15, 25] },
+      { name: "드래곤 헬름", baseDodge: [20, 30] }
+    ];
+
+    // 바지 종류 (이동속도 증가)
+    const pants = [
+      { name: "가죽 바지", baseSpeed: [5, 10] },
+      { name: "마법 바지", baseSpeed: [8, 15] },
+      { name: "달리기 바지", baseSpeed: [12, 20] },
+      { name: "바람 바지", baseSpeed: [15, 25] },
+      { name: "리베르타스 바지", baseSpeed: [20, 35] }
+    ];
+
+    // 신발 종류 (점프력 증가)
+    const shoes = [
+      { name: "가죽 신발", baseJump: [3, 8] },
+      { name: "전사 부츠", baseJump: [5, 12] },
+      { name: "달리기 신발", baseJump: [8, 15] },
+      { name: "바람 신발", baseJump: [12, 20] },
+      { name: "비상 신발", baseJump: [15, 30] }
+    ];
+
+    // 목걸이 종류 (체력 증가)
+    const necklaces = [
+      { name: "청동 목걸이", baseHp: [20, 40] },
+      { name: "은 목걸이", baseHp: [30, 60] },
+      { name: "금 목걸이", baseHp: [50, 80] },
+      { name: "마법 목걸이", baseHp: [70, 120] },
+      { name: "드래곤 목걸이", baseHp: [100, 180] }
+    ];
+
+    // 반지 종류 (공격력 증가)
+    const rings = [
+      { name: "청동 반지", baseAtk: [1, 2] },
+      { name: "은 반지", baseAtk: [1, 3] },
+      { name: "금 반지", baseAtk: [2, 4] },
+      { name: "마법 반지", baseAtk: [2, 5] },
+      { name: "드래곤 반지", baseAtk: [1, 10] }
+    ];
+
+    const ITEM_OPTIONS = [
+      { key: "공격력", type: "atk", value: [1, 5], "pre": "+", "after": "" },
+      { key: "방어력", type: "def", value: [10, 50], "pre": "+", "after": "" },
+      { key: "체력", type: "hp", value: [5, 20], "pre": "+", "after": "" },
+      { key: "회피율", type: "dodge", value: [1, 4], "pre": "+", "after": "%" },
+      { key: "속도", type: "speed", value: [1, 8], "pre": "+", "after": "" },
+      { key: "점프력", type: "jump", value: [5, 25], "pre": "+", "after": "" }
+    ];
+
+    // 유니크 고유 옵션들
+    const UNIQUE_OPTIONS = {
+      // 공격시 발동 효과
+      attack_triggers: [
+        { key: "공격시 10% 확률로 번개 발생 (추가 50% 데미지)", type: "lightning_strike", chance: 10, value: 0.5 },
+        { key: "공격시 15% 확률로 독 감염 (3초간 DOT)", type: "poison_attack", chance: 15, value: 3 },
+        { key: "공격시 1% 확률로 즉사 공격", type: "instant_kill", chance: 1, value: 1 },
+        { key: "공격시 20% 확률로 체력 흡수 (데미지의 30%)", type: "life_steal", chance: 20, value: 0.3 },
+        { key: "공격시 12% 확률로 화염 폭발 (주변 적 동시 공격)", type: "fire_explosion", chance: 12, value: 0.8 }
+      ],
+
+      // 방어시 발동 효과
+      defense_triggers: [
+        { key: "피격시 15% 확률로 가시 반사 (받은 데미지의 50% 반사)", type: "thorn_reflect", chance: 15, value: 0.5 },
+        { key: "피격시 10% 확률로 순간이동 (2초간 무적)", type: "teleport_dodge", chance: 10, value: 2 },
+        { key: "피격시 10% 확률로 방어막 생성 (다음 공격 무효화)", type: "shield_barrier", chance: 20, value: 1 },
+        { key: "피격시 5% 확률로 즉시 체력 회복 (최대 체력의 20%)", type: "auto_heal", chance: 5, value: 0.2 },
+        { key: "피격시 4% 확률로 시간 정지 (몬스터 3초간 마비)", type: "time_freeze", chance: 4, value: 3 }
+      ],
+
+      // 퍼센트 증가 스탯
+      percentage_stats: [
+        { key: "모든 공격력 25% 증가", type: "attack_percent", value: 25 },
+        { key: "모든 방어력 30% 증가", type: "defense_percent", value: 30 },
+        { key: "최대 체력 40% 증가", type: "hp_percent", value: 40 },
+        { key: "공격 속도 20% 증가", type: "speed_percent", value: 20 },
+        { key: "경험치 획득 50% 증가", type: "exp_percent", value: 50 },
+        { key: "골드 획득 35% 증가", type: "gold_percent", value: 35 },
+        { key: "치명타 확률 15% 증가", type: "crit_percent", value: 15 },
+        { key: "모든 저항 20% 증가", type: "resist_percent", value: 20 }
+      ],
+
+      // 특수 능력
+      special_abilities: [
+        { key: "불사신의 축복 (사망시 1회 부활)", type: "resurrection", value: 1 },
+        { key: "마나 흡수 (처치시 보석 획득 확률 +10%)", type: "mana_drain", value: 10 },
+        { key: "시간 가속 (몬스터 리스폰 시간 50% 감소)", type: "time_acceleration", value: 50 },
+        { key: "행운의 가호 (모든 확률 효과 2배)", type: "luck_blessing", value: 2 },
+        { key: "무한 인벤토리 (아이템 자동 판매)", type: "auto_sell", value: 1 }
+      ]
+    };
+    function getRandomOption() {
+      let select_option = ITEM_OPTIONS[Math.floor(Math.random() * ITEM_OPTIONS.length)];
+      let ran_val = randBetween(select_option.value[0], select_option.value[1]);
+      let key_str = select_option.key + " " + select_option.pre + " " + ran_val + " " + select_option.after;
+      let option = {
+        key: key_str,
+        type: select_option.type,
+        value: ran_val
+      };
+      return option;
+    }
+
+    function getRandomUniqueOption() {
+      // 유니크 옵션 카테고리 랜덤 선택
+      const categories = Object.keys(UNIQUE_OPTIONS);
+      const selectedCategory = categories[Math.floor(Math.random() * categories.length)];
+      const categoryOptions = UNIQUE_OPTIONS[selectedCategory];
+
+      // 선택된 카테고리에서 랜덤 옵션 선택
+      const selectedOption = categoryOptions[Math.floor(Math.random() * categoryOptions.length)];
+
+      return {
+        key: selectedOption.key,
+        type: selectedOption.type,
+        category: selectedCategory,
+        chance: selectedOption.chance || null,
+        value: selectedOption.value,
+        isUnique: true
+      };
+    }
+
+    function getRandomOptions(grade) {
+      let options = [];
+
+      if (grade === "매직") {
+        // 매직: 일반 옵션 1개
+        let option = getRandomOption();
+        options.push(option);
+      } else if (grade === "레어") {
+        // 레어: 일반 옵션 2개
+        let usedTypes = new Set();
+        for (let i = 0; i < 2; i++) {
+          let attempts = 0;
+          let option;
+          do {
+            option = getRandomOption();
+            attempts++;
+          } while (usedTypes.has(option.type) && attempts < 10);
+
+          if (!usedTypes.has(option.type)) {
+            usedTypes.add(option.type);
+            options.push(option);
+          }
+        }
+      } else if (grade === "유니크") {
+        // 유니크: 일반 옵션 1개 + 고유 옵션 1개
+        let normalOption = getRandomOption();
+        let uniqueOption = getRandomUniqueOption();
+        options.push(normalOption);
+        options.push(uniqueOption);
+      }
+
+      return options;
+    }
+
+    // 장비의 옵션 효과를 계산하는 함수
+    function getItemOptionStats(item) {
+      let stats = {
+        atk: 0,
+        def: 0,
+        hp: 0,
+        dodge: 0,
+        speed: 0,
+        jump: 0
+      };
+
+      if (item && item.options) {
+        item.options.forEach(option => {
+          if (stats.hasOwnProperty(option.type)) {
+            stats[option.type] += option.value;
+          }
+        });
+      }
+
+      return stats;
+    }
+
+    // 유니크 공격 효과 처리 함수
+    function processUniqueAttackEffects(targetMonster, damage) {
+      let extraDamage = 0;
+      let extraMessage = "";
+      let healAmount = 0;
+
+      // 모든 장착된 아이템의 유니크 옵션 확인
+      const allEquippedItems = [
+        equipped !== null ? inventory[equipped] : null,
+        equippedArmor !== null ? armorInventory[equippedArmor] : null,
+        equippedHelmet !== null ? helmetInventory[equippedHelmet] : null,
+        equippedPants !== null ? pantsInventory[equippedPants] : null,
+        equippedShoes !== null ? shoesInventory[equippedShoes] : null,
+        equippedNecklace !== null ? necklaceInventory[equippedNecklace] : null,
+        equippedRing !== null ? ringInventory[equippedRing] : null
+      ].filter(item => item !== null);
+
+      allEquippedItems.forEach(item => {
+        if (item.options) {
+          item.options.forEach(option => {
+            if (option.isUnique && option.category === 'attack_triggers') {
+              let chance = option.chance || 0;
+
+              // 행운의 가호 효과 적용
+              let luckMultiplier = hasUniqueOption('luck_blessing') ? getUniqueOptionValue('luck_blessing') : 1;
+              chance *= luckMultiplier;
+
+              if (Math.random() * 100 < chance) {
+                switch (option.type) {
+                  case 'lightning_strike':
+                    extraDamage += damage * option.value;
+                    extraMessage += " ⚡번개 발생!";
+                    break;
+
+                  case 'poison_attack':
+                    // DOT 효과는 나중에 구현 (간단히 즉시 추가 데미지로 처리)
+                    extraDamage += damage * 0.3;
+                    extraMessage += " 🧪독 감염!";
+                    break;
+
+                  case 'instant_kill':
+                    if (targetMonster.hp < targetMonster.maxHp * 0.8) { // 체력 80% 이하일 때만
+                      extraDamage = targetMonster.hp;
+                      extraMessage += " ☠️즉사 공격!";
+                    }
+                    break;
+
+                  case 'life_steal':
+                    healAmount = damage * option.value;
+                    extraMessage += " 🩸체력 흡수!";
+                    break;
+
+                  case 'fire_explosion':
+                    // 모든 살아있는 몬스터에게 추가 데미지 (주 타겟 제외)
+                    let otherMonsters = monsters.filter(m => m.alive && m !== targetMonster);
+                    otherMonsters.forEach(monster => {
+                      let explosionDamage = damage * option.value;
+                      monster.hp -= explosionDamage;
+
+                      // 화염 폭발 데미지 팝업 표시
+                      showMonsterDamagePopup(monster.id, explosionDamage, 'damage');
+
+                      if (monster.hp <= 0) {
+                        monster.alive = false;
+                        const reward = fields[currentField].reward;
+                        coins += reward;
+                        totalMonstersKilled++;
+                      }
+                    });
+                    extraMessage += " 🔥화염 폭발!";
+                    break;
+                }
+              }
+            }
+          });
+        }
+      });
+
+      // 체력 흡수 적용
+      if (healAmount > 0) {
+        const currentMaxHp = player.maxHp + player.bonusHp;
+        player.hp = Math.min(currentMaxHp, player.hp + healAmount);
+        showDamagePopup(document.getElementById("characterSprite"), Math.floor(healAmount), 'heal');
+      }
+
+      return { extraDamage, extraMessage };
+    }
+
+    // 유니크 옵션 보유 확인 함수
+    function hasUniqueOption(optionType) {
+      const allEquippedItems = [
+        equipped !== null ? inventory[equipped] : null,
+        equippedArmor !== null ? armorInventory[equippedArmor] : null,
+        equippedHelmet !== null ? helmetInventory[equippedHelmet] : null,
+        equippedPants !== null ? pantsInventory[equippedPants] : null,
+        equippedShoes !== null ? shoesInventory[equippedShoes] : null,
+        equippedNecklace !== null ? necklaceInventory[equippedNecklace] : null,
+        equippedRing !== null ? ringInventory[equippedRing] : null
+      ].filter(item => item !== null);
+
+      for (let item of allEquippedItems) {
+        if (item.options) {
+          for (let option of item.options) {
+            if (option.isUnique && option.type === optionType) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    // 유니크 옵션 값 가져오기 함수
+    function getUniqueOptionValue(optionType) {
+      const allEquippedItems = [
+        equipped !== null ? inventory[equipped] : null,
+        equippedArmor !== null ? armorInventory[equippedArmor] : null,
+        equippedHelmet !== null ? helmetInventory[equippedHelmet] : null,
+        equippedPants !== null ? pantsInventory[equippedPants] : null,
+        equippedShoes !== null ? shoesInventory[equippedShoes] : null,
+        equippedNecklace !== null ? necklaceInventory[equippedNecklace] : null,
+        equippedRing !== null ? ringInventory[equippedRing] : null
+      ].filter(item => item !== null);
+
+      for (let item of allEquippedItems) {
+        if (item.options) {
+          for (let option of item.options) {
+            if (option.isUnique && option.type === optionType) {
+              return option.value;
+            }
+          }
+        }
+      }
+      return 0;
+    }
+
+    // 유니크 방어 효과 처리 함수
+    function processUniqueDefenseEffects(incomingDamage) {
+      let damageReduction = 0;
+      let reflectDamage = 0;
+      let extraMessage = "";
+      let negateAttack = false;
+      let healAmount = 0;
+
+      // 모든 장착된 아이템의 유니크 옵션 확인
+      const allEquippedItems = [
+        equipped !== null ? inventory[equipped] : null,
+        equippedArmor !== null ? armorInventory[equippedArmor] : null,
+        equippedHelmet !== null ? helmetInventory[equippedHelmet] : null,
+        equippedPants !== null ? pantsInventory[equippedPants] : null,
+        equippedShoes !== null ? shoesInventory[equippedShoes] : null,
+        equippedNecklace !== null ? necklaceInventory[equippedNecklace] : null,
+        equippedRing !== null ? ringInventory[equippedRing] : null
+      ].filter(item => item !== null);
+
+      allEquippedItems.forEach(item => {
+        if (item.options) {
+          item.options.forEach(option => {
+            if (option.isUnique && option.category === 'defense_triggers') {
+              let chance = option.chance || 0;
+
+              // 행운의 가호 효과 적용
+              let luckMultiplier = hasUniqueOption('luck_blessing') ? getUniqueOptionValue('luck_blessing') : 1;
+              chance *= luckMultiplier;
+
+              if (Math.random() * 100 < chance) {
+                switch (option.type) {
+                  case 'thorn_reflect':
+                    let reflectAmount = incomingDamage * option.value;
+                    if (isNaN(reflectAmount)) {
+                      reflectAmount = 0;
+                    }
+                    reflectDamage += reflectAmount;
+                    extraMessage += " 🌿가시 반사!";
+                    break;
+
+                  case 'teleport_dodge':
+                    negateAttack = true;
+                    extraMessage += " 🌀순간이동!";
+                    break;
+
+                  case 'shield_barrier':
+                    negateAttack = true;
+                    extraMessage += " 🛡️방어막!";
+                    break;
+
+                  case 'auto_heal':
+                    const currentMaxHp = player.maxHp + player.bonusHp;
+                    healAmount = currentMaxHp * option.value;
+                    if (isNaN(healAmount)) {
+                      healAmount = 0;
+                    }
+                    extraMessage += " 💚자동 회복!";
+                    break;
+
+                  case 'time_freeze':
+                    // 몬스터들을 일시적으로 마비시킴 (간단히 1턴 스킵으로 처리)
+                    extraMessage += " ⏰시간 정지!";
+                    negateAttack = true;
+                    break;
+                }
+              }
+            }
+          });
+        }
+      });
+
+      // NaN 체크
+      if (isNaN(reflectDamage)) {
+        reflectDamage = 0;
+      }
+      if (isNaN(healAmount)) {
+        healAmount = 0;
+      }
+
+      // 반사 데미지 적용
+      if (reflectDamage > 0) {
+        monsters.filter(m => m.alive).forEach((monster, index) => {
+          monster.hp -= reflectDamage;
+
+          // 반사 데미지 팝업 표시
+          showMonsterDamagePopup(monster.id, reflectDamage, 'damage');
+
+          if (monster.hp <= 0) {
+            monster.alive = false;
+            const reward = fields[currentField].reward;
+            coins += reward;
+            totalMonstersKilled++;
+            battleLog(`${monster.name} 반사 데미지로 처치!`);
+          }
+        });
+      }
+
+      // 자동 회복 적용
+      if (healAmount > 0) {
+        const currentMaxHp = player.maxHp + player.bonusHp;
+        player.hp = Math.min(currentMaxHp, player.hp + healAmount);
+        showDamagePopup(document.getElementById("characterSprite"), Math.floor(healAmount), 'heal');
+      }
+
+      // 반환값 NaN 체크
+      let finalReflectDamage = Math.floor(reflectDamage);
+      if (isNaN(finalReflectDamage)) {
+        finalReflectDamage = 0;
+      }
+
+      return {
+        damageReduction,
+        extraMessage,
+        negateAttack,
+        reflectDamage: finalReflectDamage
+      };
+    }
+
+    function buyArmor() {
+      if (coins >= 120) {
+        coins -= 120;
+        const templateIndex = weightedRandom(armors);
+        const template = armors[templateIndex];
+        const grade = randomGrade();
+        const a = JSON.parse(JSON.stringify(template));
+        a.grade = grade.name;
+        a.gradeColor = grade.color;
+        a.baseDef = Math.round(randBetween(template.baseDef[0], template.baseDef[1]) * grade.stat);
+        a.upgrade = 0;
+        a.options = getRandomOptions(grade.name);
+        armorInventory.push(a);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${a.name} (방어:${a.baseDef}) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function buyHelmet() {
+      if (coins >= 80) {
+        coins -= 80;
+        const templateIndex = weightedRandom(helmets);
+        const template = helmets[templateIndex];
+        const grade = randomGrade();
+        const h = JSON.parse(JSON.stringify(template));
+        h.grade = grade.name;
+        h.gradeColor = grade.color;
+        h.baseDodge = Math.round(randBetween(template.baseDodge[0], template.baseDodge[1]) * grade.stat);
+        h.upgrade = 0;
+        h.options = getRandomOptions(grade.name);
+        helmetInventory.push(h);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${h.name} (회피:${h.baseDodge}%) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function buyPants() {
+      if (coins >= 90) {
+        coins -= 90;
+        const templateIndex = weightedRandom(pants);
+        const template = pants[templateIndex];
+        const grade = randomGrade();
+        const p = JSON.parse(JSON.stringify(template));
+        p.grade = grade.name;
+        p.gradeColor = grade.color;
+        p.baseSpeed = Math.round(randBetween(template.baseSpeed[0], template.baseSpeed[1]) * grade.stat);
+        p.upgrade = 0;
+        p.options = getRandomOptions(grade.name);
+        pantsInventory.push(p);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${p.name} (속도:${p.baseSpeed}) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function buyShoes() {
+      if (coins >= 70) {
+        coins -= 70;
+        const templateIndex = weightedRandom(shoes);
+        const template = shoes[templateIndex];
+        const grade = randomGrade();
+        const s = JSON.parse(JSON.stringify(template));
+        s.grade = grade.name;
+        s.gradeColor = grade.color;
+        s.baseJump = Math.round(randBetween(template.baseJump[0], template.baseJump[1]) * grade.stat);
+        s.upgrade = 0;
+        s.options = getRandomOptions(grade.name);
+        shoesInventory.push(s);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${s.name} (점프:${s.baseJump}) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function buyNecklace() {
+      if (coins >= 150) {
+        coins -= 150;
+        const templateIndex = weightedRandom(necklaces);
+        const template = necklaces[templateIndex];
+        const grade = randomGrade();
+        const n = JSON.parse(JSON.stringify(template));
+        n.grade = grade.name;
+        n.gradeColor = grade.color;
+        n.baseHp = Math.round(randBetween(template.baseHp[0], template.baseHp[1]) * grade.stat);
+        n.upgrade = 0;
+        n.options = getRandomOptions(grade.name);
+        necklaceInventory.push(n);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${n.name} (HP:${n.baseHp}) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function buyRing() {
+      if (coins >= 110) {
+        coins -= 110;
+        const templateIndex = weightedRandom(rings);
+        const template = rings[templateIndex];
+        const grade = randomGrade();
+        const r = JSON.parse(JSON.stringify(template));
+        r.grade = grade.name;
+        r.gradeColor = grade.color;
+        r.baseAtk = Math.round(randBetween(template.baseAtk[0], template.baseAtk[1]) * grade.stat);
+        r.upgrade = 0;
+        r.options = getRandomOptions(grade.name);
+        ringInventory.push(r);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${r.name} (공격:${r.baseAtk}) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+    let monsterAtkSpd = 1000; // ms
+    let autoBattleInterval = null;
+
+    // 최근 데미지 표시용 변수
+    let playerLastDamage = 0;
+    let monsterLastDamage = 0;
+    let playerDamageTimeout = null;
+    let monsterDamageTimeout = null;
+
+    const weapons = [
+      { name: "롱소드", baseDamage: [8, 12], effect: "20% 확률 2배 데미지", atkSpdRange: [600, 900], icon: "⚔️" },
+      { name: "도끼", baseDamage: [12, 18], effect: "10% 확률 치명타(3배)", atkSpdRange: [800, 1200], icon: "🪓" },
+      { name: "단검", baseDamage: [4, 8], effect: "30% 확률 추가공격", atkSpdRange: [300, 600], icon: "🗡️" },
+      { name: "마법봉", baseDamage: [6, 10], effect: "20% 확률 현재체력 10% 추가데미지", atkSpdRange: [700, 1000], icon: "🪄" },
+      { name: "활", baseDamage: [10, 14], effect: "15% 확률 방어무시", atkSpdRange: [500, 800], icon: "🏹" }
+    ];
+
+    // 몬스터 이름과 이미지 데이터
+    const monsterTypes = [
+      // 초원
+      [{ name: "초록 슬라임", emoji: "🟢" }, { name: "야생 토끼", emoji: "🐇" }, { name: "초원 달팡이", emoji: "🐌" }],
+      // 숲
+      [{ name: "어둠 늘대", emoji: "🐺" }, { name: "숲 고블린", emoji: "👹" }, { name: "거대 거미", emoji: "🕷️" }],
+      // 동굴
+      [{ name: "동굴 박쥐", emoji: "🦇" }, { name: "어둠 오크", emoji: "👹" }, { name: "동굴 드레이크", emoji: "🐲" }],
+      // 화산
+      [{ name: "화염 데모", emoji: "🔥" }, { name: "용암 골렘", emoji: "🧟" }, { name: "화산 드래곤", emoji: "🐉" }],
+      // 빙하
+      [{ name: "얼음 거인", emoji: "❄️" }, { name: "서리 늑대", emoji: "🐺" }, { name: "빙하 정령", emoji: "👻" }, { name: "눈보라 드래곤", emoji: "🐲" }],
+      // 사막
+      [{ name: "사막 전갈", emoji: "🦂" }, { name: "모래 바실리스크", emoji: "🐍" }, { name: "사막 나가", emoji: "🐉" }, { name: "미라 로드", emoji: "🧟‍♂️" }],
+      // 심연
+      [{ name: "심연 크라켄", emoji: "🐙" }, { name: "어둠 악마", emoji: "😈" }, { name: "공허 스펙터", emoji: "👻" }, { name: "심연 드래곤", emoji: "🐲" }, { name: "무명 공포", emoji: "🖤" }],
+      // 천공성
+      [{ name: "천사 워리어", emoji: "👼" }, { name: "빛의 수호자", emoji: "✨" }, { name: "대천사", emoji: "🕊️" }, { name: "세라핌", emoji: "👼" }, { name: "천계 드래곤", emoji: "🐉" }],
+      // 어둠의 영역
+      [{ name: "그림자 악마", emoji: "😈" }, { name: "죽음의 기사", emoji: "💀" }, { name: "어둠 군주", emoji: "👑" }, { name: "네크로맨서", emoji: "🧙‍♀️" }, { name: "암흑 드래곤", emoji: "🐲" }, { name: "공허 제왕", emoji: "🖤" }],
+      // 시공의 틈
+      [{ name: "시공 수호자", emoji: "⏰" }, { name: "차원 악마", emoji: "👹" }, { name: "무한 드래곤", emoji: "🌀" }, { name: "시간 조작자", emoji: "⚡" }, { name: "공간 파괴자", emoji: "💥" }, { name: "운명의 주인", emoji: "🔮" }],
+      // 절대신역
+      [{ name: "창조신", emoji: "🌟" }, { name: "파괴신", emoji: "💥" }, { name: "절대자", emoji: "👑" }, { name: "무한신", emoji: "∞" }, { name: "신성 드래곤", emoji: "🐉" }, { name: "세계수 정령", emoji: "🌳" }, { name: "우주 지배자", emoji: "🌌" }]
+    ];
+
+    let logVisible = false;
+
+    function toggleLog() {
+      const logDiv = document.getElementById("log");
+      const toggleBtn = document.getElementById("logToggle");
+      logVisible = !logVisible;
+      logDiv.style.display = logVisible ? "block" : "none";
+      toggleBtn.textContent = logVisible ? "로그 숨기기" : "로그 보기";
+    }
+
+    function log(msg) {
+      const logDiv = document.getElementById("log");
+      logDiv.innerHTML = msg + "<br>" + logDiv.innerHTML;
+    }
+
+    function battleLog(msg) {
+      const battleLogDiv = document.getElementById("battleLog");
+      battleLogDiv.innerHTML = msg + "<br>" + battleLogDiv.innerHTML;
+    }
+
+    function showBattleInfo(msg, duration = 2000) {
+      const battleInfo = document.getElementById("battleInfo");
+      battleInfo.textContent = msg;
+      battleInfo.classList.add("show");
+      setTimeout(() => {
+        battleInfo.classList.remove("show");
+      }, duration);
+    }
+
+    function showDamagePopup(element, damage, type = 'damage') {
+      const popup = document.createElement('div');
+      popup.className = `damage-popup ${type}`;
+      if(damage==undefined || isNaN(damage)){
+        damage=0;
+      }
+      popup.textContent = type === 'gold' ? `+${Math.floor(damage)} 골드` : `-${Math.floor(damage)}`;
+
+      element.style.position = 'relative';
+      element.appendChild(popup);
+
+      setTimeout(() => {
+        if (popup.parentNode) {
+          popup.parentNode.removeChild(popup);
+        }
+      }, 1000);
+    }
+
+    // 몬스터 전용 데미지 팝업 함수
+    function showMonsterDamagePopup(monsterId, damage, type = 'damage') {
+      console.log(`Trying to show damage popup for monster${monsterId}, damage: ${damage}`);
+      const monsterElement = document.getElementById(`monster${monsterId}`);
+      if (!monsterElement) {
+        console.log(`Monster element not found: monster${monsterId}`);
+        // 모든 몬스터 요소 확인
+        const allMonsters = document.querySelectorAll('[id^="monster"]');
+        console.log('Available monster elements:', Array.from(allMonsters).map(el => el.id));
+        return;
+      }
+      console.log(`Found monster element: ${monsterElement.id}`);
+
+      const popup = document.createElement('div');
+      popup.className = `damage-popup ${type}`;
+      popup.style.cssText = `
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, 0);
+        background: rgba(255, 0, 0, 0.9);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-weight: bold;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 9999;
+        animation: damageFloatMonster 1s ease-out forwards;
+        white-space: nowrap;
+      `;
+
+      if (type === 'heal') {
+        popup.style.background = 'rgba(0, 255, 0, 0.9)';
+      }
+
+      if(damage==undefined || isNaN(damage)){
+        damage=0;
+      }
+      popup.textContent = type === 'heal' ? `+${Math.floor(damage)}` : `-${Math.floor(damage)}`;
+
+      monsterElement.style.position = 'relative';
+      monsterElement.appendChild(popup);
+
+      setTimeout(() => {
+        if (popup.parentNode) {
+          popup.parentNode.removeChild(popup);
+        }
+      }, 1000);
+    }
+
+    function updateUIVisibility() {
+      const shopDiv = document.getElementById("shop");
+      const battleAreaDiv = document.querySelector(".battle-area");
+      const battleLogDiv = document.getElementById("battleLog");
+      const fieldSelectDiv = document.getElementById("fieldSelect");
+      // 자동사냥이 ON이면 사냥 중으로 간주 (몬스터 리스폰 대기 시간에도 상점 숨김)
+      const isHunting = autoHunt && player.alive;
+
+      if (isHunting) {
+        // 사냥 중: 상점 숨김, 사냥터 UI 보임
+        shopDiv.classList.add("hidden");
+        battleAreaDiv.classList.remove("hidden");
+        battleLogDiv.classList.remove("hidden");
+        fieldSelectDiv.classList.remove("hidden");
+      } else {
+        // 비사냥 중: 상점 보임, 사냥터 UI 숨김 (자동사냥 버튼은 항상 보임)
+        shopDiv.classList.remove("hidden");
+        battleAreaDiv.classList.add("hidden");
+        battleLogDiv.classList.add("hidden");
+        fieldSelectDiv.classList.add("hidden");
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById("coins").textContent = coins;
+      document.getElementById("gems").textContent = gems;
+      document.getElementById("killCount").textContent = totalMonstersKilled;
+
+      // 진행 상황 메시지 업데이트
+      const progressMsg = document.getElementById("progressMessage");
+
+      // 다음 해금될 사냥터 찾기
+      let nextField = null;
+      for (let i = 0; i < fields.length; i++) {
+        if (totalMonstersKilled < fields[i].unlock) {
+          nextField = fields[i];
+          break;
+        }
+      }
+
+      if (totalMonstersKilled < 20) {
+        progressMsg.textContent = `(${20 - totalMonstersKilled}마리 더 처치하면 다중 몬스터 등장!)`;
+        progressMsg.style.color = "#fa4";
+      } else if (nextField) {
+        const remaining = nextField.unlock - totalMonstersKilled;
+        progressMsg.textContent = `(${remaining}마리 더 처치하면 [${nextField.name}] 해금!)`;
+        progressMsg.style.color = "#4af";
+      } else {
+        progressMsg.textContent = "(모든 사냥터 해금 완료! 최고 레벨!)";
+        progressMsg.style.color = "#f84";
+      }
+
+      updateUIVisibility();
+      const invDiv = document.getElementById("inventoryList");
+
+      let html = "";
+
+      // 장착 중인 아이템 섹션
+      html += `<div class="equipped-section">`;
+      html += `<div class="equipped-title">✨ 장착 중 ✨</div>`;
+
+      if (equipped !== null && inventory[equipped]) {
+        const w = inventory[equipped];
+        const totalDamage = w.baseDamage + (w.upgrade || 0) * 2 + player.bonusAtk;
+        const dps = Math.round((totalDamage / w.atkSpd) * 1000 * 10) / 10;
+        html += `<div><strong>무기:</strong> <span class="${weaponClass(w.upgrade)}">${w.name} +${w.upgrade}</span> (공:${totalDamage}, DPS:${dps}) `;
+        html += `<button class="sell-btn" onclick="equipped=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (w.options && w.options.length > 0) {
+          w.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf'; // 유니크 옵션은 황금색
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      } else {
+        html += `<div><strong>무기:</strong> 없음</div>`;
+      }
+
+      if (equippedArmor !== null && armorInventory[equippedArmor]) {
+        const a = armorInventory[equippedArmor];
+        const totalDef = a.baseDef + (a.upgrade || 0) * 2;
+        html += `<div><strong>방어구:</strong> <span style='color:#6cf;'>${a.name} +${a.upgrade}</span> (방어:${totalDef}) `;
+        html += `<button class="sell-btn" onclick="equippedArmor=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (a.options && a.options.length > 0) {
+          a.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      } else {
+        html += `<div><strong>방어구:</strong> 없음</div>`;
+      }
+
+      if (equippedHelmet !== null && helmetInventory[equippedHelmet]) {
+        const h = helmetInventory[equippedHelmet];
+        const totalDodge = Math.min(h.baseDodge + (h.upgrade || 0) * 2, 75);
+        html += `<div><strong>모자:</strong> <span style='color:#f84;'>${h.name} +${h.upgrade}</span> (회피:${totalDodge}%) `;
+        html += `<button class="sell-btn" onclick="equippedHelmet=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (h.options && h.options.length > 0) {
+          h.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      }
+      if (equippedPants !== null && pantsInventory[equippedPants]) {
+        const p = pantsInventory[equippedPants];
+        const totalSpeed = p.baseSpeed + (p.upgrade || 0) * 2;
+        html += `<div><strong>바지:</strong> <span style='color:#8f4;'>${p.name} +${p.upgrade}</span> (속도:${totalSpeed}) `;
+        html += `<button class="sell-btn" onclick="equippedPants=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (p.options && p.options.length > 0) {
+          p.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      }
+      if (equippedShoes !== null && shoesInventory[equippedShoes]) {
+        const s = shoesInventory[equippedShoes];
+        const totalJump = s.baseJump + (s.upgrade || 0) * 2;
+        html += `<div><strong>신발:</strong> <span style='color:#48f;'>${s.name} +${s.upgrade}</span> (점프:${totalJump}) `;
+        html += `<button class="sell-btn" onclick="equippedShoes=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (s.options && s.options.length > 0) {
+          s.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      }
+      if (equippedNecklace !== null && necklaceInventory[equippedNecklace]) {
+        const n = necklaceInventory[equippedNecklace];
+        const totalHp = n.baseHp + (n.upgrade || 0) * 5;
+        html += `<div><strong>목걸이:</strong> <span style='color:#f48;'>${n.name} +${n.upgrade}</span> (HP:${totalHp}) `;
+        html += `<button class="sell-btn" onclick="equippedNecklace=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (n.options && n.options.length > 0) {
+          n.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      }
+      if (equippedRing !== null && ringInventory[equippedRing]) {
+        const r = ringInventory[equippedRing];
+        const totalAtk = r.baseAtk + (r.upgrade || 0) * 2;
+        html += `<div><strong>반지:</strong> <span style='color:#f84;'>${r.name} +${r.upgrade}</span> (공격:${totalAtk}) `;
+        html += `<button class="sell-btn" onclick="equippedRing=null; updateDisplay();" style="margin-left:5px; font-size:10px;">해제</button></div>`;
+        if (r.options && r.options.length > 0) {
+          r.options.forEach(option => {
+            let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+            html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+          });
+        }
+      }
+      html += `</div>`;
+
+      // 통합 인벤토리
+      const allItems = [];
+
+      // 무기 추가 (미장착만)
+      inventory.forEach((w, i) => {
+        const isEquipped = (equipped === i);
+        if (!isEquipped) {
+          const totalDamage = w.baseDamage + (w.upgrade || 0) * 2;
+          const dps = Math.round((totalDamage / w.atkSpd) * 1000 * 10) / 10;
+          allItems.push({
+            type: 'weapon',
+            typeOrder: 1,
+            typeName: '무기',
+            name: w.name,
+            upgrade: w.upgrade || 0,
+            color: weaponClass(w.upgrade),
+            stat1: totalDamage,
+            stat2: w.atkSpd + 'ms',
+            stat3: dps,
+            isEquipped: false,
+            equipFunc: `equip(${i})`,
+            sellFunc: `sell(${i})`,
+            upgradeFunc: `upgrade(${i},'weapon')`,
+            grade: w.grade,
+            gradeColor: w.gradeColor,
+            options: w.options,
+          });
+        }
+      });
+
+      // 방어구 추가 (미장착만)
+      armorInventory.forEach((a, i) => {
+        const isEquipped = (equippedArmor === i);
+        if (!isEquipped) {
+          const totalDef = a.baseDef + (a.upgrade || 0) * 2;
+          allItems.push({
+            type: 'armor',
+            typeOrder: 2,
+            typeName: '방어구',
+            name: a.name,
+            upgrade: a.upgrade || 0,
+            color: '',
+            stat1: totalDef,
+            stat2: '',
+            stat3: '',
+            isEquipped: false,
+            equipFunc: `equipArmor(${i})`,
+            sellFunc: `sellArmor(${i})`,
+            upgradeFunc: `upgrade(${i},'armor')`,
+            grade: a.grade,
+            gradeColor: a.gradeColor,
+            options: a.options,
+          });
+        }
+      });
+
+      // 기타 장비 추가
+      const equipTypes = [
+        { inventory: helmetInventory, name: '모자', stat: 'baseDodge', color: '#f84', type: 'helmet', order: 3 },
+        { inventory: pantsInventory, name: '바지', stat: 'baseSpeed', color: '#8f4', type: 'pants', order: 4 },
+        { inventory: shoesInventory, name: '신발', stat: 'baseJump', color: '#48f', type: 'shoes', order: 5 },
+        { inventory: necklaceInventory, name: '목걸이', stat: 'baseHp', color: '#f48', type: 'necklace', order: 6 },
+        { inventory: ringInventory, name: '반지', stat: 'baseAtk', color: '#f84', type: 'ring', order: 7 }
+      ];
+
+      equipTypes.forEach(equipType => {
+        equipType.inventory.forEach((item, i) => {
+          const isEquipped = (eval(`equipped${equipType.type.charAt(0).toUpperCase() + equipType.type.slice(1)}`) === i);
+          if (!isEquipped) {
+            let totalStat = item[equipType.stat] + (item.upgrade || 0) * (equipType.type === 'necklace' ? 5 : equipType.type === 'helmet' ? 2 : 2);
+            if (equipType.type === 'helmet') {
+              totalStat = Math.min(totalStat, 75);
+            }
+            allItems.push({
+              type: equipType.type,
+              typeOrder: equipType.order,
+              typeName: equipType.name,
+              name: item.name,
+              upgrade: item.upgrade || 0,
+              color: equipType.color,
+              stat1: totalStat,
+              stat2: '',
+              stat3: '',
+              isEquipped: false,
+              equipFunc: `equip${equipType.type.charAt(0).toUpperCase() + equipType.type.slice(1)}(${i})`,
+              sellFunc: `sell${equipType.type.charAt(0).toUpperCase() + equipType.type.slice(1)}(${i})`,
+              upgradeFunc: `upgrade(${i},'${equipType.type}')`,
+              grade: item.grade,
+              gradeColor: item.gradeColor,
+              options: item.options,
+            });
+          }
+        });
+      });
+
+      // 장비 타입별로 정렬 (모든 아이템이 미장착이므로 isEquipped 정렬 삭제)
+      allItems.sort((a, b) => {
+        if (a.typeOrder !== b.typeOrder) return a.typeOrder - b.typeOrder;
+        return b.upgrade - a.upgrade; // 강화 레벨 높은 순
+      });
+
+      // 통합 인벤토리 테이블 생성
+      if (allItems.length > 0) {
+        html += `<h3>전체 인벤토리</h3>`;
+        html += `<div style="margin-bottom: 10px;">`;
+        html += `<button onclick="sellAllItems()" style="background: #d44; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🗑️ 전체 판매 (장착 중 제외)</button>`;
+        html += `</div>`;
+        html += `<table class="inventory-table">`;
+        html += `<tr><th>종류</th><th>등급</th><th>이름</th><th>주 스탯</th><th>대미지/속도</th><th>DPS</th><th style="min-width: 140px;">액션</th></tr>`;
+
+        allItems.forEach(item => {
+          html += `<tr>`;
+          html += `<td>${item.typeName}</td>`;
+          html += `<td><span style='color:${item.gradeColor || "#888"};font-weight:bold;'>${item.grade || "일반"}</span></td>`;
+          let nameClass = item.type === 'weapon' ? item.color : '';
+          let nameStyle = item.type !== 'weapon' && item.type !== 'armor' ? item.color : (item.type === 'armor' ? '#6cf' : '');
+          html += `<td><span class="item-name ${nameClass}" ${nameStyle ? `style=\"color:${nameStyle};\"` : ''}>`;
+          html += `${item.name} +${item.upgrade}`;
+          if (item.options && item.options.length > 0) {
+            item.options.forEach(option => {
+              let optionColor = option.isUnique ? '#ffd700' : '#6cf';
+              html += `<div style='font-size:11px;color:${optionColor};${option.isUnique ? 'font-weight:bold;text-shadow:0 0 3px #ffd700;' : ''}'>${option.key}</div>`;
+            });
+          }
+          html += `</span></td>`;
+          html += `<td>${item.stat1}</td>`;
+          html += `<td>${item.stat2}</td>`;
+          html += `<td>${item.stat3}</td>`;
+          html += `<td style="white-space: nowrap;">`;
+          html += `<button class="equip-btn" onclick="${item.equipFunc}">착용</button>`;
+          html += `<button class="sell-btn" onclick="${item.sellFunc}">판매</button>`;
+          html += `<button class="upgrade-btn" onclick="${item.upgradeFunc}">강화</button>`;
+          html += `</td></tr>`;
+        });
+        html += `</table>`;
+      }
+
+      invDiv.innerHTML = html;
+      updatePlayerArea();
+      updateMonstersDisplay();
+      updateFieldSelect();
+      updateCharacterSprite();
+      updatePlayerStats();
+      updateUIVisibility();
+    }
+
+    function updateCharacterSprite() {
+      const sprite = document.getElementById("characterSprite");
+      const weaponIcon = document.getElementById("weaponIcon");
+
+      if (equipped !== null && inventory[equipped]) {
+        const weapon = inventory[equipped];
+        weaponIcon.textContent = weapon.icon || "⚔️";
+        weaponIcon.style.display = "flex";
+      } else {
+        weaponIcon.style.display = "none";
+      }
+    }
+
+    function updatePlayerArea() {
+      const area = document.getElementById("playerArea");
+      const currentMaxHp = player.maxHp + player.bonusHp;
+      const percent = Math.max(0, Math.round(player.hp / currentMaxHp * 100));
+      let damagePercent = 0;
+      if (playerLastDamage > 0) {
+        damagePercent = Math.min(100, Math.round(playerLastDamage / currentMaxHp * 100));
+        if (percent + damagePercent > 100) damagePercent = 100 - percent;
+      }
+      area.innerHTML = `HP: ${Math.floor(player.hp)}/${currentMaxHp}` +
+        (player.def > 0 ? ` / 방어: ${player.def}` : "") +
+        (player.bonusAtk > 0 ? ` / +공격: ${player.bonusAtk}` : "") +
+        (player.dodge > 0 ? ` / 회피: ${player.dodge}%` : "") +
+        `<div style='background:#444;width:100%;height:18px;border-radius:8px;margin:4px 0;position:relative;overflow:hidden;'>` +
+        `<div style='background:#4af;height:100%;width:${percent}%;border-radius:8px;transition:width 0.2s;position:absolute;left:0;top:0;'></div>` +
+        (damagePercent > 0 ? `<div style='background:#fff;opacity:0.7;height:100%;width:${damagePercent}%;border-radius:8px;position:absolute;left:${percent}%;top:0;transition:width 0.2s;'></div>` : "") +
+        `</div>`;
+    }
+
+    function updatePlayerStats() {
+      // 모든 장비의 옵션 효과 계산
+      let totalOptionStats = {
+        atk: 0,
+        def: 0,
+        hp: 0,
+        dodge: 0,
+        speed: 0,
+        jump: 0
+      };
+
+      // 각 장비의 옵션 효과 합산
+      if (equipped !== null && inventory[equipped]) {
+        let weaponStats = getItemOptionStats(inventory[equipped]);
+        Object.keys(weaponStats).forEach(key => {
+          totalOptionStats[key] += weaponStats[key];
+        });
+      }
+
+      if (equippedArmor !== null && armorInventory[equippedArmor]) {
+        let armorStats = getItemOptionStats(armorInventory[equippedArmor]);
+        Object.keys(armorStats).forEach(key => {
+          totalOptionStats[key] += armorStats[key];
+        });
+      }
+
+      if (equippedHelmet !== null && helmetInventory[equippedHelmet]) {
+        let helmetStats = getItemOptionStats(helmetInventory[equippedHelmet]);
+        Object.keys(helmetStats).forEach(key => {
+          totalOptionStats[key] += helmetStats[key];
+        });
+      }
+
+      if (equippedPants !== null && pantsInventory[equippedPants]) {
+        let pantsStats = getItemOptionStats(pantsInventory[equippedPants]);
+        Object.keys(pantsStats).forEach(key => {
+          totalOptionStats[key] += pantsStats[key];
+        });
+      }
+
+      if (equippedShoes !== null && shoesInventory[equippedShoes]) {
+        let shoesStats = getItemOptionStats(shoesInventory[equippedShoes]);
+        Object.keys(shoesStats).forEach(key => {
+          totalOptionStats[key] += shoesStats[key];
+        });
+      }
+
+      if (equippedNecklace !== null && necklaceInventory[equippedNecklace]) {
+        let necklaceStats = getItemOptionStats(necklaceInventory[equippedNecklace]);
+        Object.keys(necklaceStats).forEach(key => {
+          totalOptionStats[key] += necklaceStats[key];
+        });
+      }
+
+      if (equippedRing !== null && ringInventory[equippedRing]) {
+        let ringStats = getItemOptionStats(ringInventory[equippedRing]);
+        Object.keys(ringStats).forEach(key => {
+          totalOptionStats[key] += ringStats[key];
+        });
+      }
+
+      // 체력 업데이트 (목걸이 기본 HP + 옵션 HP)
+      const oldMaxHp = player.maxHp + player.bonusHp;
+      let baseNecklaceHp = equippedNecklace !== null ? necklaceInventory[equippedNecklace].baseHp + (necklaceInventory[equippedNecklace].upgrade || 0) * 5 : 0;
+      player.bonusHp = baseNecklaceHp + totalOptionStats.hp;
+      const newMaxHp = player.maxHp + player.bonusHp;
+
+      if (newMaxHp > oldMaxHp) {
+        // 체력 증가시 현재 HP도 증가
+        player.hp += (newMaxHp - oldMaxHp);
+      } else if (newMaxHp < oldMaxHp) {
+        // 체력 감소시 최대 체력을 초과하지 않도록 조정
+        if (player.hp > newMaxHp) player.hp = newMaxHp;
+      }
+
+      // 체력이 최대체력을 초과하지 않도록 보장
+      if (player.hp > newMaxHp) player.hp = newMaxHp;
+
+      // 방어력 (갑옷 기본 방어력 + 옵션 방어력)
+      let baseArmorDef = (equippedArmor !== null ? armorInventory[equippedArmor].baseDef + (armorInventory[equippedArmor].upgrade || 0) * 2 : 0);
+      player.def = baseArmorDef + totalOptionStats.def;
+
+      // 회피율 계산 (최대 75%까지, 모자 기본 회피 + 옵션 회피)
+      let baseHelmetDodge = (equippedHelmet !== null ? helmetInventory[equippedHelmet].baseDodge + (helmetInventory[equippedHelmet].upgrade || 0) * 2 : 0);
+      let rawDodge = baseHelmetDodge + totalOptionStats.dodge;
+      player.dodge = Math.min(rawDodge, 75);
+
+      // 이동속도 (바지 기본 속도 + 옵션 속도)
+      let basePantsSpeed = (equippedPants !== null ? pantsInventory[equippedPants].baseSpeed + (pantsInventory[equippedPants].upgrade || 0) * 2 : 0);
+      player.speed = basePantsSpeed + totalOptionStats.speed;
+
+      // 점프력 (신발 기본 점프 + 옵션 점프)
+      let baseShoesJump = (equippedShoes !== null ? shoesInventory[equippedShoes].baseJump + (shoesInventory[equippedShoes].upgrade || 0) * 2 : 0);
+      player.jump = baseShoesJump + totalOptionStats.jump;
+
+      // 추가 공격력 (반지 기본 공격 + 옵션 공격)
+      let baseRingAtk = (equippedRing !== null ? ringInventory[equippedRing].baseAtk + (ringInventory[equippedRing].upgrade || 0) * 2 : 0);
+      player.bonusAtk = baseRingAtk + totalOptionStats.atk;
+
+      // 퍼센트 증가 스탯 적용
+      applyPercentageStats();
+    }
+
+    // 퍼센트 증가 스탯 적용 함수
+    function applyPercentageStats() {
+      // 모든 장착된 아이템의 유니크 퍼센트 옵션 확인
+      const allEquippedItems = [
+        equipped !== null ? inventory[equipped] : null,
+        equippedArmor !== null ? armorInventory[equippedArmor] : null,
+        equippedHelmet !== null ? helmetInventory[equippedHelmet] : null,
+        equippedPants !== null ? pantsInventory[equippedPants] : null,
+        equippedShoes !== null ? shoesInventory[equippedShoes] : null,
+        equippedNecklace !== null ? necklaceInventory[equippedNecklace] : null,
+        equippedRing !== null ? ringInventory[equippedRing] : null
+      ].filter(item => item !== null);
+
+      let percentStats = {
+        attack_percent: 0,
+        defense_percent: 0,
+        hp_percent: 0,
+        speed_percent: 0
+      };
+
+      allEquippedItems.forEach(item => {
+        if (item.options) {
+          item.options.forEach(option => {
+            if (option.isUnique && option.category === 'percentage_stats') {
+              if (percentStats.hasOwnProperty(option.type)) {
+                percentStats[option.type] += option.value;
+              }
+            }
+          });
+        }
+      });
+
+      // 공격력 퍼센트 증가 적용
+      if (percentStats.attack_percent > 0) {
+        player.bonusAtk = Math.floor(player.bonusAtk * (1 + percentStats.attack_percent / 100));
+      }
+
+      // 방어력 퍼센트 증가 적용
+      if (percentStats.defense_percent > 0) {
+        player.def = Math.floor(player.def * (1 + percentStats.defense_percent / 100));
+      }
+
+      // 체력 퍼센트 증가 적용
+      if (percentStats.hp_percent > 0) {
+        let oldMaxHp = player.maxHp + player.bonusHp;
+        let percentBonus = Math.floor((player.maxHp + player.bonusHp) * percentStats.hp_percent / 100);
+        player.bonusHp += percentBonus;
+        let newMaxHp = player.maxHp + player.bonusHp;
+
+        // 체력 증가만큼 현재 체력도 증가
+        if (newMaxHp > oldMaxHp) {
+          player.hp += (newMaxHp - oldMaxHp);
+        }
+      }
+
+      // 공격 속도 퍼센트 증가는 startAutoBattle에서 적용
+    }
+
+    function equipArmor(i) {
+      if (equippedArmor === i) {
+        equippedArmor = null;
+        log("방어구를 해제했습니다.");
+      } else {
+        equippedArmor = i;
+        log(armorInventory[i].name + " 착용!");
+      }
+      updateDisplay();
+    }
+
+    function equipHelmet(i) {
+      if (equippedHelmet === i) {
+        equippedHelmet = null;
+        log("모자를 해제했습니다.");
+      } else {
+        equippedHelmet = i;
+        log(helmetInventory[i].name + " 착용!");
+      }
+      updateDisplay();
+    }
+
+    function equipPants(i) {
+      if (equippedPants === i) {
+        equippedPants = null;
+        log("바지를 해제했습니다.");
+      } else {
+        equippedPants = i;
+        log(pantsInventory[i].name + " 착용!");
+      }
+      updateDisplay();
+    }
+
+    function equipShoes(i) {
+      if (equippedShoes === i) {
+        equippedShoes = null;
+        log("신발을 해제했습니다.");
+      } else {
+        equippedShoes = i;
+        log(shoesInventory[i].name + " 착용!");
+      }
+      updateDisplay();
+    }
+
+    function equipNecklace(i) {
+      if (equippedNecklace === i) {
+        equippedNecklace = null;
+        log("목걸이를 해제했습니다.");
+      } else {
+        const oldMaxHp = player.maxHp + player.bonusHp;
+        equippedNecklace = i;
+        updatePlayerStats(); // 스템 먼저 업데이트
+        const newMaxHp = player.maxHp + player.bonusHp;
+
+        // 체력이 최대체력보다 낮으면 최대체력까지 채워줌
+        if (player.hp < newMaxHp) {
+          player.hp = newMaxHp;
+        }
+
+        log(necklaceInventory[i].name + " 착용! 체력이 최대치로 회복되었습니다!");
+      }
+      updateDisplay();
+    }
+
+    function equipRing(i) {
+      if (equippedRing === i) {
+        equippedRing = null;
+        log("반지를 해제했습니다.");
+      } else {
+        equippedRing = i;
+        log(ringInventory[i].name + " 착용!");
+      }
+      updateDisplay();
+    }
+    function sellArmor(i) {
+      let a = armorInventory[i];
+      let value = 60; // 방어구 구매가격(120코인)의 반값
+      coins += value;
+      log(`${a.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 방어구 인덱스 조정
+      if (equippedArmor === i) {
+        equippedArmor = null;
+      } else if (equippedArmor !== null && equippedArmor > i) {
+        equippedArmor--;
+      }
+
+      armorInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    function sellHelmet(i) {
+      let h = helmetInventory[i];
+      let value = 40; // 모자 구매가격(80코인)의 반값
+      coins += value;
+      log(`${h.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 모자 인덱스 조정
+      if (equippedHelmet === i) {
+        equippedHelmet = null;
+      } else if (equippedHelmet !== null && equippedHelmet > i) {
+        equippedHelmet--;
+      }
+
+      helmetInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    function sellPants(i) {
+      let p = pantsInventory[i];
+      let value = 45; // 바지 구매가격(90코인)의 반값
+      coins += value;
+      log(`${p.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 바지 인덱스 조정
+      if (equippedPants === i) {
+        equippedPants = null;
+      } else if (equippedPants !== null && equippedPants > i) {
+        equippedPants--;
+      }
+
+      pantsInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    function sellShoes(i) {
+      let s = shoesInventory[i];
+      let value = 35; // 신발 구매가격(70코인)의 반값
+      coins += value;
+      log(`${s.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 신발 인덱스 조정
+      if (equippedShoes === i) {
+        equippedShoes = null;
+      } else if (equippedShoes !== null && equippedShoes > i) {
+        equippedShoes--;
+      }
+
+      shoesInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    function sellNecklace(i) {
+      let n = necklaceInventory[i];
+      let value = 75; // 목걸이 구매가격(150코인)의 반값
+      coins += value;
+      log(`${n.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 목걸이 인덱스 조정
+      if (equippedNecklace === i) {
+        equippedNecklace = null;
+      } else if (equippedNecklace !== null && equippedNecklace > i) {
+        equippedNecklace--;
+      }
+
+      necklaceInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    function sellRing(i) {
+      let r = ringInventory[i];
+      let value = 55; // 반지 구매가격(110코인)의 반값
+      coins += value;
+      log(`${r.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 반지 인덱스 조정
+      if (equippedRing === i) {
+        equippedRing = null;
+      } else if (equippedRing !== null && equippedRing > i) {
+        equippedRing--;
+      }
+
+      ringInventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    // 등급 정의
+    const ITEM_GRADES = [
+      { name: "일반", color: "#ccc", rate: 0.7, stat: 1 },
+      { name: "매직", color: "#4af", rate: 0.2, stat: 1.2 },
+      { name: "레어", color: "#a4f", rate: 0.09, stat: 1.5 },
+      { name: "유니크", color: "gold", rate: 0.01, stat: 2 }
+    ];
+    function randomGrade() {
+      // 사냥터에 따른 등급 확률 조정
+      let grades = JSON.parse(JSON.stringify(ITEM_GRADES)); // 깊은 복사
+
+      if (currentField >= 4) { // 빙하 이상
+        grades[0].rate = Math.max(0.3, grades[0].rate - (currentField - 3) * 0.08); // 일반 확률 감소
+        grades[1].rate = Math.min(0.4, grades[1].rate + (currentField - 3) * 0.03); // 매직 확률 증가
+        grades[2].rate = Math.min(0.25, grades[2].rate + (currentField - 3) * 0.03); // 레어 확률 증가
+        grades[3].rate = Math.min(0.15, grades[3].rate + (currentField - 3) * 0.02); // 유니크 확률 증가
+      }
+
+      if (currentField >= 8) { // 천공성 이상 - 추가 보너스
+        grades[0].rate = Math.max(0.1, grades[0].rate - 0.2);
+        grades[1].rate = Math.min(0.5, grades[1].rate + 0.05);
+        grades[2].rate = Math.min(0.3, grades[2].rate + 0.1);
+        grades[3].rate = Math.min(0.25, grades[3].rate + 0.05);
+      }
+
+      if (currentField >= 10) { // 절대신역 - 최고 보너스
+        grades[0].rate = 0.05; // 일반 5%
+        grades[1].rate = 0.35; // 매직 35%
+        grades[2].rate = 0.4;  // 레어 40%
+        grades[3].rate = 0.2;  // 유니크 20%
+      }
+
+      const r = Math.random();
+      let acc = 0;
+      for (let g of grades) {
+        acc += g.rate;
+        if (r < acc) return g;
+      }
+      return grades[0];
+    }
+    function weaponClass(up) {
+      if (up >= 15) return "weapon-mythic";
+      if (up >= 10) return "weapon-legendary";
+      if (up >= 5) return "weapon-epic";
+      if (up >= 3) return "weapon-rare";
+      return "weapon-common";
+    }
+
+    function buyGem() {
+      if (coins >= 50) { coins -= 50; gems++; log("보석 구매!"); }
+      else log("코인이 부족합니다");
+      updateDisplay();
+    }
+    function buyWeapon() {
+      if (coins >= 100) {
+        coins -= 100;
+        const templateIndex = weightedRandom(weapons);
+        const template = weapons[templateIndex];
+        const grade = randomGrade();
+
+        const w = JSON.parse(JSON.stringify(template));
+        w.grade = grade.name;
+        w.gradeColor = grade.color;
+        w.baseDamage = Math.round(randBetween(template.baseDamage[0], template.baseDamage[1]) * grade.stat);
+        w.upgrade = 0;
+        w.atkSpd = randBetween(template.atkSpdRange[0], template.atkSpdRange[1]);
+        w.options = getRandomOptions(grade.name);
+        inventory.push(w);
+        log(`<span style='color:${grade.color}'>[${grade.name}]</span> ${w.name} (공:${w.baseDamage}, 속도:${w.atkSpd}ms) 획득!`);
+        updateDisplay();
+      } else log("코인이 부족합니다");
+    }
+
+    function randBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 가중치 기반 랜덤 선택 (낮은 인덱스일수록 높은 확률)
+    function weightedRandom(array) {
+      const weights = array.map((_, index) => Math.pow(2, array.length - index - 1));
+      const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+      let random = Math.random() * totalWeight;
+
+      for (let i = 0; i < array.length; i++) {
+        random -= weights[i];
+        if (random <= 0) {
+          return i;
+        }
+      }
+      return array.length - 1;
+    }
+
+    function equip(i) {
+      equipped = i;
+      log(inventory[i].name + " 장착!");
+      updateDisplay();
+      // 몬스터가 살아있으면 장착 즉시 전투 시작
+      if (monsters.filter(m => m.alive).length > 0 && player.alive) {
+        startAutoBattle();
+      }
+    }
+    function sell(i) {
+      let w = inventory[i];
+      let value = 50; // 무기 구매가격(100코인)의 반값
+      coins += value;
+      log(`${w.name} 판매하여 ${value}코인 획득`);
+
+      // 장착된 무기 인덱스 조정
+      if (equipped === i) {
+        equipped = null; // 판매하는 무기가 장착된 경우 해제
+      } else if (equipped !== null && equipped > i) {
+        equipped--; // 판매된 무기보다 뒤에 있는 장착된 무기의 인덱스 조정
+      }
+
+      inventory.splice(i, 1);
+      updateDisplay();
+    }
+
+    // 전체 아이템 판매 함수 (장착 중인 아이템 제외)
+    function sellAllItems() {
+
+      let totalValue = 0;
+      let soldCount = 0;
+
+      // 무기 판매 (장착된 무기 제외)
+      for (let i = inventory.length - 1; i >= 0; i--) {
+        if (equipped !== i) {
+          totalValue += 50; // 무기 판매 가격
+          soldCount++;
+          inventory.splice(i, 1);
+
+          // 장착된 무기 인덱스 조정
+          if (equipped !== null && equipped > i) {
+            equipped--;
+          }
+        }
+      }
+
+      // 방어구 판매 (장착된 방어구 제외)
+      for (let i = armorInventory.length - 1; i >= 0; i--) {
+        if (equippedArmor !== i) {
+          totalValue += 60; // 방어구 판매 가격
+          soldCount++;
+          armorInventory.splice(i, 1);
+
+          // 장착된 방어구 인덱스 조정
+          if (equippedArmor !== null && equippedArmor > i) {
+            equippedArmor--;
+          }
+        }
+      }
+
+      // 모자 판매 (장착된 모자 제외)
+      for (let i = helmetInventory.length - 1; i >= 0; i--) {
+        if (equippedHelmet !== i) {
+          totalValue += 40; // 모자 판매 가격
+          soldCount++;
+          helmetInventory.splice(i, 1);
+
+          // 장착된 모자 인덱스 조정
+          if (equippedHelmet !== null && equippedHelmet > i) {
+            equippedHelmet--;
+          }
+        }
+      }
+
+      // 바지 판매 (장착된 바지 제외)
+      for (let i = pantsInventory.length - 1; i >= 0; i--) {
+        if (equippedPants !== i) {
+          totalValue += 45; // 바지 판매 가격
+          soldCount++;
+          pantsInventory.splice(i, 1);
+
+          // 장착된 바지 인덱스 조정
+          if (equippedPants !== null && equippedPants > i) {
+            equippedPants--;
+          }
+        }
+      }
+
+      // 신발 판매 (장착된 신발 제외)
+      for (let i = shoesInventory.length - 1; i >= 0; i--) {
+        if (equippedShoes !== i) {
+          totalValue += 35; // 신발 판매 가격
+          soldCount++;
+          shoesInventory.splice(i, 1);
+
+          // 장착된 신발 인덱스 조정
+          if (equippedShoes !== null && equippedShoes > i) {
+            equippedShoes--;
+          }
+        }
+      }
+
+      // 목걸이 판매 (장착된 목걸이 제외)
+      for (let i = necklaceInventory.length - 1; i >= 0; i--) {
+        if (equippedNecklace !== i) {
+          totalValue += 75; // 목걸이 판매 가격
+          soldCount++;
+          necklaceInventory.splice(i, 1);
+
+          // 장착된 목걸이 인덱스 조정
+          if (equippedNecklace !== null && equippedNecklace > i) {
+            equippedNecklace--;
+          }
+        }
+      }
+
+      // 반지 판매 (장착된 반지 제외)
+      for (let i = ringInventory.length - 1; i >= 0; i--) {
+        if (equippedRing !== i) {
+          totalValue += 55; // 반지 판매 가격
+          soldCount++;
+          ringInventory.splice(i, 1);
+
+          // 장착된 반지 인덱스 조정
+          if (equippedRing !== null && equippedRing > i) {
+            equippedRing--;
+          }
+        }
+      }
+
+      // 결과 적용
+      coins += totalValue;
+
+      if (soldCount > 0) {
+        log(`전체 판매 완료! ${soldCount}개 아이템을 판매하여 ${totalValue}코인 획득`);
+      } else {
+        log("판매할 아이템이 없습니다 (모든 아이템이 장착 중이거나 인벤토리가 비어있음)");
+      }
+
+      updateDisplay();
+    }
+
+    function upgrade(i, type) {
+      let item, arr;
+      if (type === 'armor') {
+        arr = armorInventory;
+        item = arr[i];
+      } else if (type === 'helmet') {
+        arr = helmetInventory;
+        item = arr[i];
+      } else if (type === 'pants') {
+        arr = pantsInventory;
+        item = arr[i];
+      } else if (type === 'shoes') {
+        arr = shoesInventory;
+        item = arr[i];
+      } else if (type === 'necklace') {
+        arr = necklaceInventory;
+        item = arr[i];
+      } else if (type === 'ring') {
+        arr = ringInventory;
+        item = arr[i];
+      } else {
+        arr = inventory;
+        item = arr[i];
+      }
+      let cost = Math.max(1, Math.floor((item.upgrade || 0) * 0.8) + 1);
+      if (gems >= cost) {
+        gems -= cost;
+        if (item.upgrade >= 12 && Math.random() < 0.2) {
+          log(`${item.name} 강화 실패! 파괴됨`);
+          if (type === 'armor' && equippedArmor === i) {
+            equippedArmor = null;
+            player.def = 0;
+          }
+          if (type !== 'armor' && equipped === i) equipped = null;
+          arr.splice(i, 1);
+        } else {
+          item.upgrade = (item.upgrade || 0) + 1;
+          log(`${item.name} 강화 성공! +${item.upgrade}`);
+        }
+      } else log("보석이 부족합니다");
+      updateDisplay();
+    }
+
+    function spawnMonster() {
+      if (autoBattleInterval) clearInterval(autoBattleInterval);
+
+      // 사냥터별 몬스터 능력치 및 개수
+      const f = fields[currentField];
+
+      // 초반 (처치한 몬스터 수가 20마리 미만)에는 항상 1마리씩만
+      let spawnCount;
+      if (totalMonstersKilled < 20) {
+        spawnCount = 1;
+      } else {
+        // 나중에는 랜덤으로 몬스터 수 결정
+        const minCount = f.monsterCount[0];
+        const maxCount = f.monsterCount[1];
+        spawnCount = minCount + Math.floor(Math.random() * (maxCount - minCount + 1));
+      }
+
+      // 이미 살아있는 몬스터가 있으면 생성하지 않음
+      if (monsters.filter(m => m.alive).length > 0) return;
+
+      // 죽은 몬스터들을 배열에서 제거
+      monsters = monsters.filter(m => m.alive);
+
+      let spawnedNames = [];
+
+      for (let i = 0; i < spawnCount; i++) {
+        const monsterType = monsterTypes[currentField][Math.floor(Math.random() * monsterTypes[currentField].length)];
+        const newMonster = {
+          id: monsterIdCounter++, // 고유 ID 추가
+          hp: f.hp[0] + Math.floor(Math.random() * (f.hp[1] - f.hp[0] + 1)),
+          maxHp: 0,
+          atk: f.atk[0] + Math.floor(Math.random() * (f.atk[1] - f.atk[0] + 1)),
+          def: f.def[0] + Math.floor(Math.random() * (f.def[1] - f.def[0] + 1)),
+          atkSpd: monsterAtkSpd,
+          alive: true,
+          name: monsterType.name,
+          emoji: monsterType.emoji
+        };
+        newMonster.maxHp = newMonster.hp;
+        monsters.push(newMonster);
+        spawnedNames.push(newMonster.name);
+      }
+
+      updateMonstersDisplay();
+      const spawnMsg = `${spawnedNames.join(', ')} 등장!`;
+      battleLog(spawnMsg);
+      showBattleInfo(spawnMsg);
+      updatePlayerStats(); // 스템 먼저 업데이트
+      player.hp = player.maxHp + player.bonusHp; // 목걸이 체력 포함
+      player.alive = true;
+      updatePlayerArea();
+      // 무기 미장착 시 안내, 장착 시 자동전투 시작
+      if (equipped != null && inventory[equipped]) {
+        startAutoBattle();
+        updateUIVisibility(); // 전투 시작 시 UI 업데이트
+      } else {
+        const equipMsg = "무기를 장착해야 공격이 시작됩니다!";
+        battleLog(equipMsg);
+        showBattleInfo(equipMsg);
+      }
+    }
+
+    function updateMonstersDisplay() {
+      const container = document.getElementById("monstersContainer");
+
+      if (monsters.length === 0) {
+        container.innerHTML = '<div class="monster-info">몬스터 없음</div>';
+        return;
+      }
+
+      // 기존 몬스터 요소들을 확인하고 필요한 경우에만 업데이트
+      const existingMonsters = container.querySelectorAll('.monster-unit');
+      const aliveMonsters = monsters.filter(m => m.alive);
+
+      // 살아있는 몬스터 수가 다르거나 몬스터가 없으면 전체 재생성
+      if (existingMonsters.length !== aliveMonsters.length || aliveMonsters.length === 0) {
+        let html = '';
+        aliveMonsters.forEach((monster, index) => {
+          const percent = Math.max(0, Math.round(monster.hp / monster.maxHp * 100));
+          html += `
+            <div class="monster-unit" id="monster${monster.id}" style="padding:4px; margin-bottom:2px; min-width:90px; position:relative;">
+              <div class="monster-name" style="font-size:11px; color:#ff6b6b; margin-bottom:2px; font-weight:bold;">${monster.name}</div>
+              <div class="monster-hp" style="font-size:10px; color:#ccc;">HP: ${Math.floor(monster.hp)}/${monster.maxHp}</div>
+              <div style='background:#444;width:100%;height:10px;border-radius:5px;margin:2px 0;position:relative;overflow:hidden;'>
+                <div class="hp-bar" style='background:#fa4;height:100%;width:${percent}%;border-radius:5px;transition:width 0.2s;position:absolute;left:0;top:0;'></div>
+              </div>
+            </div>
+          `;
+        });
+
+        if (html === '') {
+          container.innerHTML = '<div class="monster-info">몬스터 없음</div>';
+        } else {
+          container.innerHTML = `<div class="monsters-scroll-area">${html}</div>`;
+        }
+      } else {
+        // 기존 요소들의 HP만 업데이트
+        aliveMonsters.forEach(monster => {
+          const monsterElement = document.getElementById(`monster${monster.id}`);
+          if (monsterElement) {
+            const hpText = monsterElement.querySelector('.monster-hp');
+            const hpBar = monsterElement.querySelector('.hp-bar');
+            if (hpText) {
+              hpText.textContent = `HP: ${Math.floor(monster.hp)}/${monster.maxHp}`;
+            }
+            if (hpBar) {
+              const percent = Math.max(0, Math.round(monster.hp / monster.maxHp * 100));
+              hpBar.style.width = `${percent}%`;
+            }
+          }
+        });
+      }
+    }
+    // 기존 updateMonsterArea 함수는 updateMonstersDisplay로 대체됨
+
+    // 자동전투 루프
+    function startAutoBattle() {
+      if (autoBattleInterval) clearInterval(autoBattleInterval);
+      let atkSpd = player.atkSpd;
+      if (equipped != null && inventory[equipped] && inventory[equipped].atkSpd) {
+        let w = inventory[equipped];
+        let upgrade = w.upgrade || 0;
+        let spdBonus = Math.max(1 - 0.02 * upgrade, 0.5); // 최소 50%까지 빨라짐
+        atkSpd = Math.floor(w.atkSpd * spdBonus);
+
+        // 공격 속도 퍼센트 증가 적용
+        let speedPercent = getUniqueOptionValue('speed_percent');
+        if (speedPercent > 0) {
+          atkSpd = Math.floor(atkSpd * (1 - speedPercent / 100)); // 속도는 낮을수록 빠름
+        }
+      }
+      autoBattleInterval = setInterval(() => {
+        const aliveMonsters = monsters.filter(m => m.alive);
+        if (aliveMonsters.length === 0 || !player.alive) {
+          clearInterval(autoBattleInterval);
+          return;
+        }
+        playerAttack();
+        setTimeout(monsterAttack, Math.floor(monsterAtkSpd / 2));
+      }, atkSpd);
+    }
+
+    function playerAttack() {
+      const aliveMonsters = monsters.filter(m => m.alive);
+      if (aliveMonsters.length === 0) return;
+      if (equipped == null) { log("무기를 장착하세요"); return; }
+
+      // 랜덤하게 살아있는 몬스터 중 하나 선택
+      const targetMonster = aliveMonsters[Math.floor(Math.random() * aliveMonsters.length)];
+
+      // 공격 애니메이션
+      const characterSprite = document.getElementById("characterSprite");
+
+      characterSprite.classList.add("attacking");
+      setTimeout(() => characterSprite.classList.remove("attacking"), 300);
+
+      let w = inventory[equipped];
+      // 강화 효과 적용: 공격력, 공격속도, 특수효과 확률 증가
+      let upgrade = w.upgrade || 0;
+      let baseDamage = w.baseDamage || 0;
+      let bonusAtk = player.bonusAtk || 0;
+
+      // NaN 체크
+      if (isNaN(baseDamage)) baseDamage = 0;
+      if (isNaN(upgrade)) upgrade = 0;
+      if (isNaN(bonusAtk)) bonusAtk = 0;
+
+      let dmg = baseDamage + upgrade * 2 + bonusAtk; // 반지 공격력 추가
+
+      // NaN 체크
+      if (isNaN(dmg) || dmg < 0) {
+        dmg = 1; // 최소 1 데미지
+      }
+      let extraMsg = "";
+      // 강화 시 특수효과 확률 1%p씩 증가, 공격속도 2%씩 빨라짐(최대 50% 감소)
+      let effectBonus = Math.min(0.01 * upgrade, 0.5);
+      // 공격속도 적용(자동전투 루프에서 반영)
+      // 특수효과 확률 증가 적용
+      let defenseIgnored = false;
+      if (w.name == "롱소드" && Math.random() < 0.2 + effectBonus) { dmg *= 2; extraMsg = "(2배 데미지!)"; }
+      if (w.name == "도끼" && Math.random() < 0.1 + effectBonus) { dmg *= 3; extraMsg = "(치명타!)"; }
+      if (w.name == "단검" && Math.random() < 0.3 + effectBonus) {
+        // 방어력 적용
+        let monsterDef = targetMonster.def || 0;
+        if (isNaN(monsterDef) || monsterDef < 0) {
+          monsterDef = 0;
+        }
+        let reduced = Math.max(1, dmg * (200 / (200 + monsterDef)));
+        if (isNaN(reduced) || reduced < 0) {
+          reduced = 1;
+        }
+        targetMonster.hp -= reduced;
+        extraMsg = "(추가타격!)";
+      }
+      if (w.name == "마법봉" && Math.random() < 0.2 + effectBonus) {
+        let extraDmg = Math.floor(targetMonster.hp * 0.1);
+        if (isNaN(extraDmg) || extraDmg < 0) {
+          extraDmg = 0;
+        }
+        dmg += extraDmg;
+        extraMsg = "(추가피해)";
+      }
+      if (w.name == "활" && Math.random() < 0.15 + effectBonus) { defenseIgnored = true; extraMsg = "(방어무시)"; }
+
+      // 방어력 적용 (활의 방어무시 효과가 있으면 스킵)
+      let finalDamage = dmg;
+      if (!defenseIgnored) {
+        let monsterDef = targetMonster.def || 0;
+        if (isNaN(monsterDef) || monsterDef < 0) {
+          monsterDef = 0;
+        }
+        finalDamage = Math.max(1, dmg * (200 / (200 + monsterDef)));
+      }
+
+      // NaN 체크
+      if (isNaN(finalDamage) || finalDamage < 0) {
+        finalDamage = 1;
+      }
+
+      // 유니크 공격 효과 처리
+      const uniqueEffects = processUniqueAttackEffects(targetMonster, finalDamage);
+      let extraDamage = uniqueEffects.extraDamage || 0;
+      if (isNaN(extraDamage)) {
+        extraDamage = 0;
+      }
+      finalDamage += extraDamage;
+      extraMsg += uniqueEffects.extraMessage;
+
+      // 최종 NaN 체크
+      if (isNaN(finalDamage) || finalDamage < 0) {
+        finalDamage = 1;
+      }
+
+      // 데미지 적용
+      targetMonster.hp -= finalDamage;
+
+      // 몬스터에게 데미지 팝업 표시
+      setTimeout(() => {
+        showMonsterDamagePopup(targetMonster.id, finalDamage, 'damage');
+      }, 50); // 약간의 지연을 주어 DOM이 업데이트된 후 실행
+
+      battleLog(`${w.name}으로 ${targetMonster.name} 공격! ${Math.floor(dmg)} → ${Math.floor(finalDamage)} 데미지 ${extraMsg}${!defenseIgnored ? " (방어력 적용)" : ""}`);
+
+      // 몬스터 사망 체크
+      if (targetMonster.hp <= 0) {
+        targetMonster.alive = false;
+        let reward = fields[currentField].reward;
+
+        // 골드 획득 퍼센트 증가 적용
+        let goldPercent = getUniqueOptionValue('gold_percent');
+        if (goldPercent > 0) {
+          reward = Math.floor(reward * (1 + goldPercent / 100));
+        }
+
+        // 보석 드롭 확률 (기본 10% + 마나 흡수 효과 + 고레벨 사냥터 보너스)
+        let gemDropChance = 10;
+        let manaDrainValue = getUniqueOptionValue('mana_drain');
+        if (manaDrainValue > 0) {
+          gemDropChance += manaDrainValue;
+        }
+
+        // 고레벨 사냥터에서 보석 드롭 확률 증가
+        if (currentField >= 4) { // 빙하 이상
+          gemDropChance += (currentField - 3) * 5; // 사냥터마다 5%씩 증가
+        }
+
+        // 특별 보상 (고레벨 사냥터)
+        let bonusGems = 0;
+        if (currentField >= 7) { // 천공성 이상
+          if (Math.random() * 100 < 3) { // 3% 확률로 보석 대량 획득
+            bonusGems = Math.floor(Math.random() * 3) + 2; // 2-4개
+          }
+        }
+        if (currentField >= 9) { // 시공의 틈 이상
+          if (Math.random() * 100 < 1) { // 1% 확률로 보석 대박
+            bonusGems = Math.floor(Math.random() * 5) + 5; // 5-9개
+          }
+        }
+
+        const gemDrop = Math.random() * 100 < gemDropChance;
+        let rewardMsg = `${targetMonster.name} 처치! 코인+${reward}`;
+
+        let totalGemsGained = 0;
+        if (gemDrop) {
+          totalGemsGained += 1;
+        }
+        if (bonusGems > 0) {
+          totalGemsGained += bonusGems;
+          rewardMsg += ` ✨보너스!`;
+        }
+
+        if (totalGemsGained > 0) {
+          gems += totalGemsGained;
+          rewardMsg += `, 보석+${totalGemsGained}`;
+        }
+        battleLog(rewardMsg);
+        showBattleInfo(rewardMsg);
+        coins += reward;
+        totalMonstersKilled++; // 처치한 몬스터 수 증가
+
+        // 죽은 몬스터는 배열에서 제거하지 않고 alive만 false로 설정
+        // 다음 전투에서 정리됨
+      }
+
+      // 모든 몬스터가 죽었는지 확인
+      const remainingMonsters = monsters.filter(m => m.alive);
+      if (remainingMonsters.length === 0) {
+        clearInterval(autoBattleInterval);
+        updateUIVisibility(); // 모든 몬스터 사망 시 UI 업데이트
+        // 자동사냥 모드면 일정 시간 후 자동 몬스터 등장
+        if (autoHunt) {
+          if (autoHuntTimeout) clearTimeout(autoHuntTimeout);
+          // 기본 딜레이 3초, 점프력에 따라 감소 (최소 0.5초)
+          const baseDelay = 3000;
+          const jumpReduction = player.jump * 50; // 점프력 1당 50ms 감소
+          const finalDelay = Math.max(500, baseDelay - jumpReduction);
+          autoHuntTimeout = setTimeout(() => {
+            spawnMonster();
+          }, finalDelay);
+        }
+      }
+      updateDisplay();
+    }
+
+    function monsterAttack() {
+      const aliveMonsters = monsters.filter(m => m.alive);
+      if (aliveMonsters.length === 0 || !player.alive) return;
+
+      let totalDamage = 0;
+      let attackMessages = [];
+
+      // 회피 체크
+      if (Math.random() * 100 < player.dodge) {
+        // 회피 성공
+        const characterSprite = document.getElementById("characterSprite");
+        battleLog(`회피 성공! (회피율: ${player.dodge}%)`);
+        showDamagePopup(document.getElementById("characterSprite"), "회피!", 'heal');
+        return;
+      }
+
+      // 모든 살아있는 몬스터가 플레이어 공격
+      aliveMonsters.forEach(monster => {
+        // 몬스터 공격 애니메이션
+        const monsterElement = document.getElementById(`monster${monster.id}`);
+        if (monsterElement) {
+          monsterElement.classList.add("attacking");
+          setTimeout(() => {
+            if (monsterElement.classList) {
+              monsterElement.classList.remove("attacking");
+            }
+          }, 300);
+        }
+
+        let dmg = monster.atk || 0;
+
+        // NaN 체크
+        if (isNaN(dmg) || dmg < 0) {
+          dmg = 0;
+        }
+
+        // 방어력 적용
+        let playerDef = player.def || 0;
+        if (isNaN(playerDef) || playerDef < 0) {
+          playerDef = 0;
+        }
+
+        let reduced = Math.max(0, dmg * (200 / (200 + playerDef)));
+
+        // NaN 체크
+        if (isNaN(reduced)) {
+          reduced = 0;
+        }
+
+        totalDamage += reduced;
+        attackMessages.push(`${monster.name}: ${Math.floor(dmg)} → ${Math.floor(reduced)} 데미지`);
+      });
+
+      // 유니크 방어 효과 처리
+      const defenseEffects = processUniqueDefenseEffects(totalDamage);
+
+      if (defenseEffects.negateAttack) {
+        // 공격 무효화
+        battleLog(`몬스터들의 공격! 하지만 무효화됨!${defenseEffects.extraMessage}`);
+        if (defenseEffects.reflectDamage > 0) {
+          battleLog(`반사 데미지 ${defenseEffects.reflectDamage}!`);
+        }
+        return;
+      }
+
+      // 플레이어 피격 애니메이션
+      const characterSprite = document.getElementById("characterSprite");
+      characterSprite.classList.add("hurt");
+      setTimeout(() => characterSprite.classList.remove("hurt"), 300);
+
+      // 데미지 적용
+      let damageReduction = defenseEffects.damageReduction || 0;
+      if (isNaN(damageReduction)) {
+        damageReduction = 0;
+      }
+
+      totalDamage -= damageReduction;
+      totalDamage = Math.max(0, totalDamage);
+
+      // NaN 체크
+      if (isNaN(totalDamage)) {
+        totalDamage = 0;
+      }
+
+      player.hp -= totalDamage;
+
+      // 플레이어 데미지 팝업 표시
+      if (totalDamage > 0) {
+        showDamagePopup(characterSprite, totalDamage, 'damage');
+      }
+
+      let damageMessage = `몬스터들의 공격! ${attackMessages.join(', ')} (총 ${Math.floor(totalDamage)} 데미지)${defenseEffects.extraMessage}`;
+      if (defenseEffects.reflectDamage > 0) {
+        damageMessage += ` 반사 데미지 ${defenseEffects.reflectDamage}!`;
+      }
+      battleLog(damageMessage);
+
+      if (player.hp <= 0) {
+        player.hp = 0;
+        player.alive = false;
+        const deathMsg = "플레이어 사망! 보유금액 1/2.";
+        battleLog(deathMsg);
+        showBattleInfo(deathMsg, 3000);
+        if (coins != 0) {
+          coins = Math.floor(coins / 2);
+        }
+        clearInterval(autoBattleInterval);
+        updateUIVisibility(); // 플레이어 사망 시 UI 업데이트
+      }
+      updateDisplay();
+    }
+
+    setInterval(() => { coins += 2; updateDisplay(); }, 1000);
+  </script>
+</body>
+
+</html>

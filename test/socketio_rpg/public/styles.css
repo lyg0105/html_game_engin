@@ -1,0 +1,9 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; background: #0e0f13; color: #e7e9ee; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji; }
+header, footer { display:flex; align-items:center; justify-content:space-between; padding: 10px 16px; background: #151821; border-bottom: 1px solid #23273a; }
+footer { border-top: 1px solid #23273a; border-bottom: none; }
+h1 { font-size: 18px; margin: 0; color:#e7e9ee; }
+.controls { display:flex; gap: 12px; align-items:center; }
+#nameInput { padding: 6px 10px; border-radius: 8px; border: 1px solid #2f3550; background:#0e0f13; color:#e7e9ee; outline: none; width: 220px; }
+#game { display:block; margin: 10px auto; border: 1px solid #23273a; background: #0b0d12; max-width: calc(100% - 20px); }
+small { color: #99a3c4; }

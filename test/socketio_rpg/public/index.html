@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Socket.IO RPG Sample</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Socket.IO RPG Sample</h1>
+    <div class="controls">
+      <input id="nameInput" maxlength="16" placeholder="Enter name & press Enter" />
+      <span>Move: WASD / Arrow Keys | Zoom: Mouse Wheel</span>
+    </div>
+  </header>
+
+  <canvas id="game" width="960" height="540"></canvas>
+
+  <footer>
+    <small>Made with HTML5 Canvas + Socket.IO</small>
+  </footer>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="client.js"></script>
+</body>
+</html>
