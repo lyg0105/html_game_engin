@@ -1,12 +1,18 @@
-window.onload = function() {
+window.onload = function () {
   on_load_window();
+  let user_pw_input = document.getElementById("user_pw");
+  user_pw_input.addEventListener("keyup", function (event) {
+    if (event.keyCode === 13) {
+      go_login();
+    }
+  });
 };
 
 function on_load_window() {
   LygLoginFunc.get_login_data();
-  if(!strFunc.is_empty(LygLoginFunc.login_data.token_id)
-    &&!strFunc.is_empty(LygLoginFunc.login_data.client_info["user_seq"])){
-    location.href="/page/lobby";
+  if (!strFunc.is_empty(LygLoginFunc.login_data.token_id)
+    && !strFunc.is_empty(LygLoginFunc.login_data.client_info["user_seq"])) {
+    location.href = "/page/lobby";
     return false;
   }
 }
@@ -40,7 +46,7 @@ function go_login() {
           if (result["result"] == "true") {
             strFunc.set_storage("token_id", result["data"]["token_id"]);
             strFunc.set_storage("client_info", JSON.stringify(result["data"]["client_info"]));
-            location.href="/page/lobby";
+            location.href = "/page/lobby";
           } else {
             alert(result["msg"]);
           }
@@ -48,5 +54,5 @@ function go_login() {
     });
 }
 function register() {
-  location.href='/page/join';
+  location.href = '/page/join';
 }

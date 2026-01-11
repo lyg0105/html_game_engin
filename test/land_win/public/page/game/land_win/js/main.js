@@ -43,15 +43,15 @@ class LandGame{
     };
     this_obj.socket.emit("set_user_data",this.user_data);
 
-    this.gameChat=new GameChat({
-      io:this.io,
-      game_body:this.game_body,
-      client_info:this.client_info,
-      Myconstant:this.Myconstant,
-      socket:this.socket,
-      user_data:this.user_data,
-    });
-    this.gameChat.start();
+    // this.gameChat=new GameChat({
+    //   io:this.io,
+    //   game_body:this.game_body,
+    //   client_info:this.client_info,
+    //   Myconstant:this.Myconstant,
+    //   socket:this.socket,
+    //   user_data:this.user_data,
+    // });
+    // this.gameChat.start();
     this.gameMain=new GameMain({
       io:this.io,
       game_body:this.game_body,

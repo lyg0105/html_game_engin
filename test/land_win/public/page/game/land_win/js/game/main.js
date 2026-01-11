@@ -37,7 +37,10 @@ class GameMain {
         this.init();
     }
     init() {
-        this.game_data = new GameData();
+        let this_obj = this;
+        this.game_data = new GameData({
+            main:this_obj,
+        });
         this.game_data.func.collisionFunc=CollisionFunc;
         this.game_data.func.stringFunc=new StringFunc();
         this.game_data.func.cellFunc=new CellFunc();
@@ -46,13 +49,16 @@ class GameMain {
             game_body:this.game_body,
         });
         this.game_data.control=new GameControl({
+            main:this_obj,
             game_data:this.game_data,
         });
         this.game_data.canvas.class=new CanvasMain({
+            main:this_obj,
             game_data:this.game_data,
             game_body:this.game_body,
         });
         this.process=new ProcessMain({
+            main:this_obj,
             game_data:this.game_data,
         });
         this.process.start();

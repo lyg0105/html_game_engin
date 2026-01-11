@@ -39,7 +39,7 @@ class GameChat{
     this.socket=opt_obj.socket;
     this.user_data=opt_obj.user_data;
     this.make_element();
-    this.elements.open_btn.addEventListener("click",()=>{
+    this.elements.open_btn.addEventListener("click",(event)=>{
       let chat_wrap=this_obj.elements.chat_wrap;
       if(chat_wrap.style.display=="none"){
         chat_wrap.style.display="block";
@@ -48,6 +48,7 @@ class GameChat{
         chat_wrap.style.display="none";
         strFunc.set_storage("is_open_chat_box","");
       }
+      event.preventDefault();
     });
     this.elements.msg_clear_btn.addEventListener("click",()=>{
       let chat_msg_wrap=this_obj.elements.chat_msg_wrap;
@@ -86,7 +87,7 @@ class GameChat{
       chat_msg_wrap.scrollTop=chat_msg_wrap.scrollHeight;
     });
     let send_msg_btn=this_obj.elements.send_msg_btn;
-    send_msg_btn.addEventListener("click",()=>{
+    send_msg_btn.addEventListener("click",(event)=>{
       let msg_input=this_obj.elements.msg_input;
       let msg_data={
         ...this_obj.user_data,
@@ -95,6 +96,7 @@ class GameChat{
       this_obj.socket.emit('chat_msg', msg_data);
       msg_input.value = '';
       msg_input.focus();
+      event.preventDefault();
     });
   }
   make_element(){

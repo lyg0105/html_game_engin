@@ -30,6 +30,20 @@ class ButtonManageProcess {
       this_obj.game_data.control.control_json.map_move_toggle=map_move_toggle_btn.is_active;
     };
     this.game_data.buttons.push(map_move_toggle_btn);
+    //채팅버튼 생성
+    let chat_toggle_btn=new ButtonBase({
+      data: {
+        idx: this.game_data.buttons.length,
+        x: 250,
+        y: 2,
+        text: 'Chat',
+      }
+    });
+    chat_toggle_btn.on_click_custom=()=>{
+      chat_toggle_btn.is_active=!chat_toggle_btn.is_active;
+      this_obj.game_data.control.control_json.chat_toggle=chat_toggle_btn.is_active;
+    };
+    this.game_data.buttons.push(chat_toggle_btn);
   };
 
   on_down() {

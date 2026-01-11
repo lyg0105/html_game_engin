@@ -1,6 +1,7 @@
 import ScreenControl from "./screen/index.js";
 
 class GameControl{
+  main=null;
   game_data={};
   key_code_json={
     up:38,
@@ -22,6 +23,7 @@ class GameControl{
     map_left:false,
     map_right:false,
     map_move_toggle:false,
+    chat_toggle:false,
   };
   map_drag_json={
     pre_x:0,
@@ -29,9 +31,11 @@ class GameControl{
   };
   constructor(inData){
     let opt_obj={
+      main:null,
       game_data:null,
       ...inData
     };
+    this.main=opt_obj.main;
     this.game_data=opt_obj.game_data;
     this.init();
   }
