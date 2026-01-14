@@ -44,7 +44,9 @@ class Control {
       } else {
         const apple = game.getAppleAt(x, y);
         const isBack = game.isBackButtonAt(x, y);
-        data.html.canvas.style.cursor = (apple || isBack) ? 'pointer' : 'default';
+        const isFinish = game.isFinishButtonAt(x, y);
+        game.setHoverFinishButton(isFinish);
+        data.html.canvas.style.cursor = (apple || isBack || isFinish) ? 'pointer' : 'default';
       }
     }
     this.main.view.render();
@@ -90,6 +92,8 @@ class Control {
           game.stop();
           this.main.model.setScreen('menu');
           this.main.view.render();
+        } else if(game.isFinishButtonAt(x, y)){
+          game.endGame();
         } else {
           const apple = game.getAppleAt(x, y);
           if(apple){

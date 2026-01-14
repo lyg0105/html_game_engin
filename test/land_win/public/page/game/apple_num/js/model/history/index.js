@@ -80,11 +80,11 @@ class History {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('순위', startX + 40, startY - 22);
-    ctx.fillText('이름', startX + 130, startY - 22);
-    ctx.fillText('점수', startX + 250, startY - 22);
-    ctx.fillText('시간', startX + 350, startY - 22);
-    ctx.fillText('날짜', startX + 450, startY - 22);
+    ctx.fillText('순위', startX + 30, startY - 22);
+    ctx.fillText('개수', startX + 90, startY - 22);
+    ctx.fillText('점수', startX + 190, startY - 22);
+    ctx.fillText('시간', startX + 290, startY - 22);
+    ctx.fillText('날짜', startX + 400, startY - 22);
 
     // 아이템들
     for (let i = 0; i < Math.min(list.length, this.data.maxVisible); i++) {
@@ -102,11 +102,11 @@ class History {
       ctx.fillStyle = '#fff';
       ctx.font = '16px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(i + 1, startX + 40, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.name || '-', startX + 130, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.score, startX + 250, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.time_sec + '초', startX + 350, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.date.substring(0, 10), startX + 450, itemY + itemHeight / 2 - 2);
+      ctx.fillText(i + 1, startX + 30, itemY + itemHeight / 2 - 2);
+      ctx.fillText(item.correct || 0, startX + 90, itemY + itemHeight / 2 - 2);
+      ctx.fillText(item.score, startX + 190, itemY + itemHeight / 2 - 2);
+      ctx.fillText(item.time_sec + '초', startX + 290, itemY + itemHeight / 2 - 2);
+      ctx.fillText(item.date.substring(0, 10), startX + 400, itemY + itemHeight / 2 - 2);
     }
 
     // 총 기록 수
