@@ -1,6 +1,3 @@
-console.log("kkk");
-
-
 async function logJSONData(url) {
   const response = await fetch(url);
   const jsonData = await response.json();

@@ -6,5 +6,6 @@ app_vhost_server.js
 app_vhosts_server.js
 fcm_key_json.json
 allow_url.txt
+start_window_back.bat
 
 env.js

@@ -23,7 +23,6 @@ var constant={
     PORT:3000,
     JWT_SECRET_KEY:'',
     IS_TEST:"",
-    DB_PREFIX:"intoyou",
     DB_HOST:"localhost",
     DB_ID:"root",
     DB_PW:"root",
