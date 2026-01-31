@@ -13,11 +13,19 @@ class Control {
     canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
     canvas.addEventListener('click', (e) => this.onClick(e));
   }
-  onMouseMove(e){
+  getCanvasPos(e){
     const data = this.main.model.data;
     const rect = data.html.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = data.canvas.width / rect.width;
+    const scaleY = data.canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  }
+  onMouseMove(e){
+    const data = this.main.model.data;
+    const {x, y} = this.getCanvasPos(e);
 
     if(data.screen === 'menu'){
       const lobby = this.main.model.lobby;
@@ -53,9 +61,7 @@ class Control {
   }
   onClick(e){
     const data = this.main.model.data;
-    const rect = data.html.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const {x, y} = this.getCanvasPos(e);
 
     if(data.screen === 'menu'){
       const clickedBtn = this.main.model.lobby.getButtonAt(x, y);

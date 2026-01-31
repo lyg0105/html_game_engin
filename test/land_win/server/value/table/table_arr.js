@@ -6,6 +6,8 @@ class TableArr
   static tb={
     "user":{"table":"ba_user","name":"회원","split":"","type":"comp","col_prefix":"user"},
     "token":{"table":"ba_login_token","name":"토큰","split":"","type":"comp","col_prefix":"token"},
+    
+    "score_history":{"table":"game_score_history","name":"점수기록","split":"y","type":"game","col_prefix":"game"},
   };
   static get(table_str){
     var result_data={

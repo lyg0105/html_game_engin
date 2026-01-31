@@ -61,6 +61,8 @@ class Game {
       this.data.timeLeft--;
       if (this.data.timeLeft <= 0) {
         this.data.isOvertime = true;
+        this.endGame();
+        return;
       }
       this.main.view.render();
     }, 1000);
@@ -102,6 +104,9 @@ class Game {
       date: dateStr
     };
     this.main.model.data.game_score_list.unshift(scoreRow);
+    this.main.model.history.saveScoreAtServer({
+      score_row_arr: [scoreRow],
+    });
 
     this.main.view.render();
   }

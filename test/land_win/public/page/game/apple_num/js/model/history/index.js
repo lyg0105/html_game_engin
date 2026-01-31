@@ -9,6 +9,81 @@ class History {
   constructor(main) {
     this.main = main;
   }
+  async saveScoreAtServer(inData) {
+    let this_obj= this;
+    let main=this_obj.main;
+    let opt_obj={
+      score_row_arr:[],
+      ...inData
+    };
+    let score_row_arr=opt_obj.score_row_arr;
+    let write_score_arr=[];
+    let now_ymd=main.model.data.util.date.get_date_format(new Date(),"Ymd");
+    let now_ymdhis=main.model.data.util.date.get_date_format(new Date(),"Y-m-d h:i:s");
+    for(let i=0;i<score_row_arr.length;i++){
+      let tmp_row=score_row_arr[i];
+      let write_score_row={
+        a_ymd:now_ymd,
+        a_seq:"",
+        a_date:now_ymdhis,
+        a_id:"apple_num",
+        a_user_name:tmp_row.name,
+        a_score:tmp_row.score,
+        a_correct:tmp_row.correct,
+        a_time_sec:tmp_row.time_sec,
+      };
+      if(localStorage.token_id){
+        write_score_row.a_is_login_user="1";
+        //write_score_row.a_user_seq="";
+      }
+      write_score_arr.push(write_score_row);
+    }
+
+    let form_json_data={
+      data_arr:write_score_arr,
+      is_default_val:"1",
+    };
+
+    let response = await main.model.data.util.fetch.send({
+      method: 'POST',
+      url: "/api/comp/game/score_history/write",
+      data:form_json_data,
+    });
+    if(response.result=="true"){
+      this_obj.getScoreListAtServer();
+    }else{
+      alert("점수 저장에 실패했습니다.");
+    }
+  }
+  async getScoreListAtServer(){
+    let this_obj= this;
+    let main=this_obj.main;
+    let response = await main.model.data.util.fetch.send({
+      method: 'POST',
+      url: "/api/comp/game/score_history/list",
+      data: {
+        order_id:"a_score DESC",
+        s_par_id:"apple_num",
+        is_paging:"",
+        max_limit_num:10,
+      },
+    });
+    if(response.result=="true"){
+      main.model.data.game_score_list = [];
+      for(let i=0;i<response.data.info_arr.length;i++){
+        let tmp_info=response.data.info_arr[i];
+        let add_score_row={
+          ...main.model.data.default_score_row,
+          name:tmp_info.a_user_name,
+          score:tmp_info.a_score,
+          correct:tmp_info.a_correct,
+          time_sec:tmp_info.a_time_sec,
+          date:tmp_info.a_date,
+        };
+        main.model.data.game_score_list.push(add_score_row);
+      }
+    }
+  }
   setHoverItem(itemId) {
     this.data.hoverItem = itemId;
   }

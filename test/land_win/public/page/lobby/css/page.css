@@ -1,0 +1,39 @@
+.lobby_wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.lobby_wrap > div:first-child {
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+
+.lobby_wrap .btn {
+  width: 220px;
+  padding: 14px 0;
+  font-size: 18px;
+  line-height: 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.lobby_wrap .btn:active {
+  transform: scale(0.96);
+}
+
+.lobby_wrap .btn_gray {
+  background: #3a3a4a;
+  border: 1px solid #555;
+}
+
+.lobby_wrap .btn_gray:hover {
+  background: #50506a;
+}

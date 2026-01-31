@@ -2,6 +2,8 @@ import Lobby from './lobby/index.js';
 import Option from './option/index.js';
 import Game from './game/index.js';
 import History from './history/index.js';
+import Util from './util/index.js';
+import Resource from "./res/index.js";
 
 class Model{
   main;
@@ -11,8 +13,8 @@ class Model{
       height: 600
     },
     screen: 'menu', // menu, game, record, setting
-    map:{x:20,y:10},
-    limit_sec:60,
+    map:{x:10,y:10},
+    limit_sec:30,
     is_game_sound:true,
     is_background_sound:true,
     correct:0,
@@ -38,7 +40,14 @@ class Model{
       game:null,
       history:null,
     },
-    util:{},
+    util:{
+      fetch:null,
+      string:null,
+      date:null,
+    },
+    img:{
+      apple:null,
+    },
   };
   constructor(main){
     this.main = main;
@@ -48,7 +57,12 @@ class Model{
     this.data.object.history = new History(main);
   }
   init(){
+    let this_obj = this;
+    let main=this.main;
     this.data.html.app = document.getElementById('app');
+    new Util({main:main});
+    new Resource({main:main});
+    this_obj.history.getScoreListAtServer();
   }
   get lobby(){
     return this.data.object.lobby;

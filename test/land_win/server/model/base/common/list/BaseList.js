@@ -53,9 +53,17 @@ class BaseList
       "max_limit_num":"1000000",
       "is_check_input_str":true,
       "is_add_idx_info":"",
+
+      "is_paging":"1"
     };
     for(var key in inOptObj){
       this.s_list_opt[key]=inOptObj[key];
+    }
+    
+    if(this.s_list_opt["is_paging"]==""){
+      this.s_list_opt.is_need_count="";
+      this.s_list_opt.is_need_info_arr="1";
+      this.s_list_opt.is_no_limit="1";
     }
 
     this.baseModel=this.s_list_opt["baseModel"];
@@ -313,6 +321,7 @@ class BaseList
       var order_data_str=this.s_list_opt["order_id"]+" "+this.s_list_opt["order_type"];
       var order_data_arr=order_data_str.split(",");
       var order_where_arr=[];
+      
       for(var i=0;i<order_data_arr.length;i++){
         var order_row=order_data_arr[i].replace(" ASC","");
         var tmp_row_arr=order_row.split(" DESC");
@@ -330,6 +339,7 @@ class BaseList
         result_where_row.push("ORDER BY "+order_where_arr_str);
       }
     }
+    
     return result_where_row;
   }
   async getTableSplitArr(){
