@@ -16,17 +16,16 @@
     <div>로비</div>
     <div style="margin-top: 10px;color:aqua;" id="lobby_sub_title"></div>
     <div style="margin-top: 10px;">
-      <button class="btn btn_gray"
-        onclick="location.href='/page/game/land_win';">게임시작</button>
+      <button class="btn btn_gray" onclick="location.href='/page/game/land_win';">게임시작</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray" onclick="location.href='/page/game/amenu';">다른게임</button>
     </div>
     <div style="margin-top: 10px;">
       <button class="btn btn_gray">랭킹보드</button>
     </div>
-    <div style="margin-top: 10px;display: none;" id="go_manage_btn_wrap" >
+    <div style="margin-top: 10px;display: none;" id="go_manage_btn_wrap">
       <button class="btn btn_gray" onclick="location.href='/page/manager/basic/user/list/';">관리자</button>
-    </div>
-    <div style="margin-top: 10px;" >
-      <button class="btn btn_gray" onclick="location.href='/page/game/amenu';">다른게임</button>
     </div>
     <div style="margin-top: 10px;">
       <button class="btn btn_gray" onclick="go_logout();">로그아웃</button>
@@ -40,12 +39,12 @@
           location.href = "/";
           return false;
         }
-        if(LygLoginFunc.login_data.client_info["user_grade"]=="m"){
-          let go_manage_btn_wrap=document.getElementById("go_manage_btn_wrap");
-          go_manage_btn_wrap.style.display="";
+        if (LygLoginFunc.login_data.client_info["user_grade"] == "m") {
+          let go_manage_btn_wrap = document.getElementById("go_manage_btn_wrap");
+          go_manage_btn_wrap.style.display = "";
         }
-        let lobby_sub_title_obj=document.getElementById("lobby_sub_title");
-        lobby_sub_title_obj.innerHTML=LygLoginFunc.login_data.client_info["user_name"];
+        let lobby_sub_title_obj = document.getElementById("lobby_sub_title");
+        lobby_sub_title_obj.innerHTML = LygLoginFunc.login_data.client_info["user_name"];
       }
       function go_logout() {
         fetch("/api/comp/user/login/logout", {
