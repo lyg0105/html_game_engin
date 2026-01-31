@@ -12,6 +12,18 @@ class Control {
 
     canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
     canvas.addEventListener('click', (e) => this.onClick(e));
+
+    // 모바일 터치 이벤트
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      this.onClick(touch);
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      this.onMouseMove(touch);
+    }, { passive: false });
   }
   getCanvasPos(e){
     const data = this.main.model.data;

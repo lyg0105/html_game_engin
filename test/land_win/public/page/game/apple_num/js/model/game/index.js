@@ -224,9 +224,10 @@ class Game {
           ctx.arc(px + gridSize / 2, py + gridSize / 2, gridSize / 2 - 2, 0, Math.PI * 2);
           ctx.fill();
 
-          // 숫자
+          // 숫자 (gridSize에 비례하여 폰트 크기 조정)
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold 16px Arial';
+          const fontSize = Math.max(Math.round(gridSize * 0.34), 12);
+          ctx.font = 'bold ' + fontSize + 'px Arial';
           ctx.fillText(apple.value, px + gridSize / 2, py + gridSize / 2);
         }
       }
