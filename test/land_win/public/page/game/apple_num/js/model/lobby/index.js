@@ -40,7 +40,7 @@ class Lobby {
     ctx.font = 'bold 60px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🍎 사과게임 🍎', centerX, 120);
+    ctx.fillText('사과게임', centerX, 120);
 
     // 버튼 그리기
     const { buttons, buttonWidth, buttonHeight, hoverButton } = this.data;

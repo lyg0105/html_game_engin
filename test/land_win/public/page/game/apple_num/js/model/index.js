@@ -13,10 +13,11 @@ class Model{
       height: 600
     },
     screen: 'menu', // menu, game, record, setting
-    map:{x:10,y:10},
-    limit_sec:30,
+    map:{x:6,y:7},
+    limit_sec:15,
     is_game_sound:true,
     is_background_sound:true,
+    name:'',
     correct:0,
     score:0,
     time_sec:0,
@@ -62,6 +63,7 @@ class Model{
     this.data.html.app = document.getElementById('app');
     new Util({main:main});
     new Resource({main:main});
+    this.data.name=localStorage.getItem("apple_num_user_name")||"";
     this_obj.history.getScoreListAtServer();
   }
   get lobby(){

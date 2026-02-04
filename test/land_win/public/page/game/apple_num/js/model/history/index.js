@@ -3,8 +3,8 @@ class History {
   data = {
     hoverItem: null,
     scrollOffset: 0,
-    itemHeight: 50,
-    maxVisible: 8
+    itemHeight: 60,
+    maxVisible: 7
   };
   constructor(main) {
     this.main = main;
@@ -74,6 +74,8 @@ class History {
         let tmp_info=response.data.info_arr[i];
         let add_score_row={
           ...main.model.data.default_score_row,
+          a_ymd:tmp_info.a_ymd,
+          a_seq:tmp_info.a_seq,
           name:tmp_info.a_user_name,
           score:tmp_info.a_score,
           correct:tmp_info.a_correct,
@@ -84,6 +86,28 @@ class History {
       }
     }
   }
+  async clearAllScoresAtServer() {
+    let this_obj = this;
+    let main = this.main;
+    if(main.model.data.game_score_list.length==0){
+      alert("초기화할 기록이 없습니다.");
+      return false;
+    }
+    let response = await main.model.data.util.fetch.send({
+      method: 'POST',
+      url: "/api/comp/game/score_history/delete",
+      data: {
+        data_arr: main.model.data.game_score_list,
+      },
+    });
+    if (response.result == "true") {
+      this_obj.getScoreListAtServer();
+      main.model.data.game_score_list = [];
+      this_obj.render();
+    } else {
+      alert("기록 초기화에 실패했습니다.");
+    }
+  }
   setHoverItem(itemId) {
     this.data.hoverItem = itemId;
   }
@@ -92,12 +116,17 @@ class History {
     const list = this.main.model.data.game_score_list;
     const startY = 120;
     const itemHeight = this.data.itemHeight;
-    const itemWidth = 500;
+    const itemWidth = 280;
     const startX = (canvasData.width - itemWidth) / 2;
 
     // 뒤로가기 버튼
     if (x >= 20 && x <= 100 && y >= 20 && y <= 60) {
       return { id: 'back', type: 'button' };
+    }
+
+    // 기록 초기화 버튼
+    if (x >= canvasData.width - 100 && x <= canvasData.width - 20 && y >= 20 && y <= 60) {
+      return { id: 'reset', type: 'button' };
     }
 
     // 리스트 아이템
@@ -118,7 +147,7 @@ class History {
 
     // 타이틀
     ctx.fillStyle = '#e94560';
-    ctx.font = 'bold 36px Arial';
+    ctx.font = 'bold 28px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('기록 확인', canvasData.width / 2, 60);
@@ -133,15 +162,25 @@ class History {
     ctx.font = '16px Arial';
     ctx.fillText('뒤로', 60, 40);
 
+    // 기록 초기화 버튼
+    const isResetHover = this.data.hoverItem === 'reset';
+    ctx.fillStyle = isResetHover ? '#e94560' : '#0f3460';
+    ctx.beginPath();
+    ctx.roundRect(canvasData.width - 100, 20, 80, 40, 8);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Arial';
+    ctx.fillText('초기화', canvasData.width - 60, 40);
+
     // 리스트
     const startY = 120;
     const itemHeight = this.data.itemHeight;
-    const itemWidth = 500;
+    const itemWidth = 280;
     const startX = (canvasData.width - itemWidth) / 2;
 
     if (list.length === 0) {
       ctx.fillStyle = '#888';
-      ctx.font = '20px Arial';
+      ctx.font = '16px Arial';
       ctx.fillText('기록이 없습니다.', canvasData.width / 2, canvasData.height / 2);
       return;
     }
@@ -149,17 +188,15 @@ class History {
     // 헤더
     ctx.fillStyle = '#0f3460';
     ctx.beginPath();
-    ctx.roundRect(startX, startY - 40, itemWidth, 35, 5);
+    ctx.roundRect(startX, startY - 35, itemWidth, 30, 5);
     ctx.fill();
 
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Arial';
+    ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('순위', startX + 30, startY - 22);
-    ctx.fillText('개수', startX + 90, startY - 22);
-    ctx.fillText('점수', startX + 190, startY - 22);
-    ctx.fillText('시간', startX + 290, startY - 22);
-    ctx.fillText('날짜', startX + 400, startY - 22);
+    ctx.fillText('순위', startX + 35, startY - 20);
+    ctx.fillText('이름', startX + 140, startY - 20);
+    ctx.fillText('점수', startX + 245, startY - 20);
 
     // 아이템들
     for (let i = 0; i < Math.min(list.length, this.data.maxVisible); i++) {
@@ -173,21 +210,27 @@ class History {
       ctx.roundRect(startX, itemY, itemWidth, itemHeight - 5, 5);
       ctx.fill();
 
-      // 텍스트
+      // 첫번째 줄: 순위, 이름, 점수
       ctx.fillStyle = '#fff';
-      ctx.font = '16px Arial';
+      ctx.font = '13px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(i + 1, startX + 30, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.correct || 0, startX + 90, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.score, startX + 190, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.time_sec + '초', startX + 290, itemY + itemHeight / 2 - 2);
-      ctx.fillText(item.date.substring(0, 10), startX + 400, itemY + itemHeight / 2 - 2);
+      const line1Y = itemY + itemHeight * 0.33;
+      ctx.fillText(i + 1, startX + 35, line1Y);
+      ctx.fillText(item.name || '', startX + 140, line1Y);
+      ctx.fillText(item.score, startX + 245, line1Y);
+
+      // 두번째 줄: 개수, 날짜
+      ctx.fillStyle = '#aaa';
+      ctx.font = '11px Arial';
+      const line2Y = itemY + itemHeight * 0.72;
+      ctx.fillText((item.correct || 0) + '개', startX + 90, line2Y);
+      ctx.fillText(item.date.substring(0, 10), startX + 200, line2Y);
     }
 
     // 총 기록 수
     if (list.length > this.data.maxVisible) {
       ctx.fillStyle = '#888';
-      ctx.font = '14px Arial';
+      ctx.font = '12px Arial';
       ctx.fillText(`총 ${list.length}개의 기록`, canvasData.width / 2, canvasData.height - 30);
     }
   }

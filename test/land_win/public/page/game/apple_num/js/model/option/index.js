@@ -2,6 +2,7 @@ class Option {
   main;
   data = {
     items: [
+      { id: 'name', text: '이름 설정', type: 'input' },
       { id: 'game_sound', text: '게임 효과음', type: 'toggle', key: 'is_game_sound' },
       { id: 'bg_sound', text: '배경 음악', type: 'toggle', key: 'is_background_sound' },
       { id: 'back', text: '돌아가기', type: 'button' }
@@ -32,6 +33,11 @@ class Option {
       }
     }
     return null;
+  }
+  setName(name) {
+    const data = this.main.model.data;
+    data.name = name;
+    localStorage.setItem('apple_num_user_name', name);
   }
   toggleOption(key) {
     const data = this.main.model.data;
@@ -72,7 +78,15 @@ class Option {
       ctx.fillStyle = isHover ? '#fff' : '#eee';
       ctx.font = 'bold 20px Arial';
 
-      if (item.type === 'toggle') {
+      if (item.type === 'input') {
+        ctx.textAlign = 'left';
+        ctx.fillText(item.text, x + 20, y + itemHeight / 2);
+
+        // 현재 이름 표시
+        ctx.textAlign = 'right';
+        ctx.fillStyle = data.name ? '#4ade80' : '#888';
+        ctx.fillText(data.name || '미설정', x + itemWidth - 20, y + itemHeight / 2);
+      } else if (item.type === 'toggle') {
         const isOn = data[item.key];
         ctx.textAlign = 'left';
         ctx.fillText(item.text, x + 20, y + itemHeight / 2);

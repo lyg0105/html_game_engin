@@ -90,6 +90,12 @@ class Control {
       if(clickedItem && clickedItem.id === 'back'){
         this.main.model.setScreen('menu');
         this.main.view.render();
+      } else if(clickedItem && clickedItem.id === 'reset'){
+        if(confirm('모든 기록을 초기화하시겠습니까?')){
+          this.main.model.history.clearAllScoresAtServer().then(() => {
+            this.main.view.render();
+          });
+        }
       }
     } else if(data.screen === 'game'){
       const game = this.main.model.game;
@@ -139,7 +145,13 @@ class Control {
   }
   onOptionItemClick(item){
     const option = this.main.model.option;
-    if(item.type === 'toggle'){
+    if(item.type === 'input'){
+      const current = this.main.model.data.name;
+      const name = prompt('이름을 입력하세요', current);
+      if(name !== null){
+        option.setName(name.trim());
+      }
+    } else if(item.type === 'toggle'){
       option.toggleOption(item.key);
     } else if(item.id === 'back'){
       this.main.model.setScreen('menu');

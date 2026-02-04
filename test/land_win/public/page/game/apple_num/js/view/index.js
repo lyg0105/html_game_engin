@@ -11,7 +11,7 @@ class View {
     const map = data.map;
 
     // 화면 크기에 맞춰 캔버스 크기 조정
-    const maxWidth = 800;
+    const maxWidth = data.canvas.width;
     const screenWidth = window.innerWidth;
     const canvasWidth = Math.min(screenWidth - 16, maxWidth);
 
@@ -20,7 +20,7 @@ class View {
     const gridSize = Math.min(Math.floor(canvasWidth / map.x), maxGridSize);
 
     // 캔버스 높이 계산 (게임 그리드 + 상단 여백, 최소 높이 보장)
-    const canvasHeight = Math.max(gridSize * map.y + 100, 550);
+    const canvasHeight = Math.max(gridSize * map.y + 100, data.canvas.height);
 
     data.canvas.width = canvasWidth;
     data.canvas.height = canvasHeight;

@@ -79,7 +79,7 @@ class Game {
     const elapsedSec = this.data.elapsedMs / 1000;
 
     // 제한시간 내에 완료했으면 점수 두 배
-    const baseScore = this.data.isOvertime ? this.data.score : this.data.score * 2;
+    const baseScore = this.data.score;
 
     // 최종 점수 = (점수 / 경과시간) * 100 (소수점 1자리)
     const finalScore = elapsedSec > 0 ? parseFloat(((baseScore / elapsedSec) * 100).toFixed(1)) : baseScore * 100;
@@ -97,8 +97,8 @@ class Game {
       String(now.getSeconds()).padStart(2, '0');
 
     const scoreRow = {
-      name: '',
-      correct: this.main.model.data.correct,
+      name: this.main.model.data.name,
+      correct: this.data.score,
       score: finalScore,
       time_sec: parseFloat(elapsedSec.toFixed(1)),
       date: dateStr
@@ -196,16 +196,17 @@ class Game {
     const startX = (canvasData.width - totalWidth) / 2;
     const startY = 80;
 
-    // 상단 정보 표시
+    // 상단 정보 표시 (뒤로 버튼과 같은 줄, 오른쪽 배치)
+    ctx.textBaseline = 'middle';
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 24px Arial';
+    ctx.font = 'bold 20px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('점수: ' + this.data.score, canvasData.width / 2 - 80, 40);
+    ctx.fillText('점수: ' + this.data.score, canvasData.width / 2 + 20, 40);
 
     // 시간 표시 (제한시간 초과시 다른 색으로)
     const timeText = '시간: ' + Math.abs(this.data.timeLeft) + '초';
     ctx.fillStyle = this.data.isOvertime ? '#ff6b6b' : '#fff';
-    ctx.fillText(timeText, canvasData.width / 2 + 80, 40);
+    ctx.fillText(timeText, canvasData.width / 2 + 150, 40);
 
     // 사과 그리드 그리기
     ctx.textAlign = 'center';
