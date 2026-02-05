@@ -3,50 +3,62 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #111;
 }
 
-body > div {
+.menu-wrap {
+  text-align: center;
+  width: 280px;
+}
+
+.menu-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 32px;
+  letter-spacing: 4px;
+  color: #ddd;
+  border-bottom: 1px solid #333;
+  padding-bottom: 16px;
+}
+
+.menu-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 32px 40px;
-  border: 1px solid #333;
-  border-radius: 12px;
-  background: #1a1a1a;
 }
 
-button {
-  min-width: 160px;
-  padding: 12px 24px;
-  font-size: 16px;
-  color: #ddd;
-  background: #2a2a2a;
+.menu-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 0;
+  font-size: 18px;
+  color: #fff;
+  background: #1a1a2e;
   border: 1px solid #444;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
 }
 
-button:hover {
-  background: #383838;
-  border-color: #666;
-  color: #fff;
+.menu-btn:hover {
+  background: #16213e;
+  border-color: #6c63ff;
 }
 
-button:active {
-  background: #222;
+.menu-btn:active {
+  transform: scale(0.97);
 }
 
-button:last-child {
-  margin-top: 6px;
-  font-size: 14px;
-  color: #888;
+.menu-btn-back {
+  margin-top: 18px;
   background: transparent;
-  border-color: #333;
+  border-color: #555;
+  color: #999;
+  font-size: 14px;
+  padding: 10px 0;
 }
 
-button:last-child:hover {
-  color: #bbb;
-  border-color: #555;
+.menu-btn-back:hover {
+  border-color: #888;
+  color: #ccc;
+  background: #111;
 }

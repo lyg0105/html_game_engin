@@ -4,81 +4,88 @@ import Game from './game/index.js';
 import History from './history/index.js';
 import Util from './util/index.js';
 import Resource from "./res/index.js";
+import Sound from "./sound/index.js";
 
-class Model{
+class Model {
   main;
-  data={
+  data = {
     canvas: {
       width: 800,
       height: 600
     },
     screen: 'menu', // menu, game, record, setting
-    map:{x:6,y:7},
-    limit_sec:15,
-    is_game_sound:true,
-    is_background_sound:true,
-    name:'',
-    correct:0,
-    score:0,
-    time_sec:0,
-    game_start_time_obj:null,
-    game_score_list:[],
-    default_score_row:{
-      name:'',
-      correct:0,
-      score:0,
-      time_sec:0,
-      date:'0000-00-00 00:00:00',
+    map: { x: 6, y: 7 },
+    limit_sec: 15,
+    is_game_sound: true,
+    is_background_sound: true,
+    sound_volume: 0.5,
+    bgm_volume: 0.5,
+    name: '',
+    correct: 0,
+    score: 0,
+    time_sec: 0,
+    game_start_time_obj: null,
+    game_score_list: [],
+    default_score_row: {
+      name: '',
+      correct: 0,
+      score: 0,
+      time_sec: 0,
+      date: '0000-00-00 00:00:00',
     },
-    html:{
-      app:null,
-      canvas:null,
-      ctx:null,
+    html: {
+      app: null,
+      canvas: null,
+      ctx: null,
+      res_div: null,
     },
-    object:{
-      lobby:null,
-      option:null,
-      game:null,
-      history:null,
+    object: {
+      lobby: null,
+      option: null,
+      game: null,
+      history: null,
     },
-    util:{
-      fetch:null,
-      string:null,
-      date:null,
+    util: {
+      fetch: null,
+      string: null,
+      date: null,
     },
-    img:{
-      apple:null,
+    img: {
+      //apple_ico:null,
     },
+    sound: null,
   };
-  constructor(main){
+  constructor(main) {
     this.main = main;
     this.data.object.lobby = new Lobby(main);
     this.data.object.option = new Option(main);
     this.data.object.game = new Game(main);
     this.data.object.history = new History(main);
   }
-  init(){
+  init() {
     let this_obj = this;
-    let main=this.main;
+    let main = this.main;
     this.data.html.app = document.getElementById('app');
-    new Util({main:main});
-    new Resource({main:main});
-    this.data.name=localStorage.getItem("apple_num_user_name")||"";
+    this.data.html.res_div = document.getElementById('res_div');
+    new Util({ main: main });
+    new Resource({ main: main });
+    this.main.model.data.sound = new Sound({ main: main });
+    this.data.name = localStorage.getItem("apple_num_user_name") || "";
     this_obj.history.getScoreListAtServer();
   }
-  get lobby(){
+  get lobby() {
     return this.data.object.lobby;
   }
-  get option(){
+  get option() {
     return this.data.object.option;
   }
-  get game(){
+  get game() {
     return this.data.object.game;
   }
-  get history(){
+  get history() {
     return this.data.object.history;
   }
-  setScreen(screen){
+  setScreen(screen) {
     this.data.screen = screen;
   }
 }

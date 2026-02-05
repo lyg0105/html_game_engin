@@ -26,3 +26,12 @@ canvas {
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
+
+#res_div {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

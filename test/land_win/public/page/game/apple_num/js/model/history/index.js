@@ -116,7 +116,7 @@ class History {
     const list = this.main.model.data.game_score_list;
     const startY = 120;
     const itemHeight = this.data.itemHeight;
-    const itemWidth = 280;
+    const itemWidth = 300;
     const startX = (canvasData.width - itemWidth) / 2;
 
     // 뒤로가기 버튼

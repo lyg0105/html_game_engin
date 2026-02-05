@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link href="/css/base.css" rel="stylesheet" />
   <link href="/css/button.css" rel="stylesheet" />
+  <link href="./css/page.css" rel="stylesheet" />
   <title>Game Menu</title>
   <script>
     function preventBack() {
@@ -18,10 +19,13 @@
 </head>
 
 <body>
-  <div>
-    <button onclick="location.href='/page/game/farm';">팜</button>
-    <button onclick="location.href='/page/game/apple_num';">사과게임</button>
-    <button onclick="preventBack();">뒤로</button>
+  <div class="menu-wrap">
+    <div class="menu-title">GAME</div>
+    <div class="menu-list">
+      <button class="menu-btn" onclick="location.href='/page/game/farm';">팜</button>
+      <button class="menu-btn" onclick="location.href='/page/game/apple_num';">사과게임</button>
+      <button class="menu-btn menu-btn-back" onclick="preventBack();">뒤로</button>
+    </div>
   </div>
 </body>
 

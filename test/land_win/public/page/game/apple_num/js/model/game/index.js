@@ -17,7 +17,9 @@ class Game {
     isOvertime: false,
     hoverFinishButton: false,
     startTime: 0,
-    elapsedMs: 0
+    elapsedMs: 0,
+    flyingApples: [],
+    animFrameId: null
   };
   constructor(main) {
     this.main = main;
@@ -35,16 +37,48 @@ class Game {
     this.data.hoverFinishButton = false;
     this.data.startTime = Date.now();
     this.data.elapsedMs = 0;
+    this.data.flyingApples = [];
+    if (this.data.animFrameId) {
+      cancelAnimationFrame(this.data.animFrameId);
+      this.data.animFrameId = null;
+    }
     this.startTimer();
   }
   generateApples() {
     const map = this.main.model.data.map;
+    const total = map.x * map.y;
+    const values = [];
+    let remaining = total;
+
+    // 홀수면 3개짜리 조합 하나 먼저 생성 (a + b + c = 10)
+    if (remaining % 2 === 1) {
+      const a = Math.floor(Math.random() * 8) + 1;
+      const b = Math.floor(Math.random() * (9 - a)) + 1;
+      const c = 10 - a - b;
+      values.push(a, b, c);
+      remaining -= 3;
+    }
+
+    // 나머지는 페어로 생성 (a + b = 10)
+    for (let i = 0; i < remaining / 2; i++) {
+      const a = Math.floor(Math.random() * 9) + 1;
+      values.push(a, 10 - a);
+    }
+
+    // Fisher-Yates 셔플
+    for (let i = values.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [values[i], values[j]] = [values[j], values[i]];
+    }
+
+    // 그리드에 배치
     this.data.apples = [];
+    let idx = 0;
     for (let y = 0; y < map.y; y++) {
       const row = [];
       for (let x = 0; x < map.x; x++) {
         row.push({
-          value: Math.floor(Math.random() * 9) + 1,
+          value: values[idx++],
           x: x,
           y: y,
           selected: false
@@ -135,7 +169,30 @@ class Game {
   checkSum() {
     const sum = this.data.selected.reduce((acc, s) => acc + s.value, 0);
     if (sum === 10) {
-      // 맞춤! 사과 제거
+      // 맞춤! 포물선 애니메이션 생성 후 사과 제거
+      const canvasData = this.main.model.data.canvas;
+      const map = this.main.model.data.map;
+      const gridSize = this.data.gridSize;
+      const totalWidth = map.x * gridSize;
+      const startX = (canvasData.width - totalWidth) / 2;
+      const startY = 80;
+
+      this.data.selected.forEach(s => {
+        const px = startX + s.x * gridSize + gridSize / 2;
+        const py = startY + s.y * gridSize + gridSize / 2;
+        this.data.flyingApples.push({
+          px, py,
+          vx: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 6 + 4),
+          vy: -(Math.random() * 4 + 8),
+          value: s.value,
+          opacity: 1.0,
+          size: gridSize - 4,
+          angle: 0,
+          rotSpeed: (Math.random() - 0.5) * 0.15
+        });
+      });
+      this.startFlyingAnimation();
+
       this.data.selected.forEach(s => {
         this.data.apples[s.y][s.x].value = 0;
         this.data.apples[s.y][s.x].selected = false;
@@ -201,12 +258,12 @@ class Game {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 20px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('점수: ' + this.data.score, canvasData.width / 2 + 20, 40);
+    ctx.fillText('점수: ' + this.data.score, canvasData.width / 2 , 40);
 
     // 시간 표시 (제한시간 초과시 다른 색으로)
     const timeText = '시간: ' + Math.abs(this.data.timeLeft) + '초';
     ctx.fillStyle = this.data.isOvertime ? '#ff6b6b' : '#fff';
-    ctx.fillText(timeText, canvasData.width / 2 + 150, 40);
+    ctx.fillText(timeText, canvasData.width / 2 + 130, 40);
 
     // 사과 그리드 그리기
     ctx.textAlign = 'center';
@@ -219,20 +276,34 @@ class Game {
         const py = startY + y * gridSize;
 
         if (apple.value > 0) {
-          // 사과 배경
-          ctx.fillStyle = apple.selected ? '#e94560' : '#2d4a3e';
-          ctx.beginPath();
-          ctx.arc(px + gridSize / 2, py + gridSize / 2, gridSize / 2 - 2, 0, Math.PI * 2);
-          ctx.fill();
+          // 사과 이미지 그리기
+          const appleImg = this.main.model.data.img.apple_ico;
+          if (appleImg) {
+            ctx.drawImage(appleImg, px + 2, py + 2, gridSize - 4, gridSize - 4);
+          }
+
+          // 선택 시 하이라이트 오버레이
+          if (apple.selected) {
+            ctx.fillStyle = 'rgba(233, 69, 96, 0.5)';
+            ctx.beginPath();
+            ctx.arc(px + gridSize / 2, py + gridSize / 2, gridSize / 2 - 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
 
           // 숫자 (gridSize에 비례하여 폰트 크기 조정)
-          ctx.fillStyle = '#fff';
+          //00~99
+          let last_color_num= Math.floor(Math.max(10, Math.random()* 100));
+          ctx.fillStyle = '#9def'+last_color_num;
+          ctx.lineWidth = 3;
           const fontSize = Math.max(Math.round(gridSize * 0.34), 12);
           ctx.font = 'bold ' + fontSize + 'px Arial';
           ctx.fillText(apple.value, px + gridSize / 2, py + gridSize / 2);
         }
       }
     }
+
+    // 날아가는 사과 애니메이션
+    this.renderFlyingApples();
 
     // 뒤로가기 버튼 (상단 좌측)
     ctx.fillStyle = '#0f3460';
@@ -382,11 +453,65 @@ class Game {
   setHoverEndButton(buttonId) {
     this.data.hoverEndButton = buttonId;
   }
+  startFlyingAnimation() {
+    if (this.data.animFrameId) return;
+    const loop = () => {
+      this.updateFlyingApples();
+      if (this.data.flyingApples.length > 0) {
+        this.main.view.render();
+        this.data.animFrameId = requestAnimationFrame(loop);
+      } else {
+        this.data.animFrameId = null;
+        this.main.view.render();
+      }
+    };
+    this.data.animFrameId = requestAnimationFrame(loop);
+  }
+  updateFlyingApples() {
+    const canvasData = this.main.model.data.canvas;
+    for (let i = this.data.flyingApples.length - 1; i >= 0; i--) {
+      const fa = this.data.flyingApples[i];
+      fa.vy += 0.8;
+      fa.px += fa.vx;
+      fa.py += fa.vy;
+      fa.angle += fa.rotSpeed;
+      if (fa.py > canvasData.height + fa.size) {
+        this.data.flyingApples.splice(i, 1);
+      }
+    }
+  }
+  renderFlyingApples() {
+    if (this.data.flyingApples.length === 0) return;
+    const ctx = this.main.model.data.html.ctx;
+    const appleImg = this.main.model.data.img.apple_ico;
+
+    this.data.flyingApples.forEach(fa => {
+      ctx.save();
+      ctx.translate(fa.px, fa.py);
+      ctx.rotate(fa.angle);
+      const half = fa.size / 2;
+      if (appleImg) {
+        ctx.drawImage(appleImg, -half, -half, fa.size, fa.size);
+      }
+      const fontSize = Math.max(Math.round(fa.size * 0.36), 12);
+      ctx.fillStyle = '#2e7d32';
+      ctx.font = 'bold ' + fontSize + 'px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(fa.value, 0, 0);
+      ctx.restore();
+    });
+  }
   stop() {
     if (this.data.timerInterval) {
       clearInterval(this.data.timerInterval);
       this.data.timerInterval = null;
     }
+    if (this.data.animFrameId) {
+      cancelAnimationFrame(this.data.animFrameId);
+      this.data.animFrameId = null;
+    }
+    this.data.flyingApples = [];
     this.data.isPlaying = false;
   }
 }
