@@ -3,10 +3,10 @@ class Control {
   constructor(main) {
     this.main = main;
   }
-  init(){
+  init() {
     this.bindEvents();
   }
-  bindEvents(){
+  bindEvents() {
     const data = this.main.model.data;
     const canvas = data.html.canvas;
 
@@ -25,7 +25,7 @@ class Control {
       this.onMouseMove(touch);
     }, { passive: false });
   }
-  getCanvasPos(e){
+  getCanvasPos(e) {
     const data = this.main.model.data;
     const rect = data.html.canvas.getBoundingClientRect();
     const scaleX = data.canvas.width / rect.width;
@@ -35,26 +35,26 @@ class Control {
       y: (e.clientY - rect.top) * scaleY
     };
   }
-  onMouseMove(e){
+  onMouseMove(e) {
     const data = this.main.model.data;
-    const {x, y} = this.getCanvasPos(e);
+    const { x, y } = this.getCanvasPos(e);
 
-    if(data.screen === 'menu'){
+    if (data.screen === 'menu') {
       const lobby = this.main.model.lobby;
       const hoveredBtn = lobby.getButtonAt(x, y);
       lobby.setHoverButton(hoveredBtn ? hoveredBtn.id : null);
       data.html.canvas.style.cursor = hoveredBtn ? 'pointer' : 'default';
-    } else if(data.screen === 'setting'){
+    } else if (data.screen === 'setting') {
       const option = this.main.model.option;
       const hoveredItem = option.getItemAt(x, y);
       option.setHoverItem(hoveredItem ? hoveredItem.id : null);
       data.html.canvas.style.cursor = hoveredItem ? 'pointer' : 'default';
-    } else if(data.screen === 'record'){
+    } else if (data.screen === 'record') {
       const history = this.main.model.history;
       const hoveredItem = history.getItemAt(x, y);
       history.setHoverItem(hoveredItem ? hoveredItem.id : null);
       data.html.canvas.style.cursor = hoveredItem ? 'pointer' : 'default';
-    } else if(data.screen === 'game'){
+    } else if (data.screen === 'game') {
       const game = this.main.model.game;
       // 팝업이 열려있으면 팝업 버튼만 체크
       if (game.data.showEndPopup) {
@@ -71,51 +71,51 @@ class Control {
     }
     this.main.view.render();
   }
-  onClick(e){
+  onClick(e) {
     const data = this.main.model.data;
-    const {x, y} = this.getCanvasPos(e);
+    const { x, y } = this.getCanvasPos(e);
 
-    if(data.screen === 'menu'){
+    if (data.screen === 'menu') {
       const clickedBtn = this.main.model.lobby.getButtonAt(x, y);
-      if(clickedBtn){
+      if (clickedBtn) {
         this.onMenuButtonClick(clickedBtn.id);
       }
-    } else if(data.screen === 'setting'){
+    } else if (data.screen === 'setting') {
       const clickedItem = this.main.model.option.getItemAt(x, y);
-      if(clickedItem){
+      if (clickedItem) {
         this.onOptionItemClick(clickedItem, x, y);
       }
-    } else if(data.screen === 'record'){
+    } else if (data.screen === 'record') {
       const clickedItem = this.main.model.history.getItemAt(x, y);
-      if(clickedItem && clickedItem.id === 'back'){
+      if (clickedItem && clickedItem.id === 'back') {
         this.main.model.setScreen('menu');
         this.main.view.render();
-      } else if(clickedItem && clickedItem.id === 'reset'){
-        if(confirm('모든 기록을 초기화하시겠습니까?')){
+      } else if (clickedItem && clickedItem.id === 'reset') {
+        if (confirm('모든 기록을 초기화하시겠습니까?')) {
           this.main.model.history.clearAllScoresAtServer().then(() => {
             this.main.view.render();
           });
         }
-      } else if(clickedItem && clickedItem.id === 'prevPage'){
+      } else if (clickedItem && clickedItem.id === 'prevPage') {
         let scoreListOpt = data.score_list_opt;
-        if(scoreListOpt.now_page > 1){
+        if (scoreListOpt.now_page > 1) {
           scoreListOpt.now_page--;
-          this.main.model.history.getScoreListAtServer({now_page:scoreListOpt.now_page}).then(() => {
+          this.main.model.history.getScoreListAtServer({ now_page: scoreListOpt.now_page }).then(() => {
             this.main.view.render();
           });
         }
-      } else if(clickedItem && clickedItem.id === 'nextPage'){
+      } else if (clickedItem && clickedItem.id === 'nextPage') {
         let scoreListOpt = data.score_list_opt;
         let totalCount = data.util.string.uncomma_int(data.score_count_info.tot);
         let totalPage = Math.max(1, Math.ceil(totalCount / scoreListOpt.num_per_page));
-        if(scoreListOpt.now_page < totalPage){
+        if (scoreListOpt.now_page < totalPage) {
           scoreListOpt.now_page++;
-          this.main.model.history.getScoreListAtServer({now_page:scoreListOpt.now_page}).then(() => {
+          this.main.model.history.getScoreListAtServer({ now_page: scoreListOpt.now_page }).then(() => {
             this.main.view.render();
           });
         }
       }
-    } else if(data.screen === 'game'){
+    } else if (data.screen === 'game') {
       const game = this.main.model.game;
       // 팝업이 열려있으면 팝업 버튼만 체크
       if (game.data.showEndPopup) {
@@ -124,27 +124,27 @@ class Control {
           if (popupBtn.id === 'retry') {
             game.init();
           } else if (popupBtn.id === 'back') {
-            this.main.model.data.sound.stop({name:"bgm"});
-            this.main.model.data.sound.play({name:"tic"});
+            this.main.model.data.sound.stop({ name: "bgm" });
+            this.main.model.data.sound.play({ name: "tic" });
             game.stop();
             this.main.model.setScreen('menu');
           }
           this.main.view.render();
         }
       } else {
-        if(game.isBackButtonAt(x, y)){
-          this.main.model.data.sound.stop({name:"bgm"});
-          this.main.model.data.sound.play({name:"tic"});
+        if (game.isBackButtonAt(x, y)) {
+          this.main.model.data.sound.stop({ name: "bgm" });
+          this.main.model.data.sound.play({ name: "tic" });
           game.stop();
           this.main.model.setScreen('menu');
           this.main.view.render();
-        } else if(game.isFinishButtonAt(x, y)){
-          this.main.model.data.sound.stop({name:"bgm"});
-          this.main.model.data.sound.play({name:"tic"});
+        } else if (game.isFinishButtonAt(x, y)) {
+          this.main.model.data.sound.stop({ name: "bgm" });
+          this.main.model.data.sound.play({ name: "tic" });
           game.endGame();
         } else {
           const apple = game.getAppleAt(x, y);
-          if(apple){
+          if (apple) {
             game.selectApple(apple.x, apple.y);
             this.main.view.render();
           }
@@ -152,9 +152,10 @@ class Control {
       }
     }
   }
-  async onMenuButtonClick(buttonId){
-    this.main.model.data.sound.play({name:"tic"});
-    switch(buttonId){
+  async onMenuButtonClick(buttonId) {
+    let main=this.main;
+    this.main.model.data.sound.play({ name: "tic" });
+    switch (buttonId) {
       case 'start':
         this.main.model.setScreen('game');
         this.main.model.game.init();
@@ -166,26 +167,29 @@ class Control {
       case 'setting':
         this.main.model.setScreen('setting');
         break;
+      case 'close':
+        location.href=main.model.data.close_url;
+        break;
     }
     this.main.view.render();
   }
-  onOptionItemClick(item, x, y){
-    this.main.model.data.sound.play({name:"tic"});
+  onOptionItemClick(item, x, y) {
+    this.main.model.data.sound.play({ name: "tic" });
     const option = this.main.model.option;
-    if(item.type === 'input'){
+    if (item.type === 'input') {
       const current = this.main.model.data.name;
       const name = prompt('이름을 입력하세요', current);
-      if(name !== null){
+      if (name !== null) {
         option.setName(name.trim());
       }
-    } else if(item.type === 'toggle'){
+    } else if (item.type === 'toggle') {
       option.toggleOption(item.key);
-    } else if(item.type === 'range'){
+    } else if (item.type === 'range') {
       const canvasData = this.main.model.data.canvas;
       const centerX = canvasData.width / 2;
       const itemX = centerX - option.data.itemWidth / 2;
       option.setVolume(item.key, x, itemX);
-    } else if(item.id === 'back'){
+    } else if (item.id === 'back') {
       this.main.model.setScreen('menu');
     }
     this.main.view.render();

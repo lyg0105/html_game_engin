@@ -118,7 +118,7 @@ class Game {
     const baseScore = this.data.score;
 
     // 최종 점수 = (점수 / 경과시간) * 100 (소수점 1자리)
-    const finalScore = elapsedSec > 0 ? parseFloat(((baseScore / elapsedSec) * 100).toFixed(1)) : baseScore * 100;
+    const finalScore = elapsedSec > 0 ? parseFloat(((baseScore / (elapsedSec*2)) * 100).toFixed(1)) : baseScore * 100;
 
     this.main.model.data.score = finalScore;
     this.data.showEndPopup = true;

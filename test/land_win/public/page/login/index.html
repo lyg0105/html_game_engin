@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="/css/base.css" rel="stylesheet" />
+  <link href="/css/login.css" rel="stylesheet" />
+  <link href="/css/button.css" rel="stylesheet" />
+  <script src="/js/lib/string.js"></script>
+  <script src="/js/login/login.js"></script>
+  <script src="/page/login/js/login.js"></script>
+  <title>Land Win Game</title>
+</head>
+
+<body>
+  <div class="login_wrap">
+    <div>Login</div>
+    <table>
+      <colgroup>
+        <col width="30%" />
+        <col width="70%" />
+      </colgroup>
+      <tbody>
+        <tr>
+          <th>아이디</th>
+          <td>
+            <input type="text" id="user_id" />
+          </td>
+        </tr>
+        <tr>
+          <th>비밀번호</th>
+          <td>
+            <input type="password" id="user_pw" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top: 10px;">
+      <button class="btn btn_gray" onclick="go_login();">로그인</button>
+      <button class="btn btn_gray" onclick="register();">회원가입</button>
+      <button class="btn btn_gray" onclick="location.href='/page/game/amenu/';">다른게임</button>
+    </div>
+  </div>
+</body>
+
+</html>

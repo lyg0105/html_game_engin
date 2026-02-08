@@ -14,8 +14,9 @@ class Model {
       height: 600
     },
     screen: 'menu', // menu, game, record, setting
+    close_url:"/page/game/amenu",
     map: { x: 7, y: 7 },
-    limit_sec: 15,
+    limit_sec: 18,
     is_game_sound: localStorage.getItem('apple_num_is_game_sound') !== 'false',
     is_background_sound: localStorage.getItem('apple_num_is_background_sound') !== 'false',
     sound_volume: parseFloat(localStorage.getItem('apple_num_sound_volume')) || 0.5,

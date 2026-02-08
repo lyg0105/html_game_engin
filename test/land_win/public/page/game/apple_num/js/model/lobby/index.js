@@ -2,9 +2,10 @@ class Lobby {
   main;
   data = {
     buttons: [
-      { id: 'start', text: '시작', y: 250 },
-      { id: 'record', text: '기록확인', y: 330 },
-      { id: 'setting', text: '설정', y: 410 }
+      { id: 'start', text: '시작', y: 200 },
+      { id: 'record', text: '기록확인', y: 280 },
+      { id: 'setting', text: '설정', y: 360 },
+      { id: 'close', text: '닫기', y: 440 }
     ],
     buttonWidth: 200,
     buttonHeight: 60,
