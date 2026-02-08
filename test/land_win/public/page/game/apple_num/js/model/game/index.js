@@ -42,6 +42,7 @@ class Game {
       cancelAnimationFrame(this.data.animFrameId);
       this.data.animFrameId = null;
     }
+    this.main.model.data.sound.play({name:"bgm",is_bgm:true});
     this.startTimer();
   }
   generateApples() {
@@ -101,7 +102,8 @@ class Game {
       this.main.view.render();
     }, 1000);
   }
-  endGame() {
+  async endGame() {
+    this.main.model.data.sound.stop({name:"bgm"});
     this.data.isPlaying = false;
     if (this.data.timerInterval) {
       clearInterval(this.data.timerInterval);
@@ -138,7 +140,8 @@ class Game {
       date: dateStr
     };
     this.main.model.data.game_score_list.unshift(scoreRow);
-    this.main.model.history.saveScoreAtServer({
+    await this.main.model.history.getScoreRankAtServer({score:finalScore});
+    await this.main.model.history.saveScoreAtServer({
       score_row_arr: [scoreRow],
     });
 
@@ -169,6 +172,7 @@ class Game {
   checkSum() {
     const sum = this.data.selected.reduce((acc, s) => acc + s.value, 0);
     if (sum === 10) {
+      this.main.model.data.sound.play({name:"correct"});
       // 맞춤! 포물선 애니메이션 생성 후 사과 제거
       const canvasData = this.main.model.data.canvas;
       const map = this.main.model.data.map;
@@ -346,7 +350,7 @@ class Game {
 
     // 팝업 박스
     const popupWidth = 320;
-    const popupHeight = this.data.isOvertime ? 290 : 330;
+    const popupHeight = this.data.isOvertime ? 330 : 370;
     const popupX = (canvasData.width - popupWidth) / 2;
     const popupY = (canvasData.height - popupHeight) / 2;
 
@@ -384,21 +388,29 @@ class Game {
     ctx.font = 'bold 26px Arial';
     ctx.fillText('최종 점수: ' + finalScore, canvasData.width / 2, popupY + 150);
 
+    // 등수 표시
+    const lastRank = data.last_rank;
+    if (lastRank > 0) {
+      ctx.fillStyle = '#ff9800';
+      ctx.font = 'bold 22px Arial';
+      ctx.fillText('🏆 ' + lastRank + '등', canvasData.width / 2, popupY + 185);
+    }
+
     // 제한시간 내 완료 보너스 표시
     if (!this.data.isOvertime) {
       ctx.fillStyle = '#4caf50';
       ctx.font = 'bold 15px Arial';
-      ctx.fillText('⭐ 제한시간 내 완료!', canvasData.width / 2, popupY + 185);
+      ctx.fillText('⭐ 제한시간 내 완료!', canvasData.width / 2, popupY + 220);
       ctx.fillStyle = '#87ceeb';
       ctx.font = '13px Arial';
-      ctx.fillText('보너스 점수 x2 적용', canvasData.width / 2, popupY + 205);
+      ctx.fillText('보너스 점수 x2 적용', canvasData.width / 2, popupY + 240);
     }
 
     // 버튼들
     const buttonWidth = 120;
     const buttonHeight = 45;
     const buttonGap = 20;
-    const buttonsStartY = this.data.isOvertime ? popupY + 200 : popupY + 240;
+    const buttonsStartY = this.data.isOvertime ? popupY + 235 : popupY + 275;
 
     this.data.endPopupButtons.forEach((btn, index) => {
       const btnX = canvasData.width / 2 - buttonWidth - buttonGap / 2 + index * (buttonWidth + buttonGap);
@@ -471,7 +483,7 @@ class Game {
     const canvasData = this.main.model.data.canvas;
     for (let i = this.data.flyingApples.length - 1; i >= 0; i--) {
       const fa = this.data.flyingApples[i];
-      fa.vy += 0.8;
+      fa.vy += 0.5;
       fa.px += fa.vx;
       fa.py += fa.vy;
       fa.angle += fa.rotSpeed;

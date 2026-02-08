@@ -75,6 +75,10 @@ class ListAction extends BaseList
       where_arr.push("AND game_id='"+this.s_list_opt["s_par_id"]+"'");
     }
 
+    if(!StrFunc.is_empty(this.s_list_opt["s_score_min"])){
+      where_arr.push("AND game_score > '"+this.s_list_opt["s_score_min"]+"'");
+    }
+
     return where_arr;
   }
 }

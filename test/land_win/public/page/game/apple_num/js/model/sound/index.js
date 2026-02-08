@@ -62,5 +62,18 @@ class Sound {
       this.sound_json[name].play();
     }
   }
+  stop(inData) {
+    let this_obj = this;
+    let main = this.main;
+    let opt_obj = {
+      name: "",
+      ...inData,
+    };
+    let name = opt_obj.name;
+    if (this.sound_json[name]) {
+      this.sound_json[name].pause();
+      this.sound_json[name].currentTime = 0;
+    }
+  }
 }
 export default Sound;

@@ -83,7 +83,7 @@ class Control {
     } else if(data.screen === 'setting'){
       const clickedItem = this.main.model.option.getItemAt(x, y);
       if(clickedItem){
-        this.onOptionItemClick(clickedItem);
+        this.onOptionItemClick(clickedItem, x, y);
       }
     } else if(data.screen === 'record'){
       const clickedItem = this.main.model.history.getItemAt(x, y);
@@ -93,6 +93,24 @@ class Control {
       } else if(clickedItem && clickedItem.id === 'reset'){
         if(confirm('모든 기록을 초기화하시겠습니까?')){
           this.main.model.history.clearAllScoresAtServer().then(() => {
+            this.main.view.render();
+          });
+        }
+      } else if(clickedItem && clickedItem.id === 'prevPage'){
+        let scoreListOpt = data.score_list_opt;
+        if(scoreListOpt.now_page > 1){
+          scoreListOpt.now_page--;
+          this.main.model.history.getScoreListAtServer({now_page:scoreListOpt.now_page}).then(() => {
+            this.main.view.render();
+          });
+        }
+      } else if(clickedItem && clickedItem.id === 'nextPage'){
+        let scoreListOpt = data.score_list_opt;
+        let totalCount = data.util.string.uncomma_int(data.score_count_info.tot);
+        let totalPage = Math.max(1, Math.ceil(totalCount / scoreListOpt.num_per_page));
+        if(scoreListOpt.now_page < totalPage){
+          scoreListOpt.now_page++;
+          this.main.model.history.getScoreListAtServer({now_page:scoreListOpt.now_page}).then(() => {
             this.main.view.render();
           });
         }
@@ -106,6 +124,8 @@ class Control {
           if (popupBtn.id === 'retry') {
             game.init();
           } else if (popupBtn.id === 'back') {
+            this.main.model.data.sound.stop({name:"bgm"});
+            this.main.model.data.sound.play({name:"tic"});
             game.stop();
             this.main.model.setScreen('menu');
           }
@@ -113,10 +133,14 @@ class Control {
         }
       } else {
         if(game.isBackButtonAt(x, y)){
+          this.main.model.data.sound.stop({name:"bgm"});
+          this.main.model.data.sound.play({name:"tic"});
           game.stop();
           this.main.model.setScreen('menu');
           this.main.view.render();
         } else if(game.isFinishButtonAt(x, y)){
+          this.main.model.data.sound.stop({name:"bgm"});
+          this.main.model.data.sound.play({name:"tic"});
           game.endGame();
         } else {
           const apple = game.getAppleAt(x, y);
@@ -128,13 +152,15 @@ class Control {
       }
     }
   }
-  onMenuButtonClick(buttonId){
+  async onMenuButtonClick(buttonId){
+    this.main.model.data.sound.play({name:"tic"});
     switch(buttonId){
       case 'start':
         this.main.model.setScreen('game');
         this.main.model.game.init();
         break;
       case 'record':
+        await this.main.model.history.getScoreListAtServer();
         this.main.model.setScreen('record');
         break;
       case 'setting':
@@ -143,7 +169,8 @@ class Control {
     }
     this.main.view.render();
   }
-  onOptionItemClick(item){
+  onOptionItemClick(item, x, y){
+    this.main.model.data.sound.play({name:"tic"});
     const option = this.main.model.option;
     if(item.type === 'input'){
       const current = this.main.model.data.name;
@@ -153,6 +180,11 @@ class Control {
       }
     } else if(item.type === 'toggle'){
       option.toggleOption(item.key);
+    } else if(item.type === 'range'){
+      const canvasData = this.main.model.data.canvas;
+      const centerX = canvasData.width / 2;
+      const itemX = centerX - option.data.itemWidth / 2;
+      option.setVolume(item.key, x, itemX);
     } else if(item.id === 'back'){
       this.main.model.setScreen('menu');
     }

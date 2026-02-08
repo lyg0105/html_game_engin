@@ -14,6 +14,7 @@ class History {
     let main=this_obj.main;
     let opt_obj={
       score_row_arr:[],
+      is_reload_score_list:false,
       ...inData
     };
     let score_row_arr=opt_obj.score_row_arr;
@@ -50,23 +51,28 @@ class History {
       data:form_json_data,
     });
     if(response.result=="true"){
-      this_obj.getScoreListAtServer();
+      if(opt_obj.is_reload_score_list){
+        this_obj.getScoreListAtServer();
+      }
     }else{
       alert("점수 저장에 실패했습니다.");
     }
   }
-  async getScoreListAtServer(){
+  async getScoreListAtServer(inData){
+    let opt_obj={
+      now_page:1,
+      ...inData
+    };
     let this_obj= this;
     let main=this_obj.main;
+    let change_list_opt={
+      ...main.model.data.score_list_opt,
+      ...opt_obj,
+    };
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
       url: "/api/comp/game/score_history/list",
-      data: {
-        order_id:"a_score DESC",
-        s_par_id:"apple_num",
-        is_paging:"",
-        max_limit_num:10,
-      },
+      data: change_list_opt,
     });
     if(response.result=="true"){
       main.model.data.game_score_list = [];
@@ -84,6 +90,33 @@ class History {
         };
         main.model.data.game_score_list.push(add_score_row);
       }
+      main.model.data.score_count_info=response.data.count_info;
+    }
+  }
+  async getScoreRankAtServer(inData){
+    let this_obj= this;
+    let main=this_obj.main;
+    let opt_obj={
+      score:0,
+      ...inData
+    };
+    main.model.data.last_rank=0;
+    if(main.model.data.util.string.is_empty(opt_obj.score)){
+      return;
+    }
+    let response = await main.model.data.util.fetch.send({
+      method: 'POST',
+      url: "/api/comp/game/score_history/list",
+      data: {
+        s_score_min:opt_obj.score,
+        s_par_id:"apple_num",
+        "is_need_count":"1",
+        "is_need_info_arr":"",
+        "is_no_limit":"1",
+      }
+    });;
+    if(response.result=="true"){
+      main.model.data.last_rank=main.model.data.util.string.uncomma_int(response.data.count_info.tot)+1;
     }
   }
   async clearAllScoresAtServer() {
@@ -127,6 +160,19 @@ class History {
     // 기록 초기화 버튼
     if (x >= canvasData.width - 100 && x <= canvasData.width - 20 && y >= 20 && y <= 60) {
       return { id: 'reset', type: 'button' };
+    }
+
+    // 이전페이지 버튼
+    const pageY = canvasData.height - 60;
+    if (x >= canvasData.width / 2 - 120 && x <= canvasData.width / 2 - 40 &&
+        y >= pageY && y <= pageY + 35) {
+      return { id: 'prevPage', type: 'button' };
+    }
+
+    // 다음페이지 버튼
+    if (x >= canvasData.width / 2 + 40 && x <= canvasData.width / 2 + 120 &&
+        y >= pageY && y <= pageY + 35) {
+      return { id: 'nextPage', type: 'button' };
     }
 
     // 리스트 아이템
@@ -224,15 +270,42 @@ class History {
       ctx.font = '11px Arial';
       const line2Y = itemY + itemHeight * 0.72;
       ctx.fillText((item.correct || 0) + '개', startX + 90, line2Y);
-      ctx.fillText(item.date.substring(0, 10), startX + 200, line2Y);
+      ctx.fillText(item.date, startX + 200, line2Y);
     }
 
-    // 총 기록 수
-    if (list.length > this.data.maxVisible) {
-      ctx.fillStyle = '#888';
-      ctx.font = '12px Arial';
-      ctx.fillText(`총 ${list.length}개의 기록`, canvasData.width / 2, canvasData.height - 30);
-    }
+    // 페이지네이션
+    const scoreCountInfo = data.score_count_info;
+    const totalCount = data.util.string.uncomma_int(scoreCountInfo.tot);
+    const numPerPage = data.score_list_opt.num_per_page;
+    const nowPage = data.score_list_opt.now_page;
+    const totalPage = Math.max(1, Math.ceil(totalCount / numPerPage));
+    const pageY = canvasData.height - 60;
+
+    // 이전페이지 버튼
+    const isPrevHover = this.data.hoverItem === 'prevPage';
+    ctx.fillStyle = nowPage <= 1 ? '#333' : (isPrevHover ? '#e94560' : '#0f3460');
+    ctx.beginPath();
+    ctx.roundRect(canvasData.width / 2 - 120, pageY, 80, 35, 8);
+    ctx.fill();
+    ctx.fillStyle = nowPage <= 1 ? '#666' : '#fff';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('◀ 이전', canvasData.width / 2 - 80, pageY + 18);
+
+    // 페이지 표시
+    ctx.fillStyle = '#ccc';
+    ctx.font = '13px Arial';
+    ctx.fillText(`${nowPage} / ${totalPage}`, canvasData.width / 2, pageY + 18);
+
+    // 다음페이지 버튼
+    const isNextHover = this.data.hoverItem === 'nextPage';
+    ctx.fillStyle = nowPage >= totalPage ? '#333' : (isNextHover ? '#e94560' : '#0f3460');
+    ctx.beginPath();
+    ctx.roundRect(canvasData.width / 2 + 40, pageY, 80, 35, 8);
+    ctx.fill();
+    ctx.fillStyle = nowPage >= totalPage ? '#666' : '#fff';
+    ctx.font = '14px Arial';
+    ctx.fillText('다음 ▶', canvasData.width / 2 + 80, pageY + 18);
   }
 }
 export default History;
