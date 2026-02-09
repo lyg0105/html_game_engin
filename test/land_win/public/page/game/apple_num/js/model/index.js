@@ -30,7 +30,7 @@ class Model {
     game_score_list: [],
     score_list_opt:{
       now_page:1,
-      num_per_page:10,
+      num_per_page:6,
       order_id:"a_score DESC",
       s_par_id:"apple_num",
     },

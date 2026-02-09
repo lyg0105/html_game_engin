@@ -245,10 +245,12 @@ class History {
     ctx.fillText('점수', startX + 245, startY - 20);
 
     // 아이템들
+    let plus_now_page = (data.score_list_opt.now_page - 1) * data.score_list_opt.num_per_page;
     for (let i = 0; i < Math.min(list.length, this.data.maxVisible); i++) {
       const item = list[i];
       const itemY = startY + i * itemHeight;
       const isHover = this.data.hoverItem === i;
+      let idx_num=i +1+plus_now_page;
 
       // 배경
       ctx.fillStyle = isHover ? '#2a2a4a' : (i % 2 === 0 ? '#1a1a2e' : '#252542');
@@ -261,16 +263,19 @@ class History {
       ctx.font = '13px Arial';
       ctx.textAlign = 'center';
       const line1Y = itemY + itemHeight * 0.33;
-      ctx.fillText(i + 1, startX + 35, line1Y);
+      ctx.fillText(idx_num, startX + 35, line1Y);
       ctx.fillText(item.name || '', startX + 140, line1Y);
-      ctx.fillText(item.score, startX + 245, line1Y);
+      let tmp_score = parseFloat(item.score||0).toFixed(1);
+      ctx.fillText(tmp_score, startX + 245, line1Y);
 
-      // 두번째 줄: 개수, 날짜
+      // 두번째 줄: 개수, 경과시간, 날짜
       ctx.fillStyle = '#aaa';
       ctx.font = '11px Arial';
       const line2Y = itemY + itemHeight * 0.72;
-      ctx.fillText((item.correct || 0) + '개', startX + 90, line2Y);
-      ctx.fillText(item.date, startX + 200, line2Y);
+      ctx.fillText((item.correct || 0) + '개', startX + 50, line2Y);
+      const timeSec = parseFloat(item.time_sec || 0).toFixed(1);
+      ctx.fillText(timeSec + '초', startX + 140, line2Y);
+      ctx.fillText(item.date, startX + 230, line2Y);
     }
 
     // 페이지네이션

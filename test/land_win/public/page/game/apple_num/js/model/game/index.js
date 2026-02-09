@@ -11,6 +11,7 @@ class Game {
     showEndPopup: false,
     endPopupButtons: [
       { id: 'retry', text: '다시하기', y: 0 },
+      { id: 'continue', text: '계속하기', y: 0 },
       { id: 'back', text: '뒤로가기', y: 0 }
     ],
     hoverEndButton: null,
@@ -118,7 +119,12 @@ class Game {
     const baseScore = this.data.score;
 
     // 최종 점수 = (점수 / 경과시간) * 100 (소수점 1자리)
-    const finalScore = elapsedSec > 0 ? parseFloat(((baseScore / (elapsedSec*2)) * 100).toFixed(1)) : baseScore * 100;
+    let finalScore = elapsedSec > 0 ? parseFloat(((baseScore / (elapsedSec*2)) * 100).toFixed(1)) : baseScore * 100;
+    if(elapsedSec>(this.main.model.data.limit_sec+2)){
+      //패널티점수
+      finalScore-=5;
+      finalScore=finalScore.toFixed(1);
+    }
 
     this.main.model.data.score = finalScore;
     this.data.showEndPopup = true;
@@ -146,6 +152,12 @@ class Game {
     });
 
     this.main.view.render();
+  }
+  continueGame() {
+    this.data.showEndPopup = false;
+    this.data.hoverEndButton = null;
+    this.data.isPlaying = true;
+    this.data.selected = [];
   }
   selectApple(x, y) {
     if (!this.data.isPlaying) return;
@@ -267,7 +279,7 @@ class Game {
     // 시간 표시 (제한시간 초과시 다른 색으로)
     const timeText = '시간: ' + Math.abs(this.data.timeLeft) + '초';
     ctx.fillStyle = this.data.isOvertime ? '#ff6b6b' : '#fff';
-    ctx.fillText(timeText, canvasData.width / 2 + 130, 40);
+    ctx.fillText(timeText, canvasData.width / 2 + 120, 40);
 
     // 사과 그리드 그리기
     ctx.textAlign = 'center';
@@ -350,7 +362,7 @@ class Game {
 
     // 팝업 박스
     const popupWidth = 320;
-    const popupHeight = this.data.isOvertime ? 330 : 370;
+    const popupHeight = this.data.isOvertime ? 430 : 370;
     const popupX = (canvasData.width - popupWidth) / 2;
     const popupY = (canvasData.height - popupHeight) / 2;
 
@@ -396,23 +408,15 @@ class Game {
       ctx.fillText('🏆 ' + lastRank + '등', canvasData.width / 2, popupY + 185);
     }
 
-    // 제한시간 내 완료 보너스 표시
-    if (!this.data.isOvertime) {
-      ctx.fillStyle = '#4caf50';
-      ctx.font = 'bold 15px Arial';
-      ctx.fillText('⭐ 제한시간 내 완료!', canvasData.width / 2, popupY + 220);
-      ctx.fillStyle = '#87ceeb';
-      ctx.font = '13px Arial';
-      ctx.fillText('보너스 점수 x2 적용', canvasData.width / 2, popupY + 240);
-    }
-
     // 버튼들
     const buttonWidth = 120;
     const buttonHeight = 45;
     const buttonGap = 20;
     const buttonsStartY = this.data.isOvertime ? popupY + 235 : popupY + 275;
 
-    this.data.endPopupButtons.forEach((btn, index) => {
+    // 다시하기, 뒤로가기 버튼
+    const mainButtons = this.data.endPopupButtons.filter(btn => btn.id !== 'continue');
+    mainButtons.forEach((btn, index) => {
       const btnX = canvasData.width / 2 - buttonWidth - buttonGap / 2 + index * (buttonWidth + buttonGap);
       const btnY = buttonsStartY;
       btn.x = btnX;
@@ -433,6 +437,35 @@ class Game {
       ctx.font = 'bold 18px Arial';
       ctx.fillText(btn.text, btnX + buttonWidth / 2, btnY + buttonHeight / 2);
     });
+
+    // 시간 초과시 계속하기 버튼 + 안내 문구
+    const continueBtn = this.data.endPopupButtons.find(btn => btn.id === 'continue');
+    if (continueBtn) {
+      const cBtnX = canvasData.width / 2 - buttonWidth / 2;
+      const cBtnY = buttonsStartY + buttonHeight + 15;
+      continueBtn.x = cBtnX;
+      continueBtn.y = cBtnY;
+
+      const isHover = this.data.hoverEndButton === 'continue';
+      ctx.fillStyle = isHover ? '#e94560' : '#2c3e50';
+      ctx.beginPath();
+      ctx.roundRect(cBtnX, cBtnY, buttonWidth, buttonHeight, 8);
+      ctx.fill();
+
+      ctx.strokeStyle = '#e94560';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 18px Arial';
+      ctx.fillText(continueBtn.text, cBtnX + buttonWidth / 2, cBtnY + buttonHeight / 2);
+
+      // 안내 문구
+      ctx.fillStyle = '#ff9800';
+      ctx.font = '13px Arial';
+      ctx.fillText('※ 끝까지 완료해도 패널티가 있습니다.', canvasData.width / 2, cBtnY + buttonHeight + 20);
+    }
+    
   }
   isBackButtonAt(x, y) {
     return x >= 20 && x <= 100 && y >= 20 && y <= 60;

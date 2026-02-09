@@ -123,6 +123,9 @@ class Control {
         if (popupBtn) {
           if (popupBtn.id === 'retry') {
             game.init();
+          } else if (popupBtn.id === 'continue') {
+            this.main.model.data.sound.play({ name: "tic" });
+            game.continueGame();
           } else if (popupBtn.id === 'back') {
             this.main.model.data.sound.stop({ name: "bgm" });
             this.main.model.data.sound.play({ name: "tic" });
