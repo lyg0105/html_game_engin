@@ -157,10 +157,6 @@ class History {
       return { id: 'back', type: 'button' };
     }
 
-    // 기록 초기화 버튼
-    if (x >= canvasData.width - 100 && x <= canvasData.width - 20 && y >= 20 && y <= 60) {
-      return { id: 'reset', type: 'button' };
-    }
 
     // 이전페이지 버튼
     const pageY = canvasData.height - 60;
@@ -208,15 +204,6 @@ class History {
     ctx.font = '16px Arial';
     ctx.fillText('뒤로', 60, 40);
 
-    // 기록 초기화 버튼
-    const isResetHover = this.data.hoverItem === 'reset';
-    ctx.fillStyle = isResetHover ? '#e94560' : '#0f3460';
-    ctx.beginPath();
-    ctx.roundRect(canvasData.width - 100, 20, 80, 40, 8);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px Arial';
-    ctx.fillText('초기화', canvasData.width - 60, 40);
 
     // 리스트
     const startY = 120;

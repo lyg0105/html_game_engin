@@ -98,12 +98,6 @@ class Control {
       if (clickedItem && clickedItem.id === 'back') {
         this.main.model.setScreen('menu');
         this.main.view.render();
-      } else if (clickedItem && clickedItem.id === 'reset') {
-        if (confirm('모든 기록을 초기화하시겠습니까?')) {
-          this.main.model.history.clearAllScoresAtServer().then(() => {
-            this.main.view.render();
-          });
-        }
       } else if (clickedItem && clickedItem.id === 'prevPage') {
         let scoreListOpt = data.score_list_opt;
         if (scoreListOpt.now_page > 1) {
