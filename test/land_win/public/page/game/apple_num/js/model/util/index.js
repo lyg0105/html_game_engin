@@ -1,6 +1,7 @@
 import LygFetch from "/js/lib/fetch/index.js";
 import StringFunc from "/js/lib/string/index.js";
 import DateFunc from "/js/lib/date/index.js";
+import URLFunc from '/js/lib/url.js';
 
 class Util {
   main;
@@ -13,6 +14,7 @@ class Util {
     this.main.model.data.util.fetch = LygFetch;
     this.main.model.data.util.string = StringFunc;
     this.main.model.data.util.date = DateFunc;
+    this.main.model.data.util.url = URLFunc;
   }
 }
 export default Util;

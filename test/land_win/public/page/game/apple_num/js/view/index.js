@@ -42,6 +42,9 @@ class View {
     ctx.fillRect(0, 0, data.canvas.width, data.canvas.height);
 
     switch(data.screen){
+      case 'intro':
+        this.renderIntro();
+        break;
       case 'menu':
         this.renderMenu();
         break;
@@ -55,6 +58,27 @@ class View {
         this.renderSetting();
         break;
     }
+  }
+  renderIntro(){
+    const data = this.main.model.data;
+    const ctx = data.html.ctx;
+    const centerX = data.canvas.width / 2;
+    const centerY = data.canvas.height / 2;
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.fillStyle = '#e94560';
+    ctx.font = 'bold 50px Arial';
+    ctx.fillText('사과게임', centerX, centerY - 60);
+
+    ctx.fillStyle = '#aaa';
+    ctx.font = '20px Arial';
+    ctx.fillText('화면을 터치하면 시작합니다', centerX, centerY + 20);
+
+    ctx.fillStyle = '#666';
+    ctx.font = '14px Arial';
+    ctx.fillText('소리가 재생됩니다', centerX, centerY + 55);
   }
   renderMenu(){
     this.main.model.lobby.render();

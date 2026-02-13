@@ -11,10 +11,11 @@ class Game {
     showEndPopup: false,
     endPopupButtons: [
       { id: 'retry', text: '다시하기', y: 0 },
-      { id: 'continue', text: '계속하기', y: 0 },
       { id: 'back', text: '뒤로가기', y: 0 }
     ],
     hoverEndButton: null,
+    hoverName: false,
+    hoverGameName: false,
     isOvertime: false,
     hoverFinishButton: false,
     startTime: 0,
@@ -51,6 +52,15 @@ class Game {
     const total = map.x * map.y;
     const values = [];
     let remaining = total;
+
+    // 낮은숫자(1~5) 비율을 높이기 위해 일부를 낮은숫자 3개짜리 조합으로 생성
+    const lowTriples = [[1,4,5],[2,3,5],[2,4,4],[3,3,4]];
+    const lowGroupCount = Math.floor(remaining * 0.2 / 3);
+    for (let i = 0; i < lowGroupCount; i++) {
+      const triple = lowTriples[Math.floor(Math.random() * lowTriples.length)];
+      values.push(...triple);
+      remaining -= 3;
+    }
 
     // 홀수면 3개짜리 조합 하나 먼저 생성 (a + b + c = 10)
     if (remaining % 2 === 1) {
@@ -115,16 +125,19 @@ class Game {
     this.data.elapsedMs = Date.now() - this.data.startTime;
     const elapsedSec = this.data.elapsedMs / 1000;
 
-    // 제한시간 내에 완료했으면 점수 두 배
     const baseScore = this.data.score;
 
     // 최종 점수 = (점수 / 경과시간) * 100 (소수점 1자리)
-    let finalScore = elapsedSec > 0 ? parseFloat(((baseScore / (elapsedSec*2)) * 100).toFixed(1)) : baseScore * 100;
+    let finalScore = elapsedSec > 0 ? parseFloat(((baseScore / (elapsedSec*1.5)) * 100).toFixed(1)) : baseScore * 100;
     if(elapsedSec>(this.main.model.data.limit_sec+2)){
       //패널티점수
-      finalScore-=5;
-      finalScore=finalScore.toFixed(1);
+      finalScore -= 5;
     }
+    // 다 맞췄으면 1.1배 보너스
+    if (this.areAllApplesGone()) {
+      finalScore *= 1.1;
+    }
+    finalScore = parseFloat(finalScore.toFixed(1));
 
     this.main.model.data.score = finalScore;
     this.data.showEndPopup = true;
@@ -152,12 +165,6 @@ class Game {
     });
 
     this.main.view.render();
-  }
-  continueGame() {
-    this.data.showEndPopup = false;
-    this.data.hoverEndButton = null;
-    this.data.isPlaying = true;
-    this.data.selected = [];
   }
   selectApple(x, y) {
     if (!this.data.isPlaying) return;
@@ -198,13 +205,14 @@ class Game {
         const py = startY + s.y * gridSize + gridSize / 2;
         this.data.flyingApples.push({
           px, py,
-          vx: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 6 + 4),
-          vy: -(Math.random() * 4 + 8),
+          vx: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 1.5 + 0.5),
+          vy: -(Math.random() * 2 + 2),
+          gravity: 0.05,
           value: s.value,
           opacity: 1.0,
           size: gridSize - 4,
           angle: 0,
-          rotSpeed: (Math.random() - 0.5) * 0.15
+          rotSpeed: (Math.random() - 0.5) * 0.05
         });
       });
       this.startFlyingAnimation();
@@ -228,6 +236,15 @@ class Game {
       });
       this.data.selected = [];
     }
+  }
+  getRemainingAppleCount() {
+    let count = 0;
+    for (let y = 0; y < this.data.apples.length; y++) {
+      for (let x = 0; x < this.data.apples[y].length; x++) {
+        if (this.data.apples[y][x].value > 0) count++;
+      }
+    }
+    return count;
   }
   areAllApplesGone() {
     for (let y = 0; y < this.data.apples.length; y++) {
@@ -292,24 +309,18 @@ class Game {
         const py = startY + y * gridSize;
 
         if (apple.value > 0) {
-          // 사과 이미지 그리기
-          const appleImg = this.main.model.data.img.apple_ico;
+          // 사과 이미지 그리기 (선택된 사과는 apple_under_ico)
+          const appleImg = apple.selected
+            ? this.main.model.data.img.apple_under_ico
+            : this.main.model.data.img.apple_ico;
           if (appleImg) {
             ctx.drawImage(appleImg, px + 2, py + 2, gridSize - 4, gridSize - 4);
-          }
-
-          // 선택 시 하이라이트 오버레이
-          if (apple.selected) {
-            ctx.fillStyle = 'rgba(233, 69, 96, 0.5)';
-            ctx.beginPath();
-            ctx.arc(px + gridSize / 2, py + gridSize / 2, gridSize / 2 - 2, 0, Math.PI * 2);
-            ctx.fill();
           }
 
           // 숫자 (gridSize에 비례하여 폰트 크기 조정)
           //00~99
           let last_color_num= Math.floor(Math.max(10, Math.random()* 100));
-          ctx.fillStyle = '#9def'+last_color_num;
+          ctx.fillStyle = apple.selected ? '#ff0000' : '#9def'+last_color_num;
           ctx.lineWidth = 3;
           const fontSize = Math.max(Math.round(gridSize * 0.34), 12);
           ctx.font = 'bold ' + fontSize + 'px Arial';
@@ -331,7 +342,7 @@ class Game {
     ctx.fillText('뒤로', 60, 40);
 
     // 완료 버튼 (제한시간 초과시 상단 우측에 표시)
-    if (this.data.isOvertime) {
+    if (this.data.isOvertime || this.getRemainingAppleCount() <= 3) {
       const finishBtnX = canvasData.width - 110;
       const finishBtnY = 20;
       const finishBtnWidth = 90;
@@ -345,6 +356,13 @@ class Game {
       ctx.font = 'bold 16px Arial';
       ctx.fillText('완료', finishBtnX + finishBtnWidth / 2, finishBtnY + finishBtnHeight / 2);
     }
+
+    // 왼쪽 하단 닉네임 표시
+    const gameName = data.name || '이름 없음';
+    ctx.textAlign = 'left';
+    ctx.font = '14px Arial';
+    ctx.fillStyle = this.data.hoverGameName ? '#e94560' : '#888';
+    ctx.fillText(gameName, 20, canvasData.height - 20);
 
     // 게임 종료 팝업
     if (this.data.showEndPopup) {
@@ -362,7 +380,7 @@ class Game {
 
     // 팝업 박스
     const popupWidth = 320;
-    const popupHeight = this.data.isOvertime ? 430 : 370;
+    const popupHeight = 370;
     const popupX = (canvasData.width - popupWidth) / 2;
     const popupY = (canvasData.height - popupHeight) / 2;
 
@@ -408,15 +426,27 @@ class Game {
       ctx.fillText('🏆 ' + lastRank + '등', canvasData.width / 2, popupY + 185);
     }
 
+    // 닉네임 표시 (클릭 가능)
+    const name = data.name || '이름 없음';
+    ctx.fillStyle = this.data.hoverName ? '#e94560' : '#aaa';
+    ctx.font = '16px Arial';
+    ctx.fillText(name, canvasData.width / 2, popupY + 215);
+    // 밑줄 표시
+    const nameWidth = ctx.measureText(name).width;
+    ctx.strokeStyle = this.data.hoverName ? '#e94560' : '#aaa';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(canvasData.width / 2 - nameWidth / 2, popupY + 224);
+    ctx.lineTo(canvasData.width / 2 + nameWidth / 2, popupY + 224);
+    ctx.stroke();
+
     // 버튼들
     const buttonWidth = 120;
     const buttonHeight = 45;
     const buttonGap = 20;
-    const buttonsStartY = this.data.isOvertime ? popupY + 235 : popupY + 275;
+    const buttonsStartY = popupY + 275;
 
-    // 다시하기, 뒤로가기 버튼
-    const mainButtons = this.data.endPopupButtons.filter(btn => btn.id !== 'continue');
-    mainButtons.forEach((btn, index) => {
+    this.data.endPopupButtons.forEach((btn, index) => {
       const btnX = canvasData.width / 2 - buttonWidth - buttonGap / 2 + index * (buttonWidth + buttonGap);
       const btnY = buttonsStartY;
       btn.x = btnX;
@@ -437,41 +467,13 @@ class Game {
       ctx.font = 'bold 18px Arial';
       ctx.fillText(btn.text, btnX + buttonWidth / 2, btnY + buttonHeight / 2);
     });
-
-    // 시간 초과시 계속하기 버튼 + 안내 문구
-    const continueBtn = this.data.endPopupButtons.find(btn => btn.id === 'continue');
-    if (continueBtn) {
-      const cBtnX = canvasData.width / 2 - buttonWidth / 2;
-      const cBtnY = buttonsStartY + buttonHeight + 15;
-      continueBtn.x = cBtnX;
-      continueBtn.y = cBtnY;
-
-      const isHover = this.data.hoverEndButton === 'continue';
-      ctx.fillStyle = isHover ? '#e94560' : '#2c3e50';
-      ctx.beginPath();
-      ctx.roundRect(cBtnX, cBtnY, buttonWidth, buttonHeight, 8);
-      ctx.fill();
-
-      ctx.strokeStyle = '#e94560';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 18px Arial';
-      ctx.fillText(continueBtn.text, cBtnX + buttonWidth / 2, cBtnY + buttonHeight / 2);
-
-      // 안내 문구
-      ctx.fillStyle = '#ff9800';
-      ctx.font = '13px Arial';
-      ctx.fillText('※ 끝까지 완료해도 패널티가 있습니다.', canvasData.width / 2, cBtnY + buttonHeight + 20);
-    }
     
   }
   isBackButtonAt(x, y) {
     return x >= 20 && x <= 100 && y >= 20 && y <= 60;
   }
   isFinishButtonAt(x, y) {
-    if (!this.data.isOvertime) return false;
+    if (!this.data.isOvertime && this.getRemainingAppleCount() > 3) return false;
     const canvasData = this.main.model.data.canvas;
     const finishBtnX = canvasData.width - 110;
     const finishBtnY = 20;
@@ -498,6 +500,26 @@ class Game {
   setHoverEndButton(buttonId) {
     this.data.hoverEndButton = buttonId;
   }
+  isNameAt(x, y) {
+    if (!this.data.showEndPopup) return false;
+    const canvasData = this.main.model.data.canvas;
+    const popupHeight = 370;
+    const popupY = (canvasData.height - popupHeight) / 2;
+    const nameY = popupY + 215;
+    const nameWidth = 120;
+    return x >= canvasData.width / 2 - nameWidth / 2 && x <= canvasData.width / 2 + nameWidth / 2 &&
+           y >= nameY - 12 && y <= nameY + 12;
+  }
+  setHoverName(isHover) {
+    this.data.hoverName = isHover;
+  }
+  isGameNameAt(x, y) {
+    const canvasData = this.main.model.data.canvas;
+    return x >= 10 && x <= 160 && y >= canvasData.height - 35 && y <= canvasData.height - 5;
+  }
+  setHoverGameName(isHover) {
+    this.data.hoverGameName = isHover;
+  }
   startFlyingAnimation() {
     if (this.data.animFrameId) return;
     const loop = () => {
@@ -516,7 +538,9 @@ class Game {
     const canvasData = this.main.model.data.canvas;
     for (let i = this.data.flyingApples.length - 1; i >= 0; i--) {
       const fa = this.data.flyingApples[i];
-      fa.vy += 0.5;
+      fa.gravity += 0.03;
+      fa.vx *= 1.02;
+      fa.vy += fa.gravity;
       fa.px += fa.vx;
       fa.py += fa.vy;
       fa.angle += fa.rotSpeed;
@@ -528,7 +552,7 @@ class Game {
   renderFlyingApples() {
     if (this.data.flyingApples.length === 0) return;
     const ctx = this.main.model.data.html.ctx;
-    const appleImg = this.main.model.data.img.apple_ico;
+    const appleImg = this.main.model.data.img.apple_under_ico;
 
     this.data.flyingApples.forEach(fa => {
       ctx.save();

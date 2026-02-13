@@ -59,14 +59,18 @@ class Control {
       // 팝업이 열려있으면 팝업 버튼만 체크
       if (game.data.showEndPopup) {
         const popupBtn = game.getEndPopupButtonAt(x, y);
+        const isName = game.isNameAt(x, y);
         game.setHoverEndButton(popupBtn ? popupBtn.id : null);
-        data.html.canvas.style.cursor = popupBtn ? 'pointer' : 'default';
+        game.setHoverName(isName);
+        data.html.canvas.style.cursor = (popupBtn || isName) ? 'pointer' : 'default';
       } else {
         const apple = game.getAppleAt(x, y);
         const isBack = game.isBackButtonAt(x, y);
         const isFinish = game.isFinishButtonAt(x, y);
+        const isGameName = game.isGameNameAt(x, y);
         game.setHoverFinishButton(isFinish);
-        data.html.canvas.style.cursor = (apple || isBack || isFinish) ? 'pointer' : 'default';
+        game.setHoverGameName(isGameName);
+        data.html.canvas.style.cursor = (apple || isBack || isFinish || isGameName) ? 'pointer' : 'default';
       }
     }
     this.main.view.render();
@@ -75,7 +79,11 @@ class Control {
     const data = this.main.model.data;
     const { x, y } = this.getCanvasPos(e);
 
-    if (data.screen === 'menu') {
+    if (data.screen === 'intro') {
+      this.main.model.setScreen('menu');
+      this.main.view.render();
+      return;
+    } else if (data.screen === 'menu') {
       const clickedBtn = this.main.model.lobby.getButtonAt(x, y);
       if (clickedBtn) {
         this.onMenuButtonClick(clickedBtn.id);
@@ -119,13 +127,20 @@ class Control {
       const game = this.main.model.game;
       // 팝업이 열려있으면 팝업 버튼만 체크
       if (game.data.showEndPopup) {
+        if (game.isNameAt(x, y)) {
+          const current = this.main.model.data.name;
+          const name = prompt('이름을 입력하세요', current);
+          if (name !== null) {
+            this.main.model.data.name = name.trim();
+            localStorage.setItem('apple_num_user_name', name.trim());
+          }
+          this.main.view.render();
+          return;
+        }
         const popupBtn = game.getEndPopupButtonAt(x, y);
         if (popupBtn) {
           if (popupBtn.id === 'retry') {
             game.init();
-          } else if (popupBtn.id === 'continue') {
-            this.main.model.data.sound.play({ name: "tic" });
-            game.continueGame();
           } else if (popupBtn.id === 'back') {
             this.main.model.data.sound.stop({ name: "bgm" });
             this.main.model.data.sound.play({ name: "tic" });
@@ -140,6 +155,14 @@ class Control {
           this.main.model.data.sound.play({ name: "tic" });
           game.stop();
           this.main.model.setScreen('menu');
+          this.main.view.render();
+        } else if (game.isGameNameAt(x, y)) {
+          const current = this.main.model.data.name;
+          const name = prompt('이름을 입력하세요', current);
+          if (name !== null) {
+            this.main.model.data.name = name.trim();
+            localStorage.setItem('apple_num_user_name', name.trim());
+          }
           this.main.view.render();
         } else if (game.isFinishButtonAt(x, y)) {
           this.main.model.data.sound.stop({ name: "bgm" });
@@ -156,7 +179,7 @@ class Control {
     }
   }
   async onMenuButtonClick(buttonId) {
-    let main=this.main;
+    let main = this.main;
     this.main.model.data.sound.play({ name: "tic" });
     switch (buttonId) {
       case 'start':
@@ -171,7 +194,7 @@ class Control {
         this.main.model.setScreen('setting');
         break;
       case 'close':
-        location.href=main.model.data.close_url;
+        location.href = main.model.data.close_url;
         break;
     }
     this.main.view.render();

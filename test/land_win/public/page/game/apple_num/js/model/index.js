@@ -13,10 +13,10 @@ class Model {
       width: 800,
       height: 600
     },
-    screen: 'menu', // menu, game, record, setting
+    screen: 'intro', // intro, menu, game, record, setting
     close_url:"/page/game/amenu",
-    map: { x: 7, y: 7 },
-    limit_sec: 18,
+    map: { x: 7, y: 8 },
+    limit_sec: 60,
     is_game_sound: localStorage.getItem('apple_num_is_game_sound') !== 'false',
     is_background_sound: localStorage.getItem('apple_num_is_background_sound') !== 'false',
     sound_volume: parseFloat(localStorage.getItem('apple_num_sound_volume')) || 0.5,
@@ -58,6 +58,7 @@ class Model {
       fetch: null,
       string: null,
       date: null,
+      url:null,
     },
     img: {
       //apple_ico:null,
@@ -80,6 +81,14 @@ class Model {
     new Resource({ main: main });
     this.main.model.data.sound = new Sound({ main: main });
     this.data.name = localStorage.getItem("apple_num_user_name") || "";
+    //url데이터로 초기화
+    let params = this.data.util.url.get_location_params(location);
+    if(params.get("close_url")){
+      this.data.close_url = params.get("close_url");
+    }
+    if(params.get("name")){
+      this.data.name = decodeURIComponent(params.get("name"));
+    }
     this_obj.history.getScoreListAtServer();
   }
   get lobby() {

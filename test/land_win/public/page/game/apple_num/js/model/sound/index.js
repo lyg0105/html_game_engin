@@ -59,7 +59,9 @@ class Sound {
       if (opt_obj.is_bgm) {
         this_obj.sound_json[name].volume = main.model.data.bgm_volume;
       }
-      this.sound_json[name].play();
+      this.sound_json[name].play().catch((err) => {
+        console.log(err);
+      });
     }
   }
   stop(inData) {
