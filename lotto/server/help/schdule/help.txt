@@ -18,3 +18,6 @@ sudo crontab -e
 //한시간마다 계속 실행
 * * * * * sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_min
 5 * * * * sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_hour
+
+* * * * * nvm use v16.20.2 && sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_min
+5 * * * * nvm use v16.20.2 && sudo curl -X POST -d 'name=lyg' https://lotto.lyg.co.kr/api/lotto/schedule/per_hour

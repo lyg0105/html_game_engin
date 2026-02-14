@@ -11,7 +11,7 @@ class Model {
   data = {
     canvas: {
       width: 800,
-      height: 600
+      height: 550
     },
     screen: 'intro', // intro, menu, game, record, setting
     close_url:"/page/game/amenu",

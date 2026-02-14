@@ -2,7 +2,7 @@ class Resource {
   main;
   img_json={
     apple_ico:"/page/game/apple_num/img/apple_ico.png",
-    apple_under_ico:"/page/game/apple_num/img/apple_undercolover_250.png",
+    apple_under_ico:"/page/game/apple_num/img/apple_select250.png",
   };
   constructor(inData) {
     let opt_obj = {

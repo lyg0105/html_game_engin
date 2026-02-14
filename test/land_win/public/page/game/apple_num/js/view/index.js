@@ -20,7 +20,7 @@ class View {
     const gridSize = Math.min(Math.floor(canvasWidth / map.x), maxGridSize);
 
     // 캔버스 높이 계산 (게임 그리드 + 상단 여백, 최소 높이 보장)
-    const canvasHeight = Math.max(gridSize * map.y + 100, data.canvas.height);
+    const canvasHeight = Math.max(gridSize * map.y + 50, data.canvas.height);
 
     data.canvas.width = canvasWidth;
     data.canvas.height = canvasHeight;

@@ -23,7 +23,7 @@ class Option {
     const canvasData = this.main.model.data.canvas;
     const { items, itemWidth, itemHeight } = this.data;
     const centerX = canvasData.width / 2;
-    const startY = 150;
+    const startY = 100;
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -60,14 +60,14 @@ class Option {
     const ctx = data.html.ctx;
     const centerX = data.canvas.width / 2;
     const { items, itemWidth, itemHeight, hoverItem } = this.data;
-    const startY = 150;
+    const startY = 100;
 
     // 타이틀
     ctx.fillStyle = '#e94560';
     ctx.font = 'bold 48px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('⚙️ 설정 ⚙️', centerX, 100);
+    ctx.fillText('⚙️ 설정 ⚙️', centerX, 50);
 
     // 옵션 아이템 그리기
     items.forEach((item, i) => {
