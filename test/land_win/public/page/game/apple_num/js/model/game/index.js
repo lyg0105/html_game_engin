@@ -538,7 +538,7 @@ class Game {
     const canvasData = this.main.model.data.canvas;
     for (let i = this.data.flyingApples.length - 1; i >= 0; i--) {
       const fa = this.data.flyingApples[i];
-      fa.gravity += 0.001;
+      fa.gravity += 0.002;
       //fa.vx *= 1.02;
       fa.vy += fa.gravity;
       fa.px += fa.vx;
