@@ -10,62 +10,62 @@ class History {
     this.main = main;
   }
   async saveScoreAtServer(inData) {
-    let this_obj= this;
-    let main=this_obj.main;
-    let opt_obj={
-      score_row_arr:[],
-      is_reload_score_list:false,
+    let this_obj = this;
+    let main = this_obj.main;
+    let opt_obj = {
+      score_row_arr: [],
+      is_reload_score_list: false,
       ...inData
     };
-    let score_row_arr=opt_obj.score_row_arr;
-    let write_score_arr=[];
-    let now_ymd=main.model.data.util.date.get_date_format(new Date(),"Ymd");
-    let now_ymdhis=main.model.data.util.date.get_date_format(new Date(),"Y-m-d h:i:s");
-    for(let i=0;i<score_row_arr.length;i++){
-      let tmp_row=score_row_arr[i];
-      let write_score_row={
-        a_ymd:now_ymd,
-        a_seq:"",
-        a_date:now_ymdhis,
-        a_id:"apple_num",
-        a_user_name:tmp_row.name,
-        a_score:tmp_row.score,
-        a_correct:tmp_row.correct,
-        a_time_sec:tmp_row.time_sec,
+    let score_row_arr = opt_obj.score_row_arr;
+    let write_score_arr = [];
+    let now_ymd = main.model.data.util.date.get_date_format(new Date(), "Ymd");
+    let now_ymdhis = main.model.data.util.date.get_date_format(new Date(), "Y-m-d h:i:s");
+    for (let i = 0; i < score_row_arr.length; i++) {
+      let tmp_row = score_row_arr[i];
+      let write_score_row = {
+        a_ymd: now_ymd,
+        a_seq: "",
+        a_date: now_ymdhis,
+        a_id: "apple_num",
+        a_user_name: tmp_row.name,
+        a_score: tmp_row.score,
+        a_correct: tmp_row.correct,
+        a_time_sec: tmp_row.time_sec,
       };
-      if(localStorage.token_id){
-        write_score_row.a_is_login_user="1";
+      if (localStorage.token_id) {
+        write_score_row.a_is_login_user = "1";
         //write_score_row.a_user_seq="";
       }
       write_score_arr.push(write_score_row);
     }
 
-    let form_json_data={
-      data_arr:write_score_arr,
-      is_default_val:"1",
+    let form_json_data = {
+      data_arr: write_score_arr,
+      is_default_val: "1",
     };
 
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
       url: "/api/comp/game/score_history/write",
-      data:form_json_data,
+      data: form_json_data,
     });
-    if(response.result=="true"){
-      if(opt_obj.is_reload_score_list){
+    if (response.result == "true") {
+      if (opt_obj.is_reload_score_list) {
         this_obj.getScoreListAtServer();
       }
-    }else{
+    } else {
       alert("점수 저장에 실패했습니다.");
     }
   }
-  async getScoreListAtServer(inData){
-    let opt_obj={
-      now_page:1,
+  async getScoreListAtServer(inData) {
+    let opt_obj = {
+      now_page: 1,
       ...inData
     };
-    let this_obj= this;
-    let main=this_obj.main;
-    let change_list_opt={
+    let this_obj = this;
+    let main = this_obj.main;
+    let change_list_opt = {
       ...main.model.data.score_list_opt,
       ...opt_obj,
     };
@@ -74,55 +74,65 @@ class History {
       url: "/api/comp/game/score_history/list",
       data: change_list_opt,
     });
-    if(response.result=="true"){
+    if (response.result == "true") {
       main.model.data.game_score_list = [];
-      for(let i=0;i<response.data.info_arr.length;i++){
-        let tmp_info=response.data.info_arr[i];
-        let add_score_row={
+      for (let i = 0; i < response.data.info_arr.length; i++) {
+        let tmp_info = response.data.info_arr[i];
+        let add_score_row = {
           ...main.model.data.default_score_row,
-          a_ymd:tmp_info.a_ymd,
-          a_seq:tmp_info.a_seq,
-          name:tmp_info.a_user_name,
-          score:tmp_info.a_score,
-          correct:tmp_info.a_correct,
-          time_sec:tmp_info.a_time_sec,
-          date:tmp_info.a_date,
+          a_ymd: tmp_info.a_ymd,
+          a_seq: tmp_info.a_seq,
+          name: tmp_info.a_user_name,
+          score: tmp_info.a_score,
+          correct: tmp_info.a_correct,
+          time_sec: tmp_info.a_time_sec,
+          date: tmp_info.a_date,
         };
         main.model.data.game_score_list.push(add_score_row);
       }
-      main.model.data.score_count_info=response.data.count_info;
+      main.model.data.score_count_info = response.data.count_info;
     }
   }
-  async getScoreRankAtServer(inData){
-    let this_obj= this;
-    let main=this_obj.main;
-    let opt_obj={
-      score:0,
+  async getScoreRankAtServer(inData) {
+    let this_obj = this;
+    let main = this_obj.main;
+    let opt_obj = {
+      score: 0,
       ...inData
     };
-    main.model.data.last_rank=0;
-    if(main.model.data.util.string.is_empty(opt_obj.score)){
+    main.model.data.last_rank = 0;
+    if (main.model.data.util.string.is_empty(opt_obj.score)) {
       return;
     }
+    let form_json_data = {
+      s_score_min: opt_obj.score,
+      s_par_id: "apple_num",
+      "is_need_count": "1",
+      "is_need_info_arr": "",
+      "is_no_limit": "1",
+    };
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
       url: "/api/comp/game/score_history/list",
       data: {
-        s_score_min:opt_obj.score,
-        s_par_id:"apple_num",
-        "is_need_count":"1",
-        "is_need_info_arr":"",
-        "is_no_limit":"1",
+        s_score_min: opt_obj.score,
+        s_par_id: "apple_num",
+        s_date_type:main.model.data.score_list_opt.s_date_type,
+        s_start_date:main.model.data.score_list_opt.s_start_date,
+        s_end_date:main.model.data.score_list_opt.s_end_date,
+        "is_need_count": "1",
+        "is_need_info_arr": "",
+        "is_no_limit": "1",
       }
     });;
-    if(response.result=="true"){
-      main.model.data.last_rank=main.model.data.util.string.uncomma_int(response.data.count_info.tot)+1;
+    if (response.result == "true") {
+      main.model.data.last_rank = main.model.data.util.string.uncomma_int(response.data.count_info.tot) + 1;
     }
   }
   async clearAllScoresAtServer() {
     let this_obj = this;
     let main = this.main;
-    if(main.model.data.game_score_list.length==0){
+    if (main.model.data.game_score_list.length == 0) {
       alert("초기화할 기록이 없습니다.");
       return false;
     }
@@ -161,13 +171,13 @@ class History {
     // 이전페이지 버튼
     const pageY = canvasData.height - 60;
     if (x >= canvasData.width / 2 - 120 && x <= canvasData.width / 2 - 40 &&
-        y >= pageY && y <= pageY + 35) {
+      y >= pageY && y <= pageY + 35) {
       return { id: 'prevPage', type: 'button' };
     }
 
     // 다음페이지 버튼
     if (x >= canvasData.width / 2 + 40 && x <= canvasData.width / 2 + 120 &&
-        y >= pageY && y <= pageY + 35) {
+      y >= pageY && y <= pageY + 35) {
       return { id: 'nextPage', type: 'button' };
     }
 
@@ -175,7 +185,7 @@ class History {
     for (let i = 0; i < Math.min(list.length, this.data.maxVisible); i++) {
       const itemY = startY + i * itemHeight;
       if (x >= startX && x <= startX + itemWidth &&
-          y >= itemY && y <= itemY + itemHeight - 5) {
+        y >= itemY && y <= itemY + itemHeight - 5) {
         return { id: i, type: 'item' };
       }
     }
@@ -237,7 +247,7 @@ class History {
       const item = list[i];
       const itemY = startY + i * itemHeight;
       const isHover = this.data.hoverItem === i;
-      let idx_num=i +1+plus_now_page;
+      let idx_num = i + 1 + plus_now_page;
 
       // 배경
       ctx.fillStyle = isHover ? '#2a2a4a' : (i % 2 === 0 ? '#1a1a2e' : '#252542');
@@ -252,7 +262,7 @@ class History {
       const line1Y = itemY + itemHeight * 0.33;
       ctx.fillText(idx_num, startX + 35, line1Y);
       ctx.fillText(item.name || '', startX + 140, line1Y);
-      let tmp_score = parseFloat(item.score||0).toFixed(1);
+      let tmp_score = parseFloat(item.score || 0).toFixed(1);
       ctx.fillText(tmp_score, startX + 245, line1Y);
 
       // 두번째 줄: 개수, 경과시간, 날짜

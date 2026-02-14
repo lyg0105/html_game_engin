@@ -33,6 +33,9 @@ class Model {
       num_per_page:6,
       order_id:"a_score DESC",
       s_par_id:"apple_num",
+      s_date_type:"a_date",
+      s_start_date:"",
+      s_end_date:"",
     },
     score_count_info:{tot:0},
     default_score_row: {
@@ -89,6 +92,8 @@ class Model {
     if(params.get("name")){
       this.data.name = decodeURIComponent(params.get("name"));
     }
+    main.model.data.score_list_opt.s_start_date=main.model.data.util.date.get_date_format(new Date(),"Y-m-01");
+    main.model.data.score_list_opt.s_end_date=main.model.data.util.date.get_date_format(new Date(),"Y-m-t");
     this_obj.history.getScoreListAtServer();
   }
   get lobby() {
