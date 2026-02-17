@@ -80,7 +80,9 @@ class AddRank {
     }
 
     if(pre_rank_info!=null){
-      if(pre_rank_info["a_score"]>=row_data["a_score"]){
+      let tmp_pre_score=parseFloat(pre_rank_info["a_score"]);
+      let tmp_score=parseFloat(row_data["a_score"]);
+      if(tmp_pre_score>=tmp_score){
         return Response.get({ "result": "true", "msg": "더 높은 점수 존재." });
       }
     }
