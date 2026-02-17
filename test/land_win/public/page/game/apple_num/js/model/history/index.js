@@ -4,7 +4,7 @@ class History {
     hoverItem: null,
     scrollOffset: 0,
     itemHeight: 60,
-    maxVisible: 7
+    maxVisible: 6
   };
   constructor(main) {
     this.main = main;
@@ -70,13 +70,17 @@ class History {
       ...opt_obj,
     };
     let url = "/api/comp/game/score_month_rank/list";
-    opt_obj.s_user_name="";
-    if(opt_obj.list_sort=="history"){
+    change_list_opt.s_user_name="";
+    change_list_opt.order_id="a_score DESC";
+    if(change_list_opt.list_sort=="history"){
+      change_list_opt.order_id="a_date DESC";
       url = "/api/comp/game/score_history/list";
-      if(opt_obj.list_my_score=="1"){
+      if(change_list_opt.list_my_score=="1"){
         change_list_opt.s_user_name=main.model.data.name;
       }
     }
+    main.model.data.score_list_opt = change_list_opt;
+
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
       url: url,
@@ -159,13 +163,21 @@ class History {
       alert("기록 초기화에 실패했습니다.");
     }
   }
+  changeMonth(direction) {
+    let main = this.main;
+    let startDate = main.model.data.score_list_opt.s_start_date;
+    let dateObj = new Date(startDate);
+    dateObj.setMonth(dateObj.getMonth() + direction);
+    main.model.data.score_list_opt.s_start_date = main.model.data.util.date.get_date_format(dateObj, "Y-m-01");
+    main.model.data.score_list_opt.s_end_date = main.model.data.util.date.get_date_format(dateObj, "Y-m-t");
+  }
   setHoverItem(itemId) {
     this.data.hoverItem = itemId;
   }
   getItemAt(x, y) {
     const canvasData = this.main.model.data.canvas;
     const list = this.main.model.data.game_score_list;
-    const startY = 120;
+    const startY = 155;
     const itemHeight = this.data.itemHeight;
     const itemWidth = 300;
     const startX = (canvasData.width - itemWidth) / 2;
@@ -176,12 +188,12 @@ class History {
     }
 
     // 랭크 탭 버튼
-    const tabY = 20;
-    const tabW = 70;
-    const tabH = 35;
-    const rankTabX = canvasData.width - tabW * 3 - 40;
-    const historyTabX = canvasData.width - tabW * 2 - 30;
-    const myHistoryTabX = canvasData.width - tabW - 20;
+    const tabY = 22;
+    const tabW = 58;
+    const tabH = 30;
+    const rankTabX = canvasData.width - tabW * 3 - 25;
+    const historyTabX = canvasData.width - tabW * 2 - 17;
+    const myHistoryTabX = canvasData.width - tabW - 9;
     if (x >= rankTabX && x <= rankTabX + tabW && y >= tabY && y <= tabY + tabH) {
       return { id: 'tabRank', type: 'button' };
     }
@@ -190,6 +202,19 @@ class History {
     }
     if (x >= myHistoryTabX && x <= myHistoryTabX + tabW && y >= tabY && y <= tabY + tabH) {
       return { id: 'tabMyHistory', type: 'button' };
+    }
+
+    // 월 이동 버튼
+    const monthY = 65;
+    const monthArrowW = 30;
+    const monthArrowH = 28;
+    const prevMonthX = canvasData.width / 2 - 90;
+    const nextMonthX = canvasData.width / 2 + 60;
+    if (x >= prevMonthX && x <= prevMonthX + monthArrowW && y >= monthY && y <= monthY + monthArrowH) {
+      return { id: 'prevMonth', type: 'button' };
+    }
+    if (x >= nextMonthX && x <= nextMonthX + monthArrowW && y >= monthY && y <= monthY + monthArrowH) {
+      return { id: 'nextMonth', type: 'button' };
     }
 
     // 이전페이지 버튼
@@ -241,21 +266,21 @@ class History {
     // 랭크/이력/내이력 탭 버튼
     const currentSort = data.score_list_opt.list_sort;
     const currentMyScore = data.score_list_opt.list_my_score;
-    const tabY = 20;
-    const tabW = 70;
-    const tabH = 35;
-    const rankTabX = canvasData.width - tabW * 3 - 40;
-    const historyTabX = canvasData.width - tabW * 2 - 30;
-    const myHistoryTabX = canvasData.width - tabW - 20;
+    const tabY = 22;
+    const tabW = 58;
+    const tabH = 30;
+    const rankTabX = canvasData.width - tabW * 3 - 25;
+    const historyTabX = canvasData.width - tabW * 2 - 17;
+    const myHistoryTabX = canvasData.width - tabW - 9;
 
     const isRankHover = this.data.hoverItem === 'tabRank';
     const isRankActive = currentSort !== 'history';
     ctx.fillStyle = isRankActive ? '#e94560' : (isRankHover ? '#c03050' : '#0f3460');
     ctx.beginPath();
-    ctx.roundRect(rankTabX, tabY, tabW, tabH, 8);
+    ctx.roundRect(rankTabX, tabY, tabW, tabH, 6);
     ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Arial';
+    ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('랭크', rankTabX + tabW / 2, tabY + tabH / 2 + 1);
 
@@ -263,10 +288,10 @@ class History {
     const isHistoryActive = currentSort === 'history' && currentMyScore !== '1';
     ctx.fillStyle = isHistoryActive ? '#e94560' : (isHistoryHover ? '#c03050' : '#0f3460');
     ctx.beginPath();
-    ctx.roundRect(historyTabX, tabY, tabW, tabH, 8);
+    ctx.roundRect(historyTabX, tabY, tabW, tabH, 6);
     ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Arial';
+    ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('이력', historyTabX + tabW / 2, tabY + tabH / 2 + 1);
 
@@ -274,15 +299,52 @@ class History {
     const isMyHistoryActive = currentSort === 'history' && currentMyScore === '1';
     ctx.fillStyle = isMyHistoryActive ? '#e94560' : (isMyHistoryHover ? '#c03050' : '#0f3460');
     ctx.beginPath();
-    ctx.roundRect(myHistoryTabX, tabY, tabW, tabH, 8);
+    ctx.roundRect(myHistoryTabX, tabY, tabW, tabH, 6);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('내이력', myHistoryTabX + tabW / 2, tabY + tabH / 2 + 1);
+
+    // 월 검색 표시
+    const monthY = 65;
+    const monthArrowW = 30;
+    const monthArrowH = 28;
+    const prevMonthX = canvasData.width / 2 - 90;
+    const nextMonthX = canvasData.width / 2 + 60;
+
+    // 이전 월 버튼
+    const isPrevMonthHover = this.data.hoverItem === 'prevMonth';
+    ctx.fillStyle = isPrevMonthHover ? '#e94560' : '#0f3460';
+    ctx.beginPath();
+    ctx.roundRect(prevMonthX, monthY, monthArrowW, monthArrowH, 6);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('내이력', myHistoryTabX + tabW / 2, tabY + tabH / 2 + 1);
+    ctx.fillText('◀', prevMonthX + monthArrowW / 2, monthY + monthArrowH / 2 + 1);
+
+    // 월 표시
+    const startDate = data.score_list_opt.s_start_date;
+    const monthLabel = startDate ? startDate.substring(0, 7) : '';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(monthLabel, canvasData.width / 2, monthY + monthArrowH / 2 + 2);
+
+    // 다음 월 버튼
+    const isNextMonthHover = this.data.hoverItem === 'nextMonth';
+    ctx.fillStyle = isNextMonthHover ? '#e94560' : '#0f3460';
+    ctx.beginPath();
+    ctx.roundRect(nextMonthX, monthY, monthArrowW, monthArrowH, 6);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('▶', nextMonthX + monthArrowW / 2, monthY + monthArrowH / 2 + 1);
 
     // 리스트
-    const startY = 120;
+    const startY = 155;
     const itemHeight = this.data.itemHeight;
     const itemWidth = 280;
     const startX = (canvasData.width - itemWidth) / 2;

@@ -15,12 +15,12 @@ class Control {
 
     // 모바일 터치 이벤트
     canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       const touch = e.touches[0];
       this.onClick(touch);
     }, { passive: false });
     canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       const touch = e.touches[0];
       this.onMouseMove(touch);
     }, { passive: false });
@@ -107,35 +107,27 @@ class Control {
           });
         }
       } else if (clickedItem && clickedItem.id === 'tabRank') {
-        let scoreListOpt = data.score_list_opt;
-        if (scoreListOpt.list_sort !== 'rank') {
-          scoreListOpt.list_sort = 'rank';
-          scoreListOpt.list_my_score = '';
-          scoreListOpt.now_page = 1;
-          this.main.model.history.getScoreListAtServer({ now_page: 1 }).then(() => {
-            this.main.view.render();
-          });
-        }
+        this.main.model.history.getScoreListAtServer({ now_page: 1,list_sort: 'rank', list_my_score: '' }).then(() => {
+          this.main.view.render();
+        });
       } else if (clickedItem && clickedItem.id === 'tabHistory') {
-        let scoreListOpt = data.score_list_opt;
-        if (scoreListOpt.list_sort !== 'history' || scoreListOpt.list_my_score === '1') {
-          scoreListOpt.list_sort = 'history';
-          scoreListOpt.list_my_score = '';
-          scoreListOpt.now_page = 1;
-          this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '' }).then(() => {
-            this.main.view.render();
-          });
-        }
+        this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '' }).then(() => {
+          this.main.view.render();
+        });
       } else if (clickedItem && clickedItem.id === 'tabMyHistory') {
-        let scoreListOpt = data.score_list_opt;
-        if (scoreListOpt.list_sort !== 'history' || scoreListOpt.list_my_score !== '1') {
-          scoreListOpt.list_sort = 'history';
-          scoreListOpt.list_my_score = '1';
-          scoreListOpt.now_page = 1;
-          this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '1' }).then(() => {
-            this.main.view.render();
-          });
-        }
+        this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '1' }).then(() => {
+          this.main.view.render();
+        });
+      } else if (clickedItem && clickedItem.id === 'prevMonth') {
+        this.main.model.history.changeMonth(-1);
+        this.main.model.history.getScoreListAtServer({ now_page: 1 }).then(() => {
+          this.main.view.render();
+        });
+      } else if (clickedItem && clickedItem.id === 'nextMonth') {
+        this.main.model.history.changeMonth(1);
+        this.main.model.history.getScoreListAtServer({ now_page: 1 }).then(() => {
+          this.main.view.render();
+        });
       } else if (clickedItem && clickedItem.id === 'nextPage') {
         let scoreListOpt = data.score_list_opt;
         let totalCount = data.util.string.uncomma_int(data.score_count_info.tot);
