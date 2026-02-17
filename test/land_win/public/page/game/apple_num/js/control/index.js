@@ -207,8 +207,18 @@ class Control {
     this.main.model.data.sound.play({ name: "tic" });
     switch (buttonId) {
       case 'start':
-        this.main.model.setScreen('game');
-        this.main.model.game.init();
+        if (main.model.data.name == "") {
+          main.model.data.name = prompt('이름을 입력하세요', '');
+          if (main.model.data.name == null) {
+            main.model.data.name = "";
+          } else {
+            main.model.data.name = main.model.data.name.trim();
+          }
+        }
+        if (main.model.data.name != "") {
+          this.main.model.setScreen('game');
+          this.main.model.game.init();
+        }
         break;
       case 'record':
         await this.main.model.history.getScoreListAtServer();
