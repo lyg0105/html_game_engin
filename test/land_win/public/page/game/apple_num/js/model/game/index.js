@@ -53,13 +53,13 @@ class Game {
     const values = [];
     let remaining = total;
 
-    // 낮은숫자(1~5) 비율을 높이기 위해 일부를 낮은숫자 3개짜리 조합으로 생성
-    const lowTriples = [[1,4,5],[2,3,5],[2,4,4],[3,3,4]];
+    // 낮은숫자(1~5) 비율을 높이기 위해 일부를 낮은숫자 조합으로 생성
+    const lowTriples = [[1,4,5],[2,3,5],[2,4,4],[3,3,4],[1,1,2,2,4],[3,3,3,1]];
     const lowGroupCount = Math.floor(remaining * 0.2 / 3);
     for (let i = 0; i < lowGroupCount; i++) {
       const triple = lowTriples[Math.floor(Math.random() * lowTriples.length)];
       values.push(...triple);
-      remaining -= 3;
+      remaining -= triple.length;
     }
 
     // 홀수면 3개짜리 조합 하나 먼저 생성 (a + b + c = 10)
@@ -199,15 +199,16 @@ class Game {
       const totalWidth = map.x * gridSize;
       const startX = (canvasData.width - totalWidth) / 2;
       const startY = 80;
-
+      let vx_direct=-1;
       this.data.selected.forEach(s => {
         const px = startX + s.x * gridSize + gridSize / 2;
         const py = startY + s.y * gridSize + gridSize / 2;
+        vx_direct*=-1;
         this.data.flyingApples.push({
           px, py,
-          vx: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 1.5 + 0.5),
+          vx: vx_direct * (Math.random() * 1.5 + 0.5),
           vy: -(Math.random() * 2 + 2),
-          gravity: 0.05,
+          gravity: 0.03,
           value: s.value,
           opacity: 1.0,
           size: gridSize - 4,

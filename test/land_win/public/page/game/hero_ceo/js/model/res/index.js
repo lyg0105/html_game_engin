@@ -1,8 +1,9 @@
 class Resource {
   main;
-  img_json={
-    
+  img_json = {
+
   };
+  img = {};
   constructor(inData) {
     let opt_obj = {
       main: null,
@@ -11,16 +12,16 @@ class Resource {
     this.main = opt_obj.main;
     this.init();
   }
-  init(){
+  init() {
     let this_obj = this;
-    let main=this_obj.main;
-    let res_div=main.model.data.html.res_div;
-    res_div.innerHTML='';
-    for(let key in this_obj.img_json){
-      let img=new Image();
-      img.src=this_obj.img_json[key];
+    let main = this_obj.main;
+    let res_div = main.model.data.html.res_div;
+    res_div.innerHTML = '';
+    for (let key in this_obj.img_json) {
+      let img = new Image();
+      img.src = this_obj.img_json[key];
       res_div.appendChild(img);
-      main.model.data.img[key]=img;
+      this_obj.img[key] = img;
     }
   }
 }

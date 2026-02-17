@@ -14,7 +14,7 @@ class WriteAction extends BaseWrite
     return Response.getResultJson({"data":{"col_val_arr":optObj["col_val_arr"]}});
   }
   async after_func(optObj){
-
+    
     return Response.getResultJson({"data":{"col_val_arr":optObj["col_val_arr"]}});
   }
 }

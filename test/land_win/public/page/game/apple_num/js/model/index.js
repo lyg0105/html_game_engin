@@ -36,6 +36,9 @@ class Model {
       s_date_type:"a_date",
       s_start_date:"",
       s_end_date:"",
+      s_user_name:"",
+      list_sort:"rank",
+      list_my_score:"",
     },
     score_count_info:{tot:0},
     default_score_row: {

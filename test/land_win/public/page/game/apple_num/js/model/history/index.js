@@ -47,7 +47,7 @@ class History {
 
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
-      url: "/api/comp/game/score_history/write",
+      url: "/api/comp/game/score_month_rank/add_rank",
       data: form_json_data,
     });
     if (response.result == "true") {
@@ -69,9 +69,17 @@ class History {
       ...main.model.data.score_list_opt,
       ...opt_obj,
     };
+    let url = "/api/comp/game/score_month_rank/list";
+    opt_obj.s_user_name="";
+    if(opt_obj.list_sort=="history"){
+      url = "/api/comp/game/score_history/list";
+      if(opt_obj.list_my_score=="1"){
+        change_list_opt.s_user_name=main.model.data.name;
+      }
+    }
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
-      url: "/api/comp/game/score_history/list",
+      url: url,
       data: change_list_opt,
     });
     if (response.result == "true") {
@@ -113,7 +121,7 @@ class History {
     };
     let response = await main.model.data.util.fetch.send({
       method: 'POST',
-      url: "/api/comp/game/score_history/list",
+      url: "/api/comp/game/score_month_rank/list",
       data: {
         s_score_min: opt_obj.score,
         s_par_id: "apple_num",
@@ -167,6 +175,22 @@ class History {
       return { id: 'back', type: 'button' };
     }
 
+    // 랭크 탭 버튼
+    const tabY = 20;
+    const tabW = 70;
+    const tabH = 35;
+    const rankTabX = canvasData.width - tabW * 3 - 40;
+    const historyTabX = canvasData.width - tabW * 2 - 30;
+    const myHistoryTabX = canvasData.width - tabW - 20;
+    if (x >= rankTabX && x <= rankTabX + tabW && y >= tabY && y <= tabY + tabH) {
+      return { id: 'tabRank', type: 'button' };
+    }
+    if (x >= historyTabX && x <= historyTabX + tabW && y >= tabY && y <= tabY + tabH) {
+      return { id: 'tabHistory', type: 'button' };
+    }
+    if (x >= myHistoryTabX && x <= myHistoryTabX + tabW && y >= tabY && y <= tabY + tabH) {
+      return { id: 'tabMyHistory', type: 'button' };
+    }
 
     // 이전페이지 버튼
     const pageY = canvasData.height - 60;
@@ -198,11 +222,11 @@ class History {
     const list = data.game_score_list;
 
     // 타이틀
-    ctx.fillStyle = '#e94560';
-    ctx.font = 'bold 28px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('기록 확인', canvasData.width / 2, 60);
+    // ctx.fillStyle = '#e94560';
+    // ctx.font = 'bold 28px Arial';
+    // ctx.textAlign = 'center';
+    // ctx.textBaseline = 'middle';
+    // ctx.fillText('기록 확인', canvasData.width / 2, 60);
 
     // 뒤로가기 버튼
     const isBackHover = this.data.hoverItem === 'back';
@@ -214,6 +238,48 @@ class History {
     ctx.font = '16px Arial';
     ctx.fillText('뒤로', 60, 40);
 
+    // 랭크/이력/내이력 탭 버튼
+    const currentSort = data.score_list_opt.list_sort;
+    const currentMyScore = data.score_list_opt.list_my_score;
+    const tabY = 20;
+    const tabW = 70;
+    const tabH = 35;
+    const rankTabX = canvasData.width - tabW * 3 - 40;
+    const historyTabX = canvasData.width - tabW * 2 - 30;
+    const myHistoryTabX = canvasData.width - tabW - 20;
+
+    const isRankHover = this.data.hoverItem === 'tabRank';
+    const isRankActive = currentSort !== 'history';
+    ctx.fillStyle = isRankActive ? '#e94560' : (isRankHover ? '#c03050' : '#0f3460');
+    ctx.beginPath();
+    ctx.roundRect(rankTabX, tabY, tabW, tabH, 8);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('랭크', rankTabX + tabW / 2, tabY + tabH / 2 + 1);
+
+    const isHistoryHover = this.data.hoverItem === 'tabHistory';
+    const isHistoryActive = currentSort === 'history' && currentMyScore !== '1';
+    ctx.fillStyle = isHistoryActive ? '#e94560' : (isHistoryHover ? '#c03050' : '#0f3460');
+    ctx.beginPath();
+    ctx.roundRect(historyTabX, tabY, tabW, tabH, 8);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('이력', historyTabX + tabW / 2, tabY + tabH / 2 + 1);
+
+    const isMyHistoryHover = this.data.hoverItem === 'tabMyHistory';
+    const isMyHistoryActive = currentSort === 'history' && currentMyScore === '1';
+    ctx.fillStyle = isMyHistoryActive ? '#e94560' : (isMyHistoryHover ? '#c03050' : '#0f3460');
+    ctx.beginPath();
+    ctx.roundRect(myHistoryTabX, tabY, tabW, tabH, 8);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('내이력', myHistoryTabX + tabW / 2, tabY + tabH / 2 + 1);
 
     // 리스트
     const startY = 120;

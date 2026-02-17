@@ -106,6 +106,36 @@ class Control {
             this.main.view.render();
           });
         }
+      } else if (clickedItem && clickedItem.id === 'tabRank') {
+        let scoreListOpt = data.score_list_opt;
+        if (scoreListOpt.list_sort !== 'rank') {
+          scoreListOpt.list_sort = 'rank';
+          scoreListOpt.list_my_score = '';
+          scoreListOpt.now_page = 1;
+          this.main.model.history.getScoreListAtServer({ now_page: 1 }).then(() => {
+            this.main.view.render();
+          });
+        }
+      } else if (clickedItem && clickedItem.id === 'tabHistory') {
+        let scoreListOpt = data.score_list_opt;
+        if (scoreListOpt.list_sort !== 'history' || scoreListOpt.list_my_score === '1') {
+          scoreListOpt.list_sort = 'history';
+          scoreListOpt.list_my_score = '';
+          scoreListOpt.now_page = 1;
+          this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '' }).then(() => {
+            this.main.view.render();
+          });
+        }
+      } else if (clickedItem && clickedItem.id === 'tabMyHistory') {
+        let scoreListOpt = data.score_list_opt;
+        if (scoreListOpt.list_sort !== 'history' || scoreListOpt.list_my_score !== '1') {
+          scoreListOpt.list_sort = 'history';
+          scoreListOpt.list_my_score = '1';
+          scoreListOpt.now_page = 1;
+          this.main.model.history.getScoreListAtServer({ now_page: 1, list_sort: 'history', list_my_score: '1' }).then(() => {
+            this.main.view.render();
+          });
+        }
       } else if (clickedItem && clickedItem.id === 'nextPage') {
         let scoreListOpt = data.score_list_opt;
         let totalCount = data.util.string.uncomma_int(data.score_count_info.tot);

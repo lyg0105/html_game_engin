@@ -70,6 +70,18 @@ class ListAction extends BaseList
         where_arr.push("AND CONCAT("+pri_col_str+")='"+this.s_list_opt["s_seq"]+"'");
       }
     }
+
+    if(!StrFunc.is_empty(this.s_list_opt["s_ymd"])){
+      where_arr.push("AND game_ymd='"+this.s_list_opt["s_ymd"]+"'");
+    }
+
+    if(!StrFunc.is_empty(this.s_list_opt["s_user_seq"])){
+      where_arr.push("AND game_user_seq='"+this.s_list_opt["s_user_seq"]+"'");
+    }
+
+    if(!StrFunc.is_empty(this.s_list_opt["s_user_name"])){
+      where_arr.push("AND game_user_name='"+this.s_list_opt["s_user_name"]+"'");
+    }
     
     if(!StrFunc.is_empty(this.s_list_opt["s_par_id"])){
       where_arr.push("AND game_id='"+this.s_list_opt["s_par_id"]+"'");
@@ -77,10 +89,6 @@ class ListAction extends BaseList
 
     if(!StrFunc.is_empty(this.s_list_opt["s_score_min"])){
       where_arr.push("AND game_score > '"+this.s_list_opt["s_score_min"]+"'");
-    }
-
-    if(!StrFunc.is_empty(this.s_list_opt["s_user_name"])){
-      where_arr.push("AND game_user_name='"+this.s_list_opt["s_user_name"]+"'");
     }
 
     return where_arr;

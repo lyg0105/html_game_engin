@@ -3,10 +3,10 @@ class View {
   constructor(main) {
     this.main = main;
   }
-  init(){
+  init() {
     this.createCanvas();
   }
-  createCanvas(){
+  createCanvas() {
     const data = this.main.model.data;
 
     let minWidth = 300;
@@ -28,12 +28,16 @@ class View {
     data.html.ctx = canvas.getContext('2d');
   }
   render() {
+    let this_obj = this;
+    let main = this.main;
     const data = this.main.model.data;
     const ctx = data.html.ctx;
 
     // 배경 클리어
     ctx.fillStyle = '#16213e';
     ctx.fillRect(0, 0, data.canvas.width, data.canvas.height);
+
+    main.model.data.page_obj.render();
   }
 }
 export default View;
