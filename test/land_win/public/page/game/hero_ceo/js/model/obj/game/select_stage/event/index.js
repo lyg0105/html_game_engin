@@ -38,11 +38,11 @@ class ObjEvent {
     let main = this.main;
 
     let button = null;
-    let lobby = main.model.data.object.lobby;
+    let page_obj = main.model.data.page_obj;
     let m_x = main.control.event.data.mouse_x;
     let m_y = main.control.event.data.mouse_y;
 
-    let buttons = lobby.data.buttons;
+    let buttons = page_obj.data.buttons;
     for (let i = 0; i < buttons.length; i++) {
       let b = buttons[i];
       if (m_x >= b.data.x && m_x <= b.data.x + b.data.width && m_y >= b.data.y && m_y <= b.data.y + b.data.height) {

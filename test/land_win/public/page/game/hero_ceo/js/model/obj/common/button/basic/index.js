@@ -44,6 +44,7 @@ class BasicButton {
     let data = this_obj.data;
     ctx.save();
     ctx.fillStyle = data.backgroundColor;
+    
     ctx.fillRect(data.x, data.y, data.width, data.height);
     if (data.borderWidth > 0) {
       ctx.lineWidth = data.borderWidth;

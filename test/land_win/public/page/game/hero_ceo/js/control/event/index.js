@@ -41,6 +41,7 @@ class Event {
           e.offsetY = e.touches[0].clientY;
           this_obj.on_mousemove(e);
           this_obj.on_mousedown(e);
+          // this_obj.on_mouseup(e);
         }
       });
       main.model.data.html.canvas.addEventListener("touchend", function (e) {

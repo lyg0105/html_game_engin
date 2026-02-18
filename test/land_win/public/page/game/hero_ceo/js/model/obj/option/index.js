@@ -1,7 +1,7 @@
 import Buttons from "./buttons/index.js";
 import ObjEvent from "./event/index.js";
 
-class Lobby {
+class Option {
   main;
   data = {
     buttons: [],
@@ -24,4 +24,4 @@ class Lobby {
     });
   }
 }
-export default Lobby;
+export default Option;

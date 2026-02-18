@@ -13,6 +13,10 @@ class Model {
     close_url: "/page/game/amenu",
     page_state: "lobby", //lobby,option,game,history
     page_obj: null,
+    game_data:{
+      select_char_arr:[],
+      select_stage:"",
+    },
     game_option:{
       is_game_sound: localStorage.getItem('hero_ceo_is_game_sound') !== 'false',
       is_background_sound: localStorage.getItem('hero_ceo_is_background_sound') !== 'false',
@@ -28,8 +32,7 @@ class Model {
     object: {
       lobby: null,
       option: null,
-      game: null,
-      history: null,
+      select_char:null,
     },
     util: {
       fetch: null,

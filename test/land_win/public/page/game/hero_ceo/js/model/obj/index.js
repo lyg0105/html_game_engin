@@ -1,5 +1,9 @@
 import BasicButton from "./common/button/basic/index.js";
+import CharListData from "./common/char/data/char_list/index.js";
 import Lobby from "./lobby/index.js";
+import Option from "./option/index.js";
+import SelectChar from "./game/select_char/index.js";
+import SelectStage from "./game/select_stage/index.js";
 
 class Obj{
   main;
@@ -13,7 +17,13 @@ class Obj{
     main.model.data.object.common={};
     main.model.data.object.common.button={};
     main.model.data.object.common.button.basic = BasicButton;
+    main.model.data.object.common.char={};
+    main.model.data.object.common.char.data={};
+    main.model.data.object.common.char.data.char_list= new CharListData();
     main.model.data.object.lobby = new Lobby(main);
+    main.model.data.object.option = new Option(main);
+    main.model.data.object.select_char = new SelectChar(main);
+    main.model.data.object.select_stage = new SelectStage(main);
   } 
 }
 export default Obj;
