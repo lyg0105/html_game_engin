@@ -4,7 +4,6 @@ class CharList{
     this.main = main;
   }
   init() {
-    let this_obj = this;
     let main = this.main;
     let page_obj = main.model.data.page_obj;
     page_obj.data.char_arr=[];
@@ -43,11 +42,16 @@ class CharList{
     ctx.restore();
 
     // ---- 선택 슬롯 (상단) ----
-    let slot_w=80;
-    let slot_h=100;
-    let slot_gap=20;
-    let max_slots=3;
-    let total_slot_w=max_slots*slot_w+(max_slots-1)*slot_gap;
+    let max_slots=10;
+    let slot_gap=6;
+    let row_gap=8;
+    // 화면 너비에 따라 1행(10개) 또는 2행(5개) 결정
+    let slot_cols=((canvas_w-20-9*slot_gap)/10)>=50?10:5;
+    let slot_rows=max_slots/slot_cols;
+    let slot_w=Math.min(75,Math.floor((canvas_w-20-(slot_cols-1)*slot_gap)/slot_cols));
+    let slot_h=Math.floor(slot_w*1.3);
+    let slot_area_h=slot_rows*slot_h+(slot_rows>1?(slot_rows-1)*row_gap:0);
+    let total_slot_w=slot_cols*slot_w+(slot_cols-1)*slot_gap;
     let slot_start_x=(canvas_w-total_slot_w)/2;
     let slot_y=60;
 
@@ -61,8 +65,10 @@ class CharList{
 
     page_obj.data.select_slots=[];
     for(let i=0;i<max_slots;i++){
-      let sx=slot_start_x+i*(slot_w+slot_gap);
-      let sy=slot_y;
+      let col=i%slot_cols;
+      let row=Math.floor(i/slot_cols);
+      let sx=slot_start_x+col*(slot_w+slot_gap);
+      let sy=slot_y+row*(slot_h+row_gap);
 
       ctx.save();
       ctx.fillStyle='#0d0d1a';
@@ -76,13 +82,13 @@ class CharList{
         let char_data=select_char_arr[i];
         // hit area 저장 (캐릭터 있는 슬롯만)
         page_obj.data.select_slots.push({x:sx,y:sy,width:slot_w,height:slot_h,index:i});
-        this_obj._draw_char_figure(ctx,sx+slot_w/2,sy+slot_h/2-10,12,26,'#4a90d9');
+        this_obj._draw_char_figure(ctx,sx+slot_w/2,sy+slot_h/2-8,9,20,'#4a90d9');
         ctx.save();
         ctx.fillStyle='#ffffff';
-        ctx.font='11px Arial';
+        ctx.font='10px Arial';
         ctx.textAlign='center';
         ctx.textBaseline='middle';
-        ctx.fillText(char_data.name,sx+slot_w/2,sy+slot_h-12);
+        ctx.fillText(char_data.name,sx+slot_w/2,sy+slot_h-10);
         ctx.restore();
         // X 버튼 힌트
         ctx.save();
@@ -108,13 +114,13 @@ class CharList{
     ctx.strokeStyle='#444466';
     ctx.lineWidth=1;
     ctx.beginPath();
-    ctx.moveTo(40,slot_y+slot_h+15);
-    ctx.lineTo(canvas_w-40,slot_y+slot_h+15);
+    ctx.moveTo(40,slot_y+slot_area_h+15);
+    ctx.lineTo(canvas_w-40,slot_y+slot_area_h+15);
     ctx.stroke();
     ctx.restore();
 
     // 캐릭터 목록 레이블
-    let list_label_y=slot_y+slot_h+30;
+    let list_label_y=slot_y+slot_area_h+30;
     ctx.save();
     ctx.fillStyle='#aaaaaa';
     ctx.font='13px Arial';
@@ -123,75 +129,70 @@ class CharList{
     ctx.fillText('캐릭터 목록 (클릭하여 선택/해제)',40,list_label_y);
     ctx.restore();
 
-    // ---- 캐릭터 카드 목록 ----
-    let card_w=150;
-    let card_h=180;
-    let card_gap=25;
+    // ---- 캐릭터 카드 목록 (그리드) ----
+    let card_margin=20;
+    let card_gap=8;
+    // 화면 너비에 따라 열 수 자동 결정 (카드 최소 너비 55px 기준)
+    let card_cols=Math.max(2,Math.floor((canvas_w-card_margin+card_gap)/(55+card_gap)));
+    let card_w=Math.floor((canvas_w-card_margin-(card_cols-1)*card_gap)/card_cols);
+    let card_h=Math.floor(card_w*1.3);
+    let card_x_start=(canvas_w-(card_cols*card_w+(card_cols-1)*card_gap))/2;
     let card_y=list_label_y+15;
 
-    // 네비게이션 필요 여부 계산
-    let avail_w_no_nav=canvas_w-80;
-    let visible_no_nav=Math.floor((avail_w_no_nav+card_gap)/(card_w+card_gap));
-    let need_nav=char_arr.length>visible_no_nav;
+    // 표시 가능한 행 수 계산
+    let avail_h=canvas_h-68-card_y-10;
+    let rows_visible=Math.max(1,Math.floor((avail_h+card_gap)/(card_h+card_gap)));
 
-    // 보이는 카드 수 계산
-    let scroll_index=page_obj.data.scroll_index||0;
-    let visible_count;
-    if(need_nav){
-      let avail_w_nav=canvas_w-120; // 좌우 각 60px 여백
-      visible_count=Math.max(1,Math.floor((avail_w_nav+card_gap)/(card_w+card_gap)));
-    }else{
-      visible_count=char_arr.length;
-    }
+    // 행 단위 스크롤
+    let scroll_row=page_obj.data.scroll_index||0;
+    let total_rows=Math.ceil(char_arr.length/card_cols);
+    let max_scroll=Math.max(0,total_rows-rows_visible);
+    scroll_row=Math.max(0,Math.min(scroll_row,max_scroll));
+    page_obj.data.scroll_index=scroll_row;
+    page_obj.data.max_scroll=max_scroll;
+    page_obj.data.visible_count=card_cols;
 
-    let max_scroll=Math.max(0,char_arr.length-visible_count);
-    scroll_index=Math.max(0,Math.min(scroll_index,max_scroll));
-    page_obj.data.scroll_index=scroll_index;
-    page_obj.data.visible_count=visible_count;
-
-    // 카드 시작 x (중앙 정렬)
-    let visible_total_w=visible_count*card_w+(visible_count>1?(visible_count-1)*card_gap:0);
-    let card_start_x=(canvas_w-visible_total_w)/2;
-
-    // 네비게이션 화살표 그리기
+    // 네비게이션 화살표 (그리드 하단 중앙)
     page_obj.data.nav_arrows={left:null,right:null};
-    if(need_nav){
-      let arrow_w=40;
-      let arrow_h=70;
-      let arrow_y=card_y+card_h/2-arrow_h/2;
-
-      if(scroll_index>0){
-        let lx=10;
+    if(max_scroll>0){
+      let grid_bottom=card_y+rows_visible*(card_h+card_gap);
+      let arrow_w=28;
+      let arrow_h=24;
+      let arrow_y=grid_bottom+4;
+      if(scroll_row>0){
+        let lx=canvas_w/2-55-arrow_w;
         page_obj.data.nav_arrows.left={x:lx,y:arrow_y,width:arrow_w,height:arrow_h};
         this_obj._draw_nav_arrow(ctx,lx,arrow_y,arrow_w,arrow_h,'left');
       }
-      if(scroll_index<max_scroll){
-        let rx=canvas_w-10-arrow_w;
+      if(scroll_row<max_scroll){
+        let rx=canvas_w/2+55;
         page_obj.data.nav_arrows.right={x:rx,y:arrow_y,width:arrow_w,height:arrow_h};
         this_obj._draw_nav_arrow(ctx,rx,arrow_y,arrow_w,arrow_h,'right');
       }
-
-      // 페이지 표시
       ctx.save();
       ctx.fillStyle='#778899';
       ctx.font='11px Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
-      ctx.fillText((scroll_index+1)+' / '+(max_scroll+1),canvas_w/2,card_y+card_h+18);
+      ctx.fillText((scroll_row+1)+' / '+(max_scroll+1),canvas_w/2,arrow_y+arrow_h/2);
       ctx.restore();
     }
 
-    // 카드 렌더링 (보이는 범위만)
+    // 카드 렌더링
     page_obj.data.char_cards=[];
-    for(let i=0;i<visible_count;i++){
-      let char_i=scroll_index+i;
+    let head_r=Math.max(6,Math.floor(card_w*0.12));
+    let body_h_fig=Math.max(14,Math.floor(card_w*0.25));
+    let name_size=Math.max(10,Math.floor(card_w*0.13));
+    for(let i=0;i<rows_visible*card_cols;i++){
+      let char_i=scroll_row*card_cols+i;
       if(char_i>=char_arr.length) break;
       let char_data=char_arr[char_i];
-      let cx=card_start_x+i*(card_w+card_gap);
-      let cy=card_y;
+      let col=i%card_cols;
+      let row=Math.floor(i/card_cols);
+      let cx=card_x_start+col*(card_w+card_gap);
+      let cy=card_y+row*(card_h+card_gap);
       let is_selected=select_char_arr&&select_char_arr.some(function(c){return c&&c.id===char_data.id;});
 
-      // 카드 hit area 저장
       page_obj.data.char_cards.push({x:cx,y:cy,width:card_w,height:card_h,char_data:char_data});
 
       // 카드 배경
@@ -204,56 +205,38 @@ class CharList{
       ctx.restore();
 
       // 캐릭터 피규어
-      this_obj._draw_char_figure(ctx,cx+card_w/2,cy+55,16,30,is_selected?'#4a90d9':'#8888aa');
+      this_obj._draw_char_figure(ctx,cx+card_w/2,cy+card_h*0.33,head_r,body_h_fig,is_selected?'#4a90d9':'#8888aa');
 
       // 캐릭터 이름
       ctx.save();
       ctx.fillStyle='#ffffff';
-      ctx.font='bold 13px Arial';
+      ctx.font='bold '+name_size+'px Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
-      ctx.fillText(char_data.name,cx+card_w/2,cy+100);
+      ctx.fillText(char_data.name,cx+card_w/2,cy+card_h*0.55);
       ctx.restore();
 
-      // 구분선
-      ctx.save();
-      ctx.strokeStyle=is_selected?'#2a5080':'#1e2040';
-      ctx.lineWidth=1;
-      ctx.beginPath();
-      ctx.moveTo(cx+10,cy+112);
-      ctx.lineTo(cx+card_w-10,cy+112);
-      ctx.stroke();
-      ctx.restore();
-
-      // 스탯
-      let stats=[
-        {label:'HP',value:char_data.hp},
-        {label:'MP',value:char_data.mp},
-        {label:'ATK',value:char_data.attack},
-        {label:'DEF',value:char_data.defense},
-      ];
-      ctx.save();
-      ctx.font='11px Arial';
-      ctx.textBaseline='middle';
-      for(let si=0;si<stats.length;si++){
-        let stat_y=cy+122+si*14;
-        ctx.fillStyle='#778899';
-        ctx.textAlign='left';
-        ctx.fillText(stats[si].label,cx+12,stat_y);
-        ctx.fillStyle='#ccddee';
-        ctx.textAlign='right';
-        ctx.fillText(stats[si].value,cx+card_w-12,stat_y);
+      // 직업 · 종족
+      let sub_size=Math.max(8,name_size-1);
+      let sub_text=[char_data.job,char_data.race].filter(Boolean).join(' · ');
+      if(sub_text){
+        ctx.save();
+        ctx.fillStyle='#aabbcc';
+        ctx.font=sub_size+'px Arial';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText(sub_text,cx+card_w/2,cy+card_h*0.72);
+        ctx.restore();
       }
-      ctx.restore();
 
       // 선택됨 표시
       if(is_selected){
         ctx.save();
         ctx.fillStyle='#4a90d9';
-        ctx.font='bold 11px Arial';
+        ctx.font='bold '+sub_size+'px Arial';
         ctx.textAlign='center';
         ctx.textBaseline='middle';
-        ctx.fillText('✓ 선택됨',cx+card_w/2,cy+card_h-12);
+        ctx.fillText('✓',cx+card_w/2,cy+card_h*0.90);
         ctx.restore();
       }
     }

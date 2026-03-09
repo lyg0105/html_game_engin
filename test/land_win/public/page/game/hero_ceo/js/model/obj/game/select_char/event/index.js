@@ -24,7 +24,9 @@ class ObjEvent {
         let page_obj = main.model.data.page_obj;
         let char_arr = page_obj.data.char_arr;
         let visible_count = page_obj.data.visible_count || 1;
-        let max_scroll = Math.max(0, char_arr.length - visible_count);
+        let max_scroll = page_obj.data.max_scroll !== undefined
+          ? page_obj.data.max_scroll
+          : Math.max(0, char_arr.length - visible_count);
         let scroll_index = page_obj.data.scroll_index || 0;
         if (nav === 'left') {
           page_obj.data.scroll_index = Math.max(0, scroll_index - 1);
@@ -151,6 +153,7 @@ class ObjEvent {
     if (idx >= 0) {
       select_char_arr.splice(idx, 1);
     } else {
+      if (select_char_arr.length >= 10) return;
       select_char_arr.push(char_data);
     }
   }
