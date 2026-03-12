@@ -10,8 +10,12 @@ class ObjEvent {
 
     main.control.event.on_mouseup_custom = function (e) {
       let button = this_obj.get_button_by_mouse();
-      if (button&&button.data.on_click) {
+      if (button && button.data.on_click) {
         button.data.on_click();
+      }
+      let card = this_obj.get_card_by_mounse();
+      if (card && card.on_click) {
+        card.on_click();
       }
     };
 
@@ -20,17 +24,23 @@ class ObjEvent {
         return false;
       }
       let button = this_obj.get_button_by_mouse();
-      if(button) {
+      if (button) {
         main.model.data.html.canvas.style.cursor = "pointer";
         button.on_hover({
           ctx: main.model.data.html.ctx,
         });
-      }else{
+      } else {
         main.model.data.html.canvas.style.cursor = "default";
         main.view.render();
       }
+      let card = this_obj.get_card_by_mounse();
+      if (card) {
+        main.model.data.html.canvas.style.cursor = "pointer";
+      } else {
+        main.model.data.html.canvas.style.cursor = "default";
+      }
     };
-    
+
   }
 
   get_button_by_mouse() {
@@ -52,5 +62,28 @@ class ObjEvent {
     }
     return button;
   };
+  get_card_by_mounse() {
+    let this_obj = this;
+    let main = this.main;
+
+    let card = null;
+    let page_obj = main.model.data.page_obj;
+    let m_x = main.control.event.data.mouse_x;
+    let m_y = main.control.event.data.mouse_y;
+
+    if (page_obj.stage_list_area && page_obj.stage_list_area.card_list) {
+    } else {
+      return card;
+    }
+    let card_list = page_obj.stage_list_area.card_list;
+    for (let i = 0; i < card_list.length; i++) {
+      let b = card_list[i];
+      if (m_x >= b.x && m_x <= b.x + b.w && m_y >= b.y && m_y <= b.y + b.h) {
+        card = b;
+        break;
+      }
+    }
+    return card;
+  }
 }
 export default ObjEvent;

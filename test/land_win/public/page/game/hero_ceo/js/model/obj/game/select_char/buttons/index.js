@@ -36,6 +36,7 @@ class Buttons {
 
       if(button_data.name=="select"){
         button_data.on_click=function(){
+          main.model.data.game_data.select_char_arr=page_obj.data.select_char_arr;
           main.control.set_page_state({state:"select_stage", is_render:true});
         };
       }

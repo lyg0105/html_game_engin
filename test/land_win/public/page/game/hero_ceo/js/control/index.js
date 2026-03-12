@@ -41,6 +41,9 @@ class Control {
     }else if (state === "select_stage") {
       main.model.data.page_obj = main.model.data.object.select_stage;
       main.model.data.page_obj.init();
+    }else if (state === "game") {
+      main.model.data.page_obj = main.model.data.object.game;
+      main.model.data.page_obj.init();
     }
     
     if (opt_obj.is_render) {

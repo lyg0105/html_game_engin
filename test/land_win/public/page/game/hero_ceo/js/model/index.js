@@ -15,7 +15,7 @@ class Model {
     page_obj: null,
     game_data:{
       select_char_arr:[],
-      select_stage:"",
+      select_stage:null,
     },
     game_option:{
       is_game_sound: localStorage.getItem('hero_ceo_is_game_sound') !== 'false',
@@ -30,6 +30,7 @@ class Model {
       res_div: null,
     },
     object: {
+      common:{},
       lobby: null,
       option: null,
       select_char:null,
