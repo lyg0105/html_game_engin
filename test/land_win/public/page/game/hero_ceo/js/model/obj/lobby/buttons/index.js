@@ -5,6 +5,9 @@ class Buttons {
       name: "start", text: "시작", x: 100, y: 100, width: 200, height: 50
     },
     {
+      name: "shop", text: "상점", x: 100, y: 100, width: 200, height: 50
+    },
+    {
       name: "record", text: "기록", x: 100, y: 100, width: 200, height: 50
     },
     {
@@ -42,6 +45,12 @@ class Buttons {
         button_data.on_click = function () {
           main.control.set_page_state({state:"select_char", is_render:true});
         }
+      }
+
+      if (button_data.name == "shop") {
+        button_data.on_click = function () {
+          main.control.set_page_state({state:"shop", is_render:true});
+        };
       }
 
       if (button_data.name == "settings") {

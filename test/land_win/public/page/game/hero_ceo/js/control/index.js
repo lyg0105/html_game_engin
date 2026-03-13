@@ -29,20 +29,8 @@ class Control {
     let state=opt_obj.state;
     main.model.data.page_state = opt_obj.state;
 
-    if (state === "lobby") {
-      main.model.data.page_obj = main.model.data.object.lobby;
-      main.model.data.page_obj.init();
-    }else if (state === "option") {
-      main.model.data.page_obj = main.model.data.object.option;
-      main.model.data.page_obj.init();
-    }else if (state === "select_char") {
-      main.model.data.page_obj = main.model.data.object.select_char;
-      main.model.data.page_obj.init();
-    }else if (state === "select_stage") {
-      main.model.data.page_obj = main.model.data.object.select_stage;
-      main.model.data.page_obj.init();
-    }else if (state === "game") {
-      main.model.data.page_obj = main.model.data.object.game;
+    if(main.model.data.object[state]){
+      main.model.data.page_obj = main.model.data.object[state];
       main.model.data.page_obj.init();
     }
     

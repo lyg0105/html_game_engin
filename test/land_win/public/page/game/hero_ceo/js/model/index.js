@@ -14,6 +14,8 @@ class Model {
     page_state: "lobby", //lobby,option,game,history
     page_obj: null,
     game_data:{
+      gold:0,
+      char_arr:[],
       select_char_arr:[],
       select_stage:null,
     },
@@ -34,6 +36,7 @@ class Model {
       lobby: null,
       option: null,
       select_char:null,
+      shop:null,
     },
     util: {
       fetch: null,
