@@ -2,11 +2,11 @@ class StageListData {
   default_stage = {
     id: "",
     name: "",
-    w:1000,
+    w:500,
     h:1000,
     start_point:{x:100,y:100},
     end_sec:60,
-    monster_cnt:10,
+    monster_cnt:3,
     monster_level:1,
     monster_race_arr:[
       "고블린","사슴"
@@ -30,12 +30,17 @@ class StageListData {
 
     //stage1
     for(let level_i=1;level_i<=level_len;level_i++){
-      this_obj.stage_arr.push({
+      let add_level_row={
         ...this_obj.default_stage,
         monster_level:level_i,
         monster_race_arr:["고블린","사슴"],
         monster_job_arr:["전사"],
-      });
+      };
+      add_level_row.monster_cnt=3*level_i;
+      if(add_level_row.monster_cnt>12){
+        add_level_row.monster_cnt=12;
+      }
+      this_obj.stage_arr.push(add_level_row);
     }
   }
 }

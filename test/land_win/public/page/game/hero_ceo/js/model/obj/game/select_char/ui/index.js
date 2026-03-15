@@ -1,4 +1,4 @@
-class Buttons {
+class UIArea {
   main;
   button_arr = [
     {
@@ -15,18 +15,18 @@ class Buttons {
   init() {
     let this_obj = this;
     let main = this.main;
-    
+
     let page_obj = main.model.data.page_obj;
     page_obj.data.buttons =  [];
     let btn_index=0;
     let init_btn_y=main.model.data.canvas.height-8;
     let btn_total_w=0;
-    
+
     let btn_length=this_obj.button_arr.length;
     for(let i=0;i<this_obj.button_arr.length;i++){
       btn_total_w+=this_obj.button_arr[i].width;
     }
-    
+
     this_obj.button_arr.forEach(function (button_data) {
       //x는 화면 가운데
       let canvas_w=main.model.data.canvas.width;
@@ -37,13 +37,14 @@ class Buttons {
       if(button_data.name=="select"){
         button_data.on_click=function(){
           main.model.data.game_data.select_char_arr=page_obj.data.select_char_arr;
-          main.control.set_page_state({state:"select_stage", is_render:true});
+          main.control.save.save();
+          main.control.set_page_state({state:"game_menu", is_render:true});
         };
       }
 
       if(button_data.name=="close"){
         button_data.on_click=function(){
-          main.control.set_page_state({state:"lobby", is_render:true});
+          main.control.set_page_state({state:"game_menu", is_render:true});
         };
       }
 
@@ -54,4 +55,4 @@ class Buttons {
     });
   }
 }
-export default Buttons;
+export default UIArea;

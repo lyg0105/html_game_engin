@@ -34,6 +34,13 @@ class ControlArea {
 
     if (all_monster_dead) {
       game.data.game_result = "win";
+      // 처치한 몬스터 골드 합산
+      let earned = game.unit_control.monster_arr.reduce(function(sum, m) {
+        return sum + (m.gold || 0);
+      }, 0);
+      game.data.earned_gold = earned;
+      main.model.data.game_data.gold += earned;
+      main.control.save.save();
       game.control_area.stop();
     } else if (all_player_dead) {
       game.data.game_result = "lose";

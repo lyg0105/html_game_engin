@@ -1,42 +1,32 @@
 import Event from "./event/index.js";
+import Route from "./route/index.js";
+import Load from "./load/index.js";
+import Save from "./save/index.js";
 
 class Control {
   main;
   event;
+  route;
+  load;
+  save;
   constructor(main) {
     this.main = main;
     this.event = new Event(main);
+    this.route = new Route(main);
+    this.load = new Load(main);
+    this.save = new Save(main);
   }
   init() {
     this.event.init();
+    this.load.init();
   }
 
   start() {
-    let this_obj = this;
-    let main = this.main;
-
-    this_obj.set_page_state({state:"lobby"});
+    this.set_page_state({ state: "lobby" });
   }
 
   set_page_state(inData) {
-    let opt_obj={
-      state:"lobby",
-      is_render:true,
-      ...inData
-    };
-    let this_obj = this;
-    let main = this.main;
-    let state=opt_obj.state;
-    main.model.data.page_state = opt_obj.state;
-
-    if(main.model.data.object[state]){
-      main.model.data.page_obj = main.model.data.object[state];
-      main.model.data.page_obj.init();
-    }
-    
-    if (opt_obj.is_render) {
-      main.view.render();
-    }
+    this.route.set_page_state(inData);
   }
 }
 export default Control;

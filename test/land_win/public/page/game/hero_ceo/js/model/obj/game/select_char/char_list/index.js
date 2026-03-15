@@ -11,7 +11,7 @@ class CharList{
     page_obj.data.select_slots=[];
     page_obj.data.scroll_index=0;
     page_obj.data.nav_arrows={left:null,right:null};
-    let common_char_arr=main.model.data.object.common.char.data.char_list.char_arr;
+    let common_char_arr=main.model.data.game_data.char_arr;
     for(let char_i=0;char_i<common_char_arr.length;char_i++){
       page_obj.data.char_arr.push(common_char_arr[char_i]);
     }

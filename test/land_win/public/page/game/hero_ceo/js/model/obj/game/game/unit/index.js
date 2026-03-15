@@ -12,97 +12,99 @@ class UnitControl {
     let game_data = main.model.data.game_data;
     let select_char_arr = game_data.select_char_arr;
     let select_stage = game_data.select_stage;
+    let game = main.model.data.page_obj;
+    let map_w = game.data.map.w;
+    let map_h = game.data.map.h;
+    let char_list = main.model.data.object.common.char.data.char_list;
+    let default_char = char_list.default_char;
+    let race_gold = char_list.race_gold;
 
     this_obj.player_arr = [];
     this_obj.monster_arr = [];
 
-    let canvas_w = main.model.data.canvas.width;
+    let sp = (select_stage && select_stage.start_point) ? select_stage.start_point : { x: 80, y: 100 };
 
     // 플레이어 유닛 생성 (선택된 캐릭터)
     select_char_arr.forEach(function (char, i) {
       this_obj.player_arr.push({
-        x: 80,
-        y: 100 + i * 80,
-        w: char.w || 30,
-        h: char.h || 50,
-        hp: char.hp || 100,
-        max_hp: char.hp || 100,
-        attack: char.attack || 10,
-        defense: char.defense || 5,
-        move_speed: (char.move_speed || 1) * 1.5,
-        name: char.name,
-        job: char.job,
-        race: char.race,
+        ...default_char,
+        ...char,
+        x: sp.x,
+        y: sp.y + i * 80,
+        max_hp: char.hp || default_char.hp,
+        move_speed: (char.move_speed || default_char.move_speed) * 1.5,
         is_player: true,
         color: "#4a90e2",
+        attack_timer: 0,
       });
     });
 
-    // 몬스터 유닛 생성 (스테이지 데이터 기반)
+    // 몬스터 유닛 생성 (스테이지 데이터 기반, 맵 오른쪽에 분산 배치)
     let monster_cnt = select_stage ? select_stage.monster_cnt : 5;
     let monster_race_arr = select_stage ? select_stage.monster_race_arr : ["고블린"];
     let monster_job_arr = select_stage ? select_stage.monster_job_arr : ["전사"];
     let monster_level = select_stage ? select_stage.monster_level : 1;
+    let m_h = 40, m_gap = 10, col_gap = 60;
+    let per_col = Math.max(1, Math.floor(map_h / (m_h + m_gap)));
 
     for (let i = 0; i < monster_cnt; i++) {
       let race = monster_race_arr[i % monster_race_arr.length];
       let job = monster_job_arr[i % monster_job_arr.length];
-      let base_hp = 60 + monster_level * 20;
+      let base_hp = (default_char.hp/10) + monster_level * 20;
+      let rm = race_gold[race] || 1;
+      let gold = Math.floor(10 * monster_level * rm);
+      let col = Math.floor(i / per_col);
+      let row = i % per_col;
       this_obj.monster_arr.push({
-        x: canvas_w - 120,
-        y: 80 + i * 60,
-        w: 30,
+        ...default_char,
+        x: map_w - 120 - col * col_gap,
+        y: m_gap + row * (m_h + m_gap),
         h: 40,
         hp: base_hp,
         max_hp: base_hp,
-        attack: 5 + monster_level * 2,
-        defense: 2 + monster_level,
+        attack: (default_char.attack/10) + monster_level * 2,
+        defense: default_char.defense + monster_level,
         move_speed: 0.8,
         name: race,
         job: job,
         race: race,
         is_player: false,
         color: "#e94560",
+        gold: gold,
+        attack_timer: 0,
       });
     }
   }
   update() {
     let this_obj = this;
 
-    // 플레이어: 가장 가까운 살아있는 몬스터를 향해 이동 또는 공격
-    this_obj.player_arr.forEach(function (p) {
-      if (p.hp <= 0) return;
-      let target = this_obj._nearest(p, this_obj.monster_arr);
+    this_obj._update_side(this_obj.player_arr, this_obj.monster_arr);
+    this_obj._update_side(this_obj.monster_arr, this_obj.player_arr);
+  }
+  _update_side(units, enemies) {
+    let this_obj = this;
+    units.forEach(function (u) {
+      if (u.hp <= 0) return;
+      let target = this_obj._nearest(u, enemies);
       if (!target) return;
-      let dx = target.x + target.w / 2 - (p.x + p.w / 2);
-      let dy = target.y + target.h / 2 - (p.y + p.h / 2);
+      let dx = target.x + target.w / 2 - (u.x + u.w / 2);
+      let dy = target.y + target.h / 2 - (u.y + u.h / 2);
       let dist = Math.sqrt(dx * dx + dy * dy);
-      let attack_range = p.w + target.w;
-      if (dist > attack_range) {
-        p.x += (dx / dist) * p.move_speed;
-        p.y += (dy / dist) * p.move_speed;
+      let touch = (u.w + u.h + target.w + target.h) / 4;
+      let range_px = touch + u.attack_range * 10;
+      u.attack_timer++;
+      if (dist > range_px) {
+        u.attack_timer = 0; // 범위 밖 이동 중 타이머 리셋
+        u.x += (dx / dist) * u.move_speed;
+        u.y += (dy / dist) * u.move_speed;
       } else {
-        // 공격 (프레임당 데미지)
-        let dmg = Math.max(1, p.attack - target.defense) * 0.05;
-        target.hp = Math.max(0, target.hp - dmg);
-      }
-    });
-
-    // 몬스터: 가장 가까운 살아있는 플레이어를 향해 이동 또는 공격
-    this_obj.monster_arr.forEach(function (m) {
-      if (m.hp <= 0) return;
-      let target = this_obj._nearest(m, this_obj.player_arr);
-      if (!target) return;
-      let dx = target.x + target.w / 2 - (m.x + m.w / 2);
-      let dy = target.y + target.h / 2 - (m.y + m.h / 2);
-      let dist = Math.sqrt(dx * dx + dy * dy);
-      let attack_range = m.w + target.w;
-      if (dist > attack_range) {
-        m.x += (dx / dist) * m.move_speed;
-        m.y += (dy / dist) * m.move_speed;
-      } else {
-        let dmg = Math.max(1, m.attack - target.defense) * 0.05;
-        target.hp = Math.max(0, target.hp - dmg);
+        // 공격 쿨타임: 20프레임 = 1초, attack_speed번/초
+        let cool = Math.max(1, Math.round(20 / u.attack_speed));
+        if (u.attack_timer >= cool) {
+          u.attack_timer = 0;
+          let dmg = Math.max(1, u.attack - target.defense);
+          target.hp = Math.max(0, target.hp - dmg);
+        }
       }
     });
   }
@@ -127,11 +129,15 @@ class UnitControl {
     let this_obj = this;
     let main = this.main;
     let ctx = main.model.data.html.ctx;
+    let game = main.model.data.page_obj;
+    let cam = game.data.camera;
+
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
 
     [...this_obj.player_arr, ...this_obj.monster_arr].forEach(function (u) {
       ctx.save();
 
-      // 죽은 유닛: 회색으로 표시
       let dead = u.hp <= 0;
       ctx.globalAlpha = dead ? 0.3 : 1.0;
 
@@ -161,6 +167,8 @@ class UnitControl {
 
       ctx.restore();
     });
+
+    ctx.restore();
   }
 }
 export default UnitControl;

@@ -1,4 +1,4 @@
-import Buttons from "./buttons/index.js";
+import UIArea from "./ui/index.js";
 import ObjEvent from "./event/index.js";
 import StageListArea from "./stage_list/index.js";
 
@@ -18,9 +18,9 @@ class SelectStage {
     this_obj.data.buttons=[];
     this_obj.stage_list_area = new StageListArea(main);
     this_obj.stage_list_area.init();
-    let tmp_buttons=new Buttons(main);
-    tmp_buttons.init_y=this_obj.stage_list_area.end_y+20;
-    tmp_buttons.init();
+    let tmp_ui=new UIArea(main);
+    tmp_ui.init_y=this_obj.stage_list_area.end_y+20;
+    tmp_ui.init();
     new ObjEvent(main);
   }
   render() {

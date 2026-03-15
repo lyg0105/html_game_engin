@@ -1,4 +1,4 @@
-class Buttons {
+class UIArea {
   main;
   init_btn_y=0;
   data = {
@@ -15,12 +15,12 @@ class Buttons {
   init() {
     let this_obj = this;
     let main = this.main;
-    
-    let option = main.model.data.object.option;
+
+    let option = main.model.data.page_obj;
     this_obj.data.buttons =  [];
     let btn_index=0;
     let init_btn_y=this_obj.init_btn_y;
-    
+
     let btn_gap=20;
     if(this_obj.button_arr.length>0){
       init_btn_y=init_btn_y+this_obj.button_arr[0].y;
@@ -48,4 +48,4 @@ class Buttons {
     this_obj.init_btn_y=init_btn_y;
   }
 }
-export default Buttons;
+export default UIArea;

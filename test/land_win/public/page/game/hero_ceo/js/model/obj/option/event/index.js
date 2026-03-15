@@ -84,10 +84,13 @@ class ObjEvent {
 
   get_option_item_by_mouse() {
     let main = this.main;
-    let option = main.model.data.object.option;
+    let option = main.model.data.page_obj;
     let m_x = main.control.event.data.mouse_x;
     let m_y = main.control.event.data.mouse_y;
-    let items = option.optionArr.data.opt_arr;
+    let items = [];
+    if(option&&option.optionArr&&option.optionArr.data){
+      items = option.optionArr.data.opt_arr;
+    }
 
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
@@ -115,11 +118,11 @@ class ObjEvent {
     let main = this.main;
 
     let button = null;
-    let option = main.model.data.object.option;
+    let option = main.model.data.page_obj;
     let m_x = main.control.event.data.mouse_x;
     let m_y = main.control.event.data.mouse_y;
 
-    let buttons = option.buttons.data.buttons;
+    let buttons = option.ui.data.buttons;
     for (let i = 0; i < buttons.length; i++) {
       let b = buttons[i];
       if (m_x >= b.data.x && m_x <= b.data.x + b.data.width && m_y >= b.data.y && m_y <= b.data.y + b.data.height) {

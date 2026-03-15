@@ -1,7 +1,7 @@
-import Buttons from "./buttons/index.js";
+import UIArea from "./ui/index.js";
 import ObjEvent from "./event/index.js";
 
-class Shop {
+class ItemShop {
   main;
   data = {
     buttons: [],
@@ -12,7 +12,7 @@ class Shop {
   init() {
     let this_obj = this;
     let main = this.main;
-    new Buttons(main);
+    new UIArea(main);
     new ObjEvent(main);
   }
   render() {
@@ -24,4 +24,4 @@ class Shop {
     });
   }
 }
-export default Shop;
+export default ItemShop;

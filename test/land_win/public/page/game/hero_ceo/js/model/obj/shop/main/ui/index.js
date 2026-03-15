@@ -1,20 +1,17 @@
-class Buttons {
+class UIArea {
   main;
   button_arr = [
     {
-      name: "start", text: "시작", x: 100, y: 100, width: 200, height: 50
+      name: "char_shop", text: "캐릭터 상점", x: 100, y: 100, width: 200, height: 50,
     },
     {
-      name: "shop", text: "상점", x: 100, y: 100, width: 200, height: 50
+      name: "item_shop", text: "아이템 상점", x: 100, y: 100, width: 200, height: 50,
     },
     {
-      name: "record", text: "기록", x: 100, y: 100, width: 200, height: 50
+      name: "auction", text: "경매", x: 100, y: 100, width: 200, height: 50,
     },
     {
-      name: "settings", text: "설정", x: 100, y: 100, width: 200, height: 50
-    },
-    {
-      name: "close", text: "닫기", x: 100, y: 100, width: 200, height: 50
+      name: "back", text: "뒤로", x: 100, y: 100, width: 200, height: 50,
     },
   ];
   constructor(main) {
@@ -25,14 +22,15 @@ class Buttons {
     let this_obj = this;
     let main = this.main;
 
-    let lobby = main.model.data.object.lobby;
-    lobby.data.buttons = [];
+    let page_obj = main.model.data.page_obj;
+    page_obj.data.buttons = [];
     let btn_index = 0;
     let init_btn_y = 0;
     let btn_gap = 20;
     if (this_obj.button_arr.length > 0) {
       init_btn_y = this_obj.button_arr[0].y;
     }
+
     this_obj.button_arr.forEach(function (button_data) {
       //x는 화면 가운데
       let canvas_w = main.model.data.canvas.width;
@@ -41,35 +39,29 @@ class Buttons {
       //y는 init_btn_y에서 시작해서 버튼 높이+gap만큼 증가
       button_data.y = init_btn_y + (button_data.height + btn_gap) * btn_index;
 
-      if(button_data.name == "start"){
+      if (button_data.name == "char_shop") {
         button_data.on_click = function () {
-          main.control.set_page_state({state:"select_char", is_render:true});
-        }
-      }
-
-      if (button_data.name == "shop") {
-        button_data.on_click = function () {
-          main.control.set_page_state({state:"shop", is_render:true});
+          main.control.set_page_state({ state: "char_shop", is_render: true });
         };
-      }
-
-      if (button_data.name == "settings") {
+      } else if (button_data.name == "item_shop") {
         button_data.on_click = function () {
-          main.control.set_page_state({state:"option", is_render:true});
+          main.control.set_page_state({ state: "item_shop", is_render: true });
         };
-      }
-
-      if (button_data.name == "close") {
+      } else if (button_data.name == "auction") {
         button_data.on_click = function () {
-          window.location.href = main.model.data.close_url;
+          main.control.set_page_state({ state: "auction", is_render: true });
+        };
+      } else if (button_data.name == "back") {
+        button_data.on_click = function () {
+          main.control.set_page_state({ state: "lobby", is_render: true });
         };
       }
 
       let button = new main.model.data.object.common.button.basic(button_data);
-      lobby.data.buttons.push(button);
+      page_obj.data.buttons.push(button);
 
       btn_index++;
     });
   }
 }
-export default Buttons;
+export default UIArea;

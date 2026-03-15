@@ -39,7 +39,8 @@ class StageListArea {
         stage_data:stage,
         on_click:()=>{
           main.model.data.game_data.select_stage=stage;
-          main.control.set_page_state({state:"game", is_render:true});
+          main.control.save.save();
+          main.control.set_page_state({state:"game_menu", is_render:true});
         },
       });
     });

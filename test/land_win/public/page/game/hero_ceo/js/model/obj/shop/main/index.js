@@ -1,7 +1,7 @@
 import UIArea from "./ui/index.js";
 import ObjEvent from "./event/index.js";
 
-class Lobby {
+class Shop {
   main;
   data = {
     buttons: [],
@@ -22,18 +22,6 @@ class Lobby {
     this_obj.data.buttons.forEach(function (button) {
       button.render(main.model.data.html.ctx);
     });
-
-    // 골드 표시 (상단 가운데)
-    let ctx = main.model.data.html.ctx;
-    let canvas_w = main.model.data.canvas.width;
-    let gold = main.model.data.game_data.gold;
-    ctx.save();
-    ctx.font = "bold 24px sans-serif";
-    ctx.fillStyle = "#FFD700";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-    ctx.fillText("G "+gold, canvas_w / 2, 16);
-    ctx.restore();
   }
 }
-export default Lobby;
+export default Shop;

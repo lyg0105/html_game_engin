@@ -1,4 +1,4 @@
-import Buttons from "./buttons/index.js";
+import UIArea from "./ui/index.js";
 import ObjEvent from "./event/index.js";
 import CharList from "./char_list/index.js";
 
@@ -17,10 +17,10 @@ class SelectChar {
   init() {
     let this_obj = this;
     let main = this.main;
-    this_obj.data.select_char_arr = [];
+    this_obj.data.select_char_arr = main.model.data.game_data.select_char_arr.slice();
     this_obj.char_list=new CharList(main);
     this_obj.char_list.init();
-    new Buttons(main);
+    new UIArea(main);
     new ObjEvent(main);
   }
   render() {

@@ -1,4 +1,4 @@
-class Buttons {
+class UIArea {
   main;
   init_y=0;
   button_arr = [
@@ -12,12 +12,12 @@ class Buttons {
   init() {
     let this_obj = this;
     let main = this.main;
-    
+
     let page_obj = main.model.data.page_obj;
     page_obj.data.buttons =  [];
     let btn_index=0;
     let init_btn_y=this_obj.init_y;
-    
+
     let btn_gap=20;
     this_obj.button_arr.forEach(function (button_data) {
       //x는 화면 가운데
@@ -29,7 +29,7 @@ class Buttons {
 
       if(button_data.name=="close"){
         button_data.on_click=function(){
-          main.control.set_page_state({state:"select_char", is_render:true});
+          main.control.set_page_state({state:"game_menu", is_render:true});
         };
       }
 
@@ -40,4 +40,4 @@ class Buttons {
     });
   }
 }
-export default Buttons;
+export default UIArea;

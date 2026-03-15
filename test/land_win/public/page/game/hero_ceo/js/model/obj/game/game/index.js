@@ -18,6 +18,9 @@ class GamePage {
     timer: 0,
     elapsed: 0,
     game_result: null, // null | "win" | "lose" | "time"
+    earned_gold: 0,
+    camera: { x: 0, y: 0, is_drag: false, drag_sx: 0, drag_sy: 0, drag_cx: 0, drag_cy: 0 },
+    map: { w: 1000, h: 1000 },
   };
   constructor(main) {
     this.main = main;
@@ -31,6 +34,10 @@ class GamePage {
     this_obj.data.elapsed = 0;
     this_obj.data.timer = stage ? stage.end_sec : 60;
     this_obj.data.game_result = null;
+    this_obj.data.earned_gold = 0;
+    this_obj.data.map.w = stage ? (stage.w || 1000) : 1000;
+    this_obj.data.map.h = stage ? (stage.h || 1000) : 1000;
+    this_obj.data.camera = { x: 0, y: 0, is_drag: false, drag_sx: 0, drag_sy: 0, drag_cx: 0, drag_cy: 0 };
 
     // 뒤로가기 버튼
     this_obj.ui_area=new UIArea(main);
@@ -66,17 +73,46 @@ class GamePage {
     let ctx = main.model.data.html.ctx;
     let canvas_w = main.model.data.canvas.width;
     let canvas_h = main.model.data.canvas.height;
+    let cam = this_obj.data.camera;
+    let map_w = this_obj.data.map.w;
+    let map_h = this_obj.data.map.h;
 
-    // 스테이지 배경
+    // 캔버스 배경 (맵 밖 영역)
     ctx.save();
-    ctx.fillStyle = "#1a3a1a";
+    ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvas_w, canvas_h);
     ctx.restore();
 
-    // 유닛 렌더
+    // 월드 공간 (카메라 적용)
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
+
+    // 스테이지 맵 배경
+    ctx.fillStyle = "#1a3a1a";
+    ctx.fillRect(0, 0, map_w, map_h);
+
+    // 맵 그리드 (선택적)
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.lineWidth = 1;
+    let grid = 100;
+    for (let gx = 0; gx <= map_w; gx += grid) {
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, map_h); ctx.stroke();
+    }
+    for (let gy = 0; gy <= map_h; gy += grid) {
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(map_w, gy); ctx.stroke();
+    }
+
+    // 맵 경계선
+    ctx.strokeStyle = "#2a6a2a";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(0, 0, map_w, map_h);
+
+    ctx.restore();
+
+    // 유닛 렌더 (카메라 내부에서 처리)
     this_obj.unit_control.render();
 
-    //ui
+    // UI (카메라 무관)
     this_obj.ui_area.render();
   }
 }
