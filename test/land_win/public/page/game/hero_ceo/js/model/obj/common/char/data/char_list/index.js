@@ -18,6 +18,34 @@ class CharListData {
     move_speed: 1,
     job:"",
     race:"",
+    left_right:"right",
+    up_down:"up",
+    sprite:"hero",
+    state:"idle",//move,attack
+    state_num:0,
+    state_max_num:0,
+  };
+  sprite_data={
+    hero:{
+      w:24,
+      h:24,
+      walk:[
+        {x:0,y:0},
+        {x:1,y:0},
+        {x:2,y:0},
+        {x:3,y:0},
+        {x:4,y:0},
+        {x:5,y:0}
+      ],
+      attack:[
+        {x:0,y:1},
+        {x:1,y:1},
+        {x:2,y:1},
+      ],
+      idle:[
+        {x:0,y:2},
+      ],
+    },
   };
   random_name_arr=["알렉스","브라이언","크리스","데이비드","에밀리","프랭크","그레이스","헨리","아이리스","제이슨","케이트","루크","미아","노아",
     "올리비아","피터","퀸","라이언","소피아","토마스","유나",

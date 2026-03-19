@@ -1,7 +1,7 @@
 class Resource {
   main;
   img_json = {
-
+    hero:"/page/game/hero_ceo/img/hero/hero144png.png",
   };
   img = {};
   constructor(inData) {

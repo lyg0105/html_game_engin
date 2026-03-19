@@ -9,7 +9,7 @@ class Save {
     localStorage.setItem('hero_ceo_char_arr', JSON.stringify(game_data.char_arr));
     localStorage.setItem('hero_ceo_select_char_arr', JSON.stringify(game_data.select_char_arr));
     if (game_data.select_stage) {
-      localStorage.setItem('hero_ceo_select_stage_id', String(game_data.select_stage.id));
+      localStorage.setItem('hero_ceo_select_stage', JSON.stringify(game_data.select_stage));
     }
     localStorage.setItem('hero_ceo_gold', String(game_data.gold));
   }

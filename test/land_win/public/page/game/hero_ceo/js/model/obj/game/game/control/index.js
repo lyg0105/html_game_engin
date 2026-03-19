@@ -42,6 +42,9 @@ class ControlArea {
       main.model.data.game_data.gold += earned;
       main.control.save.save();
       game.control_area.stop();
+      if(main.model.data.game_data.is_infinite){
+        main.control.set_page_state({ state: "game", is_render: true });
+      }
     } else if (all_player_dead) {
       game.data.game_result = "lose";
       game.control_area.stop();

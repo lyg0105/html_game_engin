@@ -21,6 +21,7 @@ class GamePage {
     earned_gold: 0,
     camera: { x: 0, y: 0, is_drag: false, drag_sx: 0, drag_sy: 0, drag_cx: 0, drag_cy: 0 },
     map: { w: 1000, h: 1000 },
+    map_offset: { x: 0, y: 0 },
   };
   constructor(main) {
     this.main = main;
@@ -83,9 +84,15 @@ class GamePage {
     ctx.fillRect(0, 0, canvas_w, canvas_h);
     ctx.restore();
 
+    // 맵이 캔버스보다 작으면 가운데 정렬
+    let off_x = Math.max(0, (canvas_w - map_w) / 2);
+    let off_y = Math.max(0, (canvas_h - map_h) / 2);
+    this_obj.data.map_offset.x = off_x;
+    this_obj.data.map_offset.y = off_y;
+
     // 월드 공간 (카메라 적용)
     ctx.save();
-    ctx.translate(-cam.x, -cam.y);
+    ctx.translate(off_x - cam.x, off_y - cam.y);
 
     // 스테이지 맵 배경
     ctx.fillStyle = "#1a3a1a";

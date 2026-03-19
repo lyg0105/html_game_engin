@@ -3,7 +3,7 @@ class StageListData {
     id: "",
     name: "",
     w:500,
-    h:1000,
+    h:800,
     start_point:{x:100,y:100},
     end_sec:60,
     monster_cnt:3,

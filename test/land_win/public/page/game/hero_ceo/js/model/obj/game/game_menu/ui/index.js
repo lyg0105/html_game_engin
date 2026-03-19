@@ -34,6 +34,25 @@ class UIArea {
       init_btn_y = this_obj.button_arr[0].y;
     }
 
+    //이름설정
+    if (this_obj.button_arr.length > 0) {
+      for(let i=0;i<this_obj.button_arr.length;i++){
+        let tmp_button=this_obj.button_arr[i];
+        if(tmp_button.name=="select_char"){
+          //tmp_button.text
+          if(main.model.data.game_data.select_char_arr.length){
+            tmp_button.text+=" ("+main.model.data.game_data.select_char_arr.length+"/"+main.model.data.game_data.char_arr.length+")"
+          }
+        }
+
+        if(tmp_button.name=="select_stage"){
+          if(main.model.data.game_data.select_stage){
+            tmp_button.text+=" ("+main.model.data.game_data.select_stage.monster_level+")";
+          }
+        }
+      }
+    }
+
     this_obj.button_arr.forEach(function (button_data) {
       //x는 화면 가운데
       let canvas_w = main.model.data.canvas.width;
