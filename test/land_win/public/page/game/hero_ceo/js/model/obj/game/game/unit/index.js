@@ -1,7 +1,15 @@
+import RenderMiniChar from "./render/mini_char/index.js";
+import { get_nearest } from "./calc/distance.js";
+import { get_touch_range } from "./calc/collision.js";
+import { calc_dmg, apply_dmg } from "./calc/damage.js";
+import MissileControl from "./calc/missile.js";
+
 class UnitControl {
   main;
   player_arr = [];
   monster_arr = [];
+  missile_ctrl = new MissileControl();
+  render_mini_char = null;
 
   constructor(main) {
     this.main = main;
@@ -21,6 +29,9 @@ class UnitControl {
 
     this_obj.player_arr = [];
     this_obj.monster_arr = [];
+    this_obj.missile_ctrl.init();
+
+    this_obj.render_mini_char = new RenderMiniChar(main);
 
     let sp = (select_stage && select_stage.start_point) ? select_stage.start_point : { x: 80, y: 100 };
 
@@ -29,6 +40,7 @@ class UnitControl {
     let p_gap = 20;
     let p_total_h = select_char_arr.length * p_h + Math.max(0, select_char_arr.length - 1) * p_gap;
     let p_start_y = Math.round((map_h - p_total_h) / 2);
+
     select_char_arr.forEach(function (char, i) {
       this_obj.player_arr.push({
         ...default_char,
@@ -44,6 +56,7 @@ class UnitControl {
         _anim_tick: 0,
         _prev_state: "idle",
         _face_right: true, // 기본 오른쪽 바라봄
+        sprite: "mini_char",
       });
     });
 
@@ -58,7 +71,7 @@ class UnitControl {
     for (let i = 0; i < monster_cnt; i++) {
       let race = monster_race_arr[i % monster_race_arr.length];
       let job = monster_job_arr[i % monster_job_arr.length];
-      let base_hp = (default_char.hp/10) + monster_level * 20;
+      let base_hp = (default_char.hp / 10) + monster_level * 20;
       let rm = race_gold[race] || 1;
       let gold = Math.floor(10 * monster_level * rm);
       let col = Math.floor(i / per_col);
@@ -73,7 +86,7 @@ class UnitControl {
         h: 40,
         hp: base_hp,
         max_hp: base_hp,
-        attack: (default_char.attack/10) + monster_level * 2,
+        attack: (default_char.attack / 10) + monster_level * 2,
         defense: default_char.defense + monster_level,
         move_speed: 0.8,
         name: race,
@@ -95,6 +108,7 @@ class UnitControl {
 
     this_obj._update_side(this_obj.player_arr, this_obj.monster_arr);
     this_obj._update_side(this_obj.monster_arr, this_obj.player_arr);
+    this_obj.missile_ctrl.update();
   }
   _update_side(units, enemies) {
     let this_obj = this;
@@ -102,66 +116,76 @@ class UnitControl {
     let char_list = main.model.data.object.common.char.data.char_list;
     let sprite_data = char_list.sprite_data;
     units.forEach(function (u) {
-      u.state="idle";
+      u.state = "idle";
       if (u.hp <= 0) return;
-      let target = this_obj._nearest(u, enemies);
+      let target = get_nearest(u, enemies);
       if (!target) return;
       let dx = target.x + target.w / 2 - (u.x + u.w / 2);
       let dy = target.y + target.h / 2 - (u.y + u.h / 2);
       let dist = Math.sqrt(dx * dx + dy * dy);
-      let touch = (u.w + u.h + target.w + target.h) / 4;
-      let range_px = touch + u.attack_range * 10;
+      let range_px = get_touch_range(u, target) + u.attack_range * 10;
+      
       u.attack_timer++;
       if (dist > range_px) {
-        u.state="move";
+        u.state = "move";
         u.attack_timer = 0; // 범위 밖 이동 중 타이머 리셋
         if (dx !== 0) u._face_right = dx > 0; // 이동 방향으로 바라보는 방향 갱신
 
         u.x += (dx / dist) * u.move_speed;
         u.y += (dy / dist) * u.move_speed;
       } else {
-        u.state="attack";
+        u.state = "attack";
+        
         // 공격 쿨타임: 20프레임 = 1초, attack_speed번/초
         let cool = Math.max(1, Math.round(20 / u.attack_speed));
+        
         if (u.attack_timer >= cool) {
           u.attack_timer = 0;
-          let dmg = Math.max(1, u.attack - target.defense);
-          target.hp = Math.max(0, target.hp - dmg);
+          if (u.attack_type !== "melee") {
+            // 투사체 발사 - 데미지는 투사체가 맞을 때 적용
+            this_obj.missile_ctrl.push({
+              x: u.x + u.w / 2,
+              y: u.y + u.h / 2,
+              target: target,
+              enemies: enemies,
+              attack_type: u.attack_type,
+              explode_r: u.attack_radius || 80,
+              speed: 6,
+              dmg: calc_dmg(u, target),
+              color: u.is_player ? "#4af" : "#f84",
+              r: 5,
+            });
+            
+          } else {
+            apply_dmg(target, calc_dmg(u, target));
+          }
         }
       }
 
       // 애니메이션 프레임 업데이트
-      let sd = sprite_data[u.sprite] || sprite_data.hero;
-      let state_key = u.state === "move" ? "walk" : u.state;
-      let frames = sd[state_key] || sd.idle;
-      if (u._prev_state !== u.state) {
-        u.state_num = 0;
-        u._anim_tick = 0;
-        u._prev_state = u.state;
+      if (u.sprite == "hero") {
+        let sd = sprite_data[u.sprite] || sprite_data.hero;
+        let state_key = u.state === "move" ? "walk" : u.state;
+        let frames = sd[state_key] || sd.idle;
+        if (u._prev_state !== u.state) {
+          u.state_num = 0;
+          u._anim_tick = 0;
+          u._prev_state = u.state;
+        }
+        u._anim_tick++;
+        if (u._anim_tick >= 4) {
+          u._anim_tick = 0;
+          u.state_num = (u.state_num + 1) % frames.length;
+        }
+      } else if (u.sprite == "mini_char") {
+        if (u._prev_state !== u.state) {
+          u._anim_tick = 0;
+          u._prev_state = u.state;
+        }
+        u._anim_tick++;
       }
-      u._anim_tick++;
-      if (u._anim_tick >= 4) {
-        u._anim_tick = 0;
-        u.state_num = (u.state_num + 1) % frames.length;
-      }
+
     });
-  }
-  _nearest(unit, arr) {
-    let best = null;
-    let best_dist = Infinity;
-    let cx = unit.x + unit.w / 2;
-    let cy = unit.y + unit.h / 2;
-    arr.forEach(function (other) {
-      if (other.hp <= 0) return;
-      let ox = other.x + other.w / 2;
-      let oy = other.y + other.h / 2;
-      let d = Math.sqrt((ox - cx) ** 2 + (oy - cy) ** 2);
-      if (d < best_dist) {
-        best_dist = d;
-        best = other;
-      }
-    });
-    return best;
   }
   render() {
     let this_obj = this;
@@ -184,7 +208,7 @@ class UnitControl {
       ctx.globalAlpha = dead ? 0.3 : 1.0;
 
       // 스프라이트 이미지 그리기
-      if (hero_img && hero_img.complete) {
+      if (u.sprite == "hero" && hero_img && hero_img.complete) {
         let sd = sprite_data[u.sprite] || sprite_data.hero;
         let state_key = u.state === "move" ? "walk" : u.state;
         let frames = sd[state_key] || sd.idle;
@@ -201,6 +225,10 @@ class UnitControl {
           ctx.drawImage(hero_img, sx, sy, sd.w, sd.h, -(u.x + u.w), u.y, u.w, u.h);
           ctx.restore();
         }
+      } else if (u.sprite == "mini_char") {
+        this_obj.render_mini_char.render_char({
+          unit: u
+        });
       } else {
         // 이미지 미로드 시 폴백
         ctx.fillStyle = dead ? "#888" : u.color;
@@ -226,6 +254,8 @@ class UnitControl {
 
       ctx.restore();
     });
+
+    this_obj.missile_ctrl.render(ctx);
 
     ctx.restore();
   }

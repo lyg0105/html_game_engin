@@ -16,7 +16,7 @@ class CharShop {
     return this.main.model.data.game_data.char_arr.length * 100;
   }
   get_reroll_cost() {
-    return Math.max(100, this.main.model.data.game_data.char_arr.length * 100);
+    return Math.min(2000, Math.max(100, this.main.model.data.game_data.char_arr.length * 100));
   }
   show_notice(text) {
     let this_obj = this;
@@ -34,13 +34,45 @@ class CharShop {
     let this_obj = this;
     let main = this.main;
     let char_list = main.model.data.object.common.char.data.char_list.char_arr;
+    let job_data = main.model.data.object.common.char.data.char_list.job_data;
+    let mini_char = main.model.data.object.common.char.data.char_list.sprite_data.mini_char;
     let owned_ids = main.model.data.game_data.char_arr.map(function(c) { return c.id; });
     let available = char_list.filter(function(c) { return !owned_ids.includes(c.id); });
     let pool = [...available];
     let picked = [];
     for (let i = 0; i < 3 && pool.length > 0; i++) {
       let idx = Math.floor(Math.random() * pool.length);
-      picked.push(pool[idx]);
+      let base = pool[idx];
+      let jd = job_data[base.job];
+      let char = { ...base };
+      if (jd) {
+        function rnd_range(arr) { return arr[0] + Math.random() * (arr[1] - arr[0]); }
+        function rnd_int(arr) { return Math.floor(arr[0] + Math.random() * (arr[1] - arr[0] + 1)); }
+        function rnd_pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        char.hp            = rnd_int(jd.hp);
+        char.mp            = rnd_int(jd.mp);
+        char.attack        = rnd_int(jd.attack);
+        char.defense       = rnd_int(jd.defense);
+        char.attack_speed  = Math.round(rnd_range(jd.attack_speed) * 100) / 100;
+        char.attack_range  = rnd_int(jd.attack_range);
+        char.attack_type   = rnd_pick(jd.attack_type);
+        char.attack_element= rnd_pick(jd.attack_element);
+        char.critical_per  = rnd_int(jd.critical_per);
+        char.critical_dam  = rnd_range(jd.critical_dam);
+        char.move_speed    = Math.round(rnd_range(jd.move_speed) * 100) / 100;
+      }
+      char.sprite = 'mini_char';
+      char.sprite_part_json = {
+        face:      Math.floor(Math.random() * mini_char.face.length),
+        head:      Math.floor(Math.random() * mini_char.head.length),
+        side_hair: Math.floor(Math.random() * mini_char.side_hair.length),
+        chest:     Math.floor(Math.random() * mini_char.chest.length),
+        arm_l:     Math.floor(Math.random() * mini_char.arm_l.length),
+        arm_r:     Math.floor(Math.random() * mini_char.arm_r.length),
+        leg_l:     Math.floor(Math.random() * mini_char.leg_l.length),
+        leg_r:     Math.floor(Math.random() * mini_char.leg_r.length),
+      };
+      picked.push(char);
       pool.splice(idx, 1);
     }
     this_obj.data.shop_chars = picked;

@@ -37,6 +37,24 @@ class ObjEvent {
         return;
       }
 
+      let del_btn = this_obj.get_char_card_delete_btn_by_mouse();
+      if (del_btn) {
+        let char_data = del_btn.char_data;
+        if (window.confirm('"' + char_data.name + '" 캐릭터를 삭제하시겠습니까?')) {
+          let game_char_arr = main.model.data.game_data.char_arr;
+          let gi = game_char_arr.findIndex(function(c){ return c && c.id === char_data.id; });
+          if (gi >= 0) game_char_arr.splice(gi, 1);
+          let page_obj = main.model.data.page_obj;
+          let sel = page_obj.data.select_char_arr;
+          let si = sel.findIndex(function(c){ return c && c.id === char_data.id; });
+          if (si >= 0) sel.splice(si, 1);
+          main.model.data.game_data.select_char_arr=page_obj.data.select_char_arr;
+          page_obj.data.char_arr = game_char_arr.slice();
+          main.control.save.save();
+          main.view.render();
+        }
+        return;
+      }
       let button = this_obj.get_button_by_mouse();
       if (button&&button.data.on_click) {
         button.data.on_click();
@@ -62,6 +80,11 @@ class ObjEvent {
       if (nav) {
         main.model.data.html.canvas.style.cursor = "pointer";
         main.view.render();
+        return;
+      }
+      let del_btn_hover = this_obj.get_char_card_delete_btn_by_mouse();
+      if (del_btn_hover) {
+        main.model.data.html.canvas.style.cursor = "pointer";
         return;
       }
       let button = this_obj.get_button_by_mouse();
@@ -129,6 +152,19 @@ class ObjEvent {
     }
     return button;
   };
+
+  get_char_card_delete_btn_by_mouse() {
+    let main = this.main;
+    let page_obj = main.model.data.page_obj;
+    let m_x = main.control.event.data.mouse_x;
+    let m_y = main.control.event.data.mouse_y;
+    let btns = page_obj.data.char_card_delete_btns || [];
+    for (let i = 0; i < btns.length; i++) {
+      let b = btns[i];
+      if (m_x >= b.x && m_x <= b.x + b.width && m_y >= b.y && m_y <= b.y + b.height) return b;
+    }
+    return null;
+  }
 
   get_char_card_by_mouse() {
     let main = this.main;

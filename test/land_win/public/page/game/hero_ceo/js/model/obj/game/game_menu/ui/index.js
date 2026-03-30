@@ -2,7 +2,7 @@ class UIArea {
   main;
   button_arr = [
     {
-      name: "start", text: "시작", x: 100, y: 100, width: 200, height: 50,
+      name: "start", text: "게임시작", x: 100, y: 100, width: 200, height: 50,
     },
     {
       name: "select_char", text: "캐릭터", x: 100, y: 100, width: 200, height: 50,

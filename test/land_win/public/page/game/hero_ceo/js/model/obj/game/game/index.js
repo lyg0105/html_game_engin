@@ -14,6 +14,7 @@ class GamePage {
   data = {
     is_game_loop: false,
     loop_frame: 50,
+    fps:1000/50,
     buttons: [],
     timer: 0,
     elapsed: 0,

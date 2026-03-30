@@ -36,7 +36,7 @@ class StageListData {
         monster_race_arr:["고블린","사슴"],
         monster_job_arr:["전사"],
       };
-      add_level_row.monster_cnt=3*level_i;
+      add_level_row.monster_cnt=2*level_i;
       if(add_level_row.monster_cnt>12){
         add_level_row.monster_cnt=12;
       }

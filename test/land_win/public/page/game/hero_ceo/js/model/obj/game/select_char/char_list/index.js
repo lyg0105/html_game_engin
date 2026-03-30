@@ -180,6 +180,7 @@ class CharList{
 
     // 카드 렌더링
     page_obj.data.char_cards=[];
+    page_obj.data.char_card_delete_btns=[];
     let head_r=Math.max(6,Math.floor(card_w*0.12));
     let body_h_fig=Math.max(14,Math.floor(card_w*0.25));
     let name_size=Math.max(10,Math.floor(card_w*0.13));
@@ -194,6 +195,12 @@ class CharList{
       let is_selected=select_char_arr&&select_char_arr.some(function(c){return c&&c.id===char_data.id;});
 
       page_obj.data.char_cards.push({x:cx,y:cy,width:card_w,height:card_h,char_data:char_data});
+
+      // X 버튼 히트 영역 등록
+      let del_btn_size=Math.max(16,Math.floor(card_w*0.25));
+      let del_bx=cx+card_w-del_btn_size;
+      let del_by=cy;
+      page_obj.data.char_card_delete_btns.push({x:del_bx,y:del_by,width:del_btn_size,height:del_btn_size,char_data:char_data});
 
       // 카드 배경
       ctx.save();
@@ -239,6 +246,20 @@ class CharList{
         ctx.fillText('✓',cx+card_w/2,cy+card_h*0.90);
         ctx.restore();
       }
+
+      // X 버튼 (카드 내용 위에 마지막으로 그림)
+      ctx.save();
+      ctx.fillStyle='#cc2222';
+      ctx.fillRect(del_bx,del_by,del_btn_size,del_btn_size);
+      ctx.strokeStyle='#ff6666';
+      ctx.lineWidth=1;
+      ctx.strokeRect(del_bx,del_by,del_btn_size,del_btn_size);
+      ctx.fillStyle='#ffffff';
+      ctx.font='bold '+Math.floor(del_btn_size*0.65)+'px Arial';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText('✕',del_bx+del_btn_size/2,del_by+del_btn_size/2);
+      ctx.restore();
     }
   }
 

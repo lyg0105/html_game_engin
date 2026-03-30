@@ -1,11 +1,12 @@
 import LygFetch from "/js/lib/fetch/index.js";
 import StringFunc from "/js/lib/string/index.js";
 import DateFunc from "/js/lib/date/index.js";
+import MathFunc from "/js/lib/math/index.js";
 
 class Util {
   main;
-  constructor(inData){
-    let opt_obj={
+  constructor(inData) {
+    let opt_obj = {
       main: null,
       ...inData
     };
@@ -13,6 +14,7 @@ class Util {
     this.main.model.data.util.fetch = LygFetch;
     this.main.model.data.util.string = StringFunc;
     this.main.model.data.util.date = DateFunc;
+    this.main.model.data.util.math = MathFunc;
   }
 }
 export default Util;
