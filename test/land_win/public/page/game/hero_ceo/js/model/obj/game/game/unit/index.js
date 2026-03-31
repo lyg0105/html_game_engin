@@ -241,12 +241,16 @@ class UnitControl {
         ctx.fillRect(u.x, u.y - 10, u.w, 6);
         // HP바
         let hp_ratio = u.hp / u.max_hp;
-        ctx.fillStyle = hp_ratio > 0.5 ? "#2ecc71" : hp_ratio > 0.25 ? "#f5a623" : "#e74c3c";
+        if (u.is_player) {
+          ctx.fillStyle = hp_ratio > 0.5 ? "#2ecc71" : hp_ratio > 0.25 ? "#f5a623" : "#e74c3c";
+        } else {
+          ctx.fillStyle = "#e74c3c";
+        }
         ctx.fillRect(u.x, u.y - 10, u.w * hp_ratio, 6);
       }
 
       // 이름
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = u.is_player ? "#fff" : "#e74c3c";
       ctx.font = "10px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";

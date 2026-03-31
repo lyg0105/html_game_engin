@@ -62,15 +62,17 @@ class CharShop {
         char.move_speed    = Math.round(rnd_range(jd.move_speed) * 100) / 100;
       }
       char.sprite = 'mini_char';
+      let arm_num=Math.floor(Math.random() * mini_char.arm_l.length);
+      let leg_num=Math.floor(Math.random() * mini_char.leg_l.length);
       char.sprite_part_json = {
         face:      Math.floor(Math.random() * mini_char.face.length),
         head:      Math.floor(Math.random() * mini_char.head.length),
         side_hair: Math.floor(Math.random() * mini_char.side_hair.length),
         chest:     Math.floor(Math.random() * mini_char.chest.length),
-        arm_l:     Math.floor(Math.random() * mini_char.arm_l.length),
-        arm_r:     Math.floor(Math.random() * mini_char.arm_r.length),
-        leg_l:     Math.floor(Math.random() * mini_char.leg_l.length),
-        leg_r:     Math.floor(Math.random() * mini_char.leg_r.length),
+        arm_l:     arm_num,
+        arm_r:     arm_num,
+        leg_l:     leg_num,
+        leg_r:     leg_num,
       };
       picked.push(char);
       pool.splice(idx, 1);
