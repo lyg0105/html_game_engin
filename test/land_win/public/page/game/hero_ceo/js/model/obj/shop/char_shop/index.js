@@ -38,6 +38,10 @@ class CharShop {
     let mini_char = main.model.data.object.common.char.data.char_list.sprite_data.mini_char;
     let owned_ids = main.model.data.game_data.char_arr.map(function(c) { return c.id; });
     let available = char_list.filter(function(c) { return !owned_ids.includes(c.id); });
+    available.forEach((element)=>{
+      element.skill_arr=[];
+      element.skill_cool_arr=[];
+    });
     let pool = [...available];
     let picked = [];
     for (let i = 0; i < 3 && pool.length > 0; i++) {
@@ -74,6 +78,25 @@ class CharShop {
         leg_l:     leg_num,
         leg_r:     leg_num,
       };
+      //스킬
+      let able_skill_arr=[];
+      let skill_data=main.model.data.object.common.char.data.char_list.skill_data;
+      for(let s_k in skill_data){
+        let is_able_job_row=false;
+        skill_data[s_k].able_job.forEach((sjob)=>{
+          if(sjob==base.job){
+            is_able_job_row=true;
+          }
+        });
+        if(is_able_job_row){
+          able_skill_arr.push(s_k);
+        }
+      }
+      if(able_skill_arr.length>0){
+        let tmp_select_s_idx=main.model.data.util.math.random(0,able_skill_arr.length-1);
+        char.skill_arr.push(able_skill_arr[tmp_select_s_idx]);
+      }
+
       picked.push(char);
       pool.splice(idx, 1);
     }
@@ -181,6 +204,18 @@ class CharShop {
         ctx.fillText('공격 ' + char.attack + '  방어 ' + char.defense, cx, ty);
         ty += line_h;
         ctx.fillText('이동 ' + char.move_speed + '  치명 ' + char.critical_per + '%', cx, ty);
+
+        // 스킬 표시
+        if (char.skill_arr && char.skill_arr.length > 0) {
+          let skill_data = main.model.data.object.common.char.data.char_list.skill_data;
+          ty += line_h;
+          ctx.fillStyle = '#f4e04d';
+          ctx.font = 'bold ' + stat_size + 'px Arial';
+          let skill_names = char.skill_arr.map(function(sk) {
+            return (skill_data[sk] && skill_data[sk].name) ? skill_data[sk].name : sk;
+          }).join(', ');
+          ctx.fillText('스킬: ' + skill_names, cx, ty);
+        }
       }
 
       // 구매 버튼 텍스트/색 동적 업데이트

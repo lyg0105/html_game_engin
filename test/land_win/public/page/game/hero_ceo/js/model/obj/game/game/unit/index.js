@@ -47,7 +47,8 @@ class UnitControl {
         ...char,
         x: sp.x,
         y: p_start_y + i * (p_h + p_gap),
-        max_hp: char.hp || default_char.hp,
+        max_hp: char.hp,
+        max_mp: char.mp,
         move_speed: (char.move_speed || default_char.move_speed) * 1.5,
         is_player: true,
         color: "#4a90e2",
@@ -115,9 +116,19 @@ class UnitControl {
     let main = this_obj.main;
     let char_list = main.model.data.object.common.char.data.char_list;
     let sprite_data = char_list.sprite_data;
+    let skill_data = char_list.skill_data;
     units.forEach(function (u) {
       u.state = "idle";
       if (u.hp <= 0) return;
+
+      // 스킬 쿨타임 증가
+      if (u.skill_arr) {
+        for (let si = 0; si < u.skill_arr.length; si++) {
+          if (u.skill_cool_arr[si] === undefined) u.skill_cool_arr[si] = 9999;
+          else u.skill_cool_arr[si]++;
+        }
+      }
+
       let target = get_nearest(u, enemies);
       if (!target) return;
       let dx = target.x + target.w / 2 - (u.x + u.w / 2);
@@ -141,23 +152,60 @@ class UnitControl {
         
         if (u.attack_timer >= cool) {
           u.attack_timer = 0;
-          if (u.attack_type !== "melee") {
-            // 투사체 발사 - 데미지는 투사체가 맞을 때 적용
-            this_obj.missile_ctrl.push({
-              x: u.x + u.w / 2,
-              y: u.y + u.h / 2,
-              target: target,
-              enemies: enemies,
-              attack_type: u.attack_type,
-              explode_r: u.attack_radius || 80,
-              speed: 6,
-              dmg: calc_dmg(u, target),
-              color: u.is_player ? "#4af" : "#f84",
-              r: 5,
-            });
-            
-          } else {
-            apply_dmg(target, calc_dmg(u, target));
+          u.mp = Math.min(u.max_mp || 0, (u.mp || 0) + 5);
+
+          // 스킬 사용 체크
+          let skill_used = false;
+          if (u.skill_arr && u.skill_arr.length > 0) {
+            for (let si = 0; si < u.skill_arr.length; si++) {
+              let sk = skill_data[u.skill_arr[si]];
+              if (!sk) continue;
+              let sk_cool = Math.max(1, Math.round(20 / sk.attack_speed));
+              if ((u.mp || 0) >= sk.mp && u.skill_cool_arr[si] >= sk_cool) {
+                u.mp -= sk.mp;
+                u.skill_cool_arr[si] = 0;
+                let atk_type = Array.isArray(sk.attack_type) ? sk.attack_type[0] : sk.attack_type;
+                let sk_dmg = Math.max(1, (sk.attack || 0) - target.defense);
+                if (atk_type !== "melee") {
+                  this_obj.missile_ctrl.push({
+                    x: u.x + u.w / 2,
+                    y: u.y + u.h / 2,
+                    target: target,
+                    enemies: enemies,
+                    attack_type: atk_type,
+                    explode_r: sk.attack_radius || 80,
+                    speed: 8,
+                    dmg: sk_dmg,
+                    color: u.is_player ? "#f4e04d" : "#f84",
+                    r: 7,
+                  });
+                } else {
+                  apply_dmg(target, sk_dmg);
+                }
+                skill_used = true;
+                break;
+              }
+            }
+          }
+
+          if (!skill_used) {
+            if (u.attack_type !== "melee") {
+              // 투사체 발사 - 데미지는 투사체가 맞을 때 적용
+              this_obj.missile_ctrl.push({
+                x: u.x + u.w / 2,
+                y: u.y + u.h / 2,
+                target: target,
+                enemies: enemies,
+                attack_type: u.attack_type,
+                explode_r: u.attack_radius || 80,
+                speed: 6,
+                dmg: calc_dmg(u, target),
+                color: u.is_player ? "#4af" : "#f84",
+                r: 5,
+              });
+            } else {
+              apply_dmg(target, calc_dmg(u, target));
+            }
           }
         }
       }
@@ -238,7 +286,7 @@ class UnitControl {
       if (!dead) {
         // HP바 배경
         ctx.fillStyle = "#333";
-        ctx.fillRect(u.x, u.y - 10, u.w, 6);
+        ctx.fillRect(u.x, u.y - 15, u.w, 6);
         // HP바
         let hp_ratio = u.hp / u.max_hp;
         if (u.is_player) {
@@ -246,7 +294,16 @@ class UnitControl {
         } else {
           ctx.fillStyle = "#e74c3c";
         }
-        ctx.fillRect(u.x, u.y - 10, u.w * hp_ratio, 6);
+        ctx.fillRect(u.x, u.y - 15, u.w * hp_ratio, 6);
+
+        // MP바
+        if (u.max_mp > 0) {
+          ctx.fillStyle = "#333";
+          ctx.fillRect(u.x, u.y - 8, u.w, 4);
+          let mp_ratio = Math.max(0, (u.mp || 0) / u.max_mp);
+          ctx.fillStyle = "#3498db";
+          ctx.fillRect(u.x, u.y - 8, u.w * mp_ratio, 4);
+        }
       }
 
       // 이름
@@ -254,7 +311,7 @@ class UnitControl {
       ctx.font = "10px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
-      ctx.fillText(u.name, u.x + u.w / 2, u.y - 11);
+      ctx.fillText(u.name, u.x + u.w / 2, u.y - 16);
 
       ctx.restore();
     });
