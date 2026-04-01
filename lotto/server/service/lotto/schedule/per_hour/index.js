@@ -9,7 +9,8 @@ class PerHourSchedule{
     };
 
     let now_date_json=DateFunc.get_date_json(new Date());
-    if(now_date_json.day==6&&parseInt(now_date_json.h)>20){
+    //if(now_date_json.day==6&&parseInt(now_date_json.h)>20){
+    if(parseInt(now_date_json.h)>20){
       await NextCrolling.action({});
     }
 
